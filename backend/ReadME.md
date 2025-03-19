@@ -48,3 +48,8 @@ Open your browser and navigate to http://127.0.0.1:8000/ to see your Django proj
 ## Additional Configuration
 Dependency Management: Once all required packages are installed, generate a requirements.txt file:
 `pip3 freeze > requirements.txt`
+
+
+export PATH="/Library/PostgreSQL/17/bin:$PATH"
+echo 'export PATH="/Library/PostgreSQL/17/bin:$PATH"' >> diretory to venv/activate
+reload
