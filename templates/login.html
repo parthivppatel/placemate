@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,18 +50,19 @@
                         <div class="col-md-8">
                             <div class="login-form">
                                 <div class="text-center mb-4">
-                                    <img src="da-logo.img" alt="StepAhead Logo" class="logo">
+                                    <img src="{% static '/images/da-logo.img'%}" alt="StepAhead Logo" class="logo">
                                     <h2>Welcome to Placemate!</h2>
                                     <p>Ready to continue?</p>
                                 </div>
-                                <form>
+                                <form method="post">
+                                    {% csrf_token %}
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email ID</label>
-                                        <input type="email" class="form-control" id="email" placeholder="Enter your Registered Email">
+                                        <input type="email" name ="email" class="form-control" id="email" placeholder="Enter your Registered Email">
                                     </div>
                                     <div class="mb-3">
                                         <label for="password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="password" placeholder="Enter your Password">
+                                        <input type="password" name="passwd" class="form-control" id="password" placeholder="Enter your Password">
                                         <div class="text-end mt-2">
                                             <a href="#" class="text-decoration-none small">Forgot Password?</a>
                                         </div>

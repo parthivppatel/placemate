@@ -6,7 +6,7 @@ INSERT INTO "User" (email, password, phone) VALUES
 
 /*
 Password -->
--- student1@example.com -> password123
--- company1@example.com -> companyPass
--- admin1@example.com -> adminSecure
+-- student@daiict.ac.in -> password123
+-- company@gmail.com -> companyPass
+-- admin1@gmail.com -> adminSecure
 */
