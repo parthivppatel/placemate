@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placemate - Forgot Password</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            color: #6c63ff;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .sub-text {
+            color: #555;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #6a5acd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+        .reset-btn:hover {
+            background-color: #5a4abd;
+            color: white;
+        }
+
+        .back-link {
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .back-link a {
+            color: #6c63ff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background-color: #f0f5ff;
+            border-left: 4px solid #5a4abd;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .info-box p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+       
+        <h1>Forgot Password?</h1>
+        <p class="sub-text">Don't worry! It happens. Please enter the email address<br>associated with your account.</p>
+
+        <div class="info-box">
+            <p>We will send you a password reset link to your email address to set a new password.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email ID</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter your Registered Email">
+        </div>
+
+        <button class="reset-btn">Reset Password</button>
+
+        <div class="back-link">
+            Remember your password? <a href="login.html">Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.reset-btn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            if (email) {
+                alert('Password reset link has been sent to your email address.');
+                // In a real application, you would handle the form submission to your backend
+            } else {
+                alert('Please enter your email address.');
+            }
+        });
+    </script>
+</body>
+</html>
