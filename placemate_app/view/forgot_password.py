@@ -72,10 +72,10 @@ def forgot_password(request):
 
     return render(request, "forgot_password.html")
 
-
 def verify_otp(request):
-    if request.method == "GET" and request.GET.get("resend") == "true":
+    if request.method == "POST":
         entered_otp = request.POST.get("otp", "").strip()
+        print(entered_otp)
         otp_token = request.COOKIES.get("otp_token")
 
         if not otp_token:
@@ -86,6 +86,7 @@ def verify_otp(request):
             payload = jwt.decode(otp_token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
             email = payload["email"]
             correct_otp = payload["otp"]
+            print(correct_otp)
 
             if entered_otp != correct_otp:
                 messages.error(request, "Invalid OTP. Please try again.")
