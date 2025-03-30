@@ -1,6 +1,9 @@
 import jwt
 import datetime
 from django.conf import settings
+from .schema.permissions import Permission
+from .schema.role_permissions import RolePermission
+from .schema.roles import Role
 
 def generate_jwt_token(user, role):
 
@@ -26,3 +29,12 @@ def decode_jwt_token(token):
         return None
     except jwt.InvalidTokenError:
         return None
+    
+
+def has_permission(role_name, permission_name):
+    permission = Permission.objects.filter(name=permission_name).first()
+    role = Role.objects.filter(name =role_name).first()
+    if not permission:
+        return False
+
+    return RolePermission.objects.filter(role=role, permission=permission).exists()

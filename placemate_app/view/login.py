@@ -34,7 +34,7 @@ def login(request):
         respone = redirect("/")
         respone.set_cookie("jwt_token", token, httponly=True, secure=True)
 
-        messages.success(request, f"Welcome, {role_name}")
+        # messages.success(request, f"Welcome, {role_name}")
         return respone
 
     return render(request,'login.html')

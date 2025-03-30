@@ -1,17 +1,9 @@
-from django.shortcuts import render, redirect
-from ..utils import decode_jwt_token
+from django.shortcuts import render, redirect 
+from ..decorators import permission_required
 
+@permission_required('view_dashboard')
 def dashboard(request):
-    token = request.COOKIES.get("jwt_token")
-
-    if not token:
-        return redirect("login")
-
-    payload = decode_jwt_token(token)
-    if not payload:
-        return redirect("login")
-
-    user_email = payload["email"]
-    user_role = payload["role"] 
+    user_email = request.user_data["email"]
+    user_role = request.user_data["role"] 
 
     return render(request, "dashboard.html", {"user_email": user_email, "user_role": user_role})
