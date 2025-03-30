@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Forbidden - Access Denied</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            background-image: radial-gradient(circle at 80% 10%, rgba(255, 182, 193, 0.2) 0%, transparent 60%),
+                              radial-gradient(circle at 10% 90%, rgba(100, 149, 237, 0.2) 0%, transparent 60%);
+        }
+        
+        .container {
+            max-width: 800px;
+            text-align: center;
+            padding: 40px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .error-container {
+            margin-bottom: 30px;
+            position: relative;
+            height: 280px;
+        }
+        
+        .error-number {
+            font-size: 220px;
+            font-weight: 700;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            line-height: 1;
+            letter-spacing: -10px;
+            background: linear-gradient(45deg, #4568dc, #b06ab3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.2;
+            z-index: 1;
+        }
+        
+        .lock-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        
+        .lock {
+            width: 140px;
+            height: 140px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); }
+            50% { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); }
+            100% { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); }
+        }
+        
+        .lock svg {
+            width: 80px;
+            height: 80px;
+            fill: #4568dc;
+        }
+        
+        .message-container {
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        p {
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.6;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .action-container {
+            margin-top: 30px;
+        }
+        
+        .back-button {
+            background: linear-gradient(45deg, #4568dc, #b06ab3);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(69, 104, 220, 0.4);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(69, 104, 220, 0.6);
+        }
+        
+        .back-button:active {
+            transform: translateY(0);
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .key-animation {
+            position: absolute;
+            width: 100px;
+            opacity: 0;
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                opacity: 0;
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                opacity: 0.4;
+                transform: translateY(-20px) rotate(10deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-40px) rotate(0deg);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .error-number {
+                font-size: 180px;
+            }
+            
+            .lock {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .lock svg {
+                width: 60px;
+                height: 60px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .error-number {
+                font-size: 140px;
+            }
+            
+            .lock {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .lock svg {
+                width: 50px;
+                height: 50px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="error-container">
+            <div class="error-number">403</div>
+            <div class="lock-container">
+                <div class="lock">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M19 10h-1V7c0-3.9-3.1-7-7-7S4 3.1 4 7v3H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zm-7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM6 7c0-2.8 2.2-5 5-5s5 2.2 5 5v3H6V7z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="message-container">
+            <h1>Access Forbidden</h1>
+            <p>Sorry, you don't have permission to access this page. Please check your credentials or contact the administrator if you believe this is an error.</p>
+        </div>
+        
+        <div class="action-container">
+            <a  href="{% url 'login'%}" class="back-button" >Go Back</a>
+        </div>
+    </div>
+    
+    <script>
+ 
+        
+        // Create floating keys animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const particles = document.getElementById('particles');
+            
+            for (let i = 0; i < 5; i++) {
+                createKey(particles);
+            }
+        });
+        
+        function createKey(container) {
+            const key = document.createElement('div');
+            key.classList.add('key-animation');
+            
+            // Key SVG content
+            key.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: rgba(176, 106, 179, 0.3);">
+                    <path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                </svg>
+            `;
+            
+            // Random position
+            const posX = Math.random() * 100; // random percentage across the screen
+            key.style.left = `${posX}%`;
+            key.style.top = `${50 + Math.random() * 20}%`;
+            
+            // Random animation delay
+            key.style.animationDelay = `${Math.random() * 5}s`;
+            
+            container.appendChild(key);
+            
+            // Remove and recreate after animation completes
+            setTimeout(() => {
+                key.remove();
+                createKey(container);
+            }, 5000 + Math.random() * 3000);
+        }
+    </script>
+</body>
+</html>

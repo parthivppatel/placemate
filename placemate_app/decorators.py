@@ -1,5 +1,5 @@
 from functools import wraps
-from django.shortcuts import redirect
+from django.shortcuts import redirect,render
 from django.contrib import messages
 from .utils import decode_jwt_token, has_permission
 
@@ -19,7 +19,7 @@ def permission_required(permission_name):
 
             user_role = payload["role"]
             if not has_permission(user_role, permission_name):
-                messages.error(request, "You do not have permission to access this page.")
+                return render(request,"403.html")
 
             request.user_data = payload
             return view_func(request, *args, **kwargs)
