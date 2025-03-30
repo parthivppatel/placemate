@@ -10,7 +10,6 @@ def permission_required(permission_name):
         def wrapper(request, *args, **kwargs):
             token = request.COOKIES.get("jwt_token") 
             if not token:
-                messages.error(request, "Please log in to access this page.")
                 return redirect("login")
 
             payload = decode_jwt_token(token)
@@ -21,7 +20,6 @@ def permission_required(permission_name):
             user_role = payload["role"]
             if not has_permission(user_role, permission_name):
                 messages.error(request, "You do not have permission to access this page.")
-                return redirect("login")
 
             request.user_data = payload
             return view_func(request, *args, **kwargs)

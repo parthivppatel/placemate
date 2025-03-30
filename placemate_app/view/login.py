@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 
 from ..utils import generate_jwt_token
@@ -17,7 +17,7 @@ def login(request):
             return render(request, 'login.html', {'status': 400})
 
         user = User.objects.filter(email__iexact=email).first()
-        print(make_password(password))
+        print(user)
 
         if not user:
             messages.error(request, "User does not exist.")
@@ -28,14 +28,14 @@ def login(request):
             return render(request, 'login.html', {'status': 401})
         
         user_role = UserRole.objects.filter(user=user).select_related("role").first()
-        role_name = user_role.role.name if user_role else "Student"
+        role_name = user_role.role.name
+        print(role_name)
 
         token = generate_jwt_token(user, role_name)
 
         respone = redirect("/")
         respone.set_cookie("jwt_token", token, httponly=True, secure=True)
 
-        # messages.success(request, f"Welcome, {role_name}")
         return respone
 
     return render(request,'login.html')

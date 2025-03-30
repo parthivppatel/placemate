@@ -9,6 +9,7 @@ Password -->
 -- student@daiict.ac.in -> password123
 -- company@gmail.com -> companyPass123
 -- admin@gmail.com -> adminSecure123
+-- 202412117@daiict.ac.in -> parthiv69
 */
 
 -- Map users to roles in the user_roles table
@@ -18,5 +19,6 @@ FROM "User" u
 JOIN "Roles" r ON (
     (u.email = 'student@daiict.ac.in' AND r.name = 'Student') OR
     (u.email = 'company@gmail.com' AND r.name = 'Company') OR
-    (u.email = 'admin@gmail.com' AND r.name = 'Admin')
+    (u.email = 'admin@gmail.com' AND r.name = 'Admin') OR 
+    (u.email = '202412117@daiict.ac.in' AND r.name = 'Admin')
 );
