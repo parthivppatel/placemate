@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -130,3 +131,7 @@ STATICFILES_DIRS=[
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JWT_SECRET = "h1bXQGnRDt1XwqDADADADADF9R06v7eTrBhZpGzTKPmDVCx1qJhLs3vBpOHxE4q9m23T5"
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_DELTA = datetime.timedelta(hours=1)

@@ -2,6 +2,8 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 
+from ..utils import generate_jwt_token
+
 from ..schema.users import User
 from ..schema.user_roles import UserRole
 
@@ -27,11 +29,12 @@ def login(request):
         user_role = UserRole.objects.filter(user=user).select_related("role").first()
         role_name = user_role.role.name if user_role else "Student"
 
-        request.session["user_id"] = user.id
-        request.session["user_email"] = user.email
-        request.session["user_role"] = role_name
+        token = generate_jwt_token(user, role_name)
 
-        messages.success(request, f"Welcome, {role_name}!")
-        return redirect("/")
+        respone = redirect("/")
+        respone.set_cookie("jwt_token", token, httponly=True, secure=True)
+
+        messages.success(request, f"Welcome, {role_name}")
+        return respone
 
     return render(request,'login.html')
