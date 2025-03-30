@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from django.contrib import messages
 
 from ..utils import generate_jwt_token
@@ -17,6 +17,7 @@ def login(request):
             return render(request, 'login.html', {'status': 400})
 
         user = User.objects.filter(email__iexact=email).first()
+        print(make_password(password))
 
         if not user:
             messages.error(request, "User does not exist.")

@@ -56,7 +56,9 @@
                                 </div>
                                 {% if messages %}
                                     {% for message in messages %}
-                                        <div class="alert alert-danger">{{ message }}</div>
+                                        {% if message.tags != "success" %}
+                                            <div class="alert alert-danger" role="alert">{{ message }}</div>
+                                        {% endif %}
                                     {% endfor %}
                                 {% endif %}
                                 <form method="post">
@@ -69,7 +71,7 @@
                                         <label for="password" class="form-label">Password</label>
                                         <input type="password" name="password" class="form-control" id="password" placeholder="Enter your Password">
                                         <div class="text-end mt-2">
-                                            <a href="#" class="text-decoration-none small">Forgot Password?</a>
+                                            <a href="{% url 'forgot-password' %}" class="text-decoration-none small">Forgot Password?</a>
                                         </div>
                                     </div>
                                     <div class="d-grid mb-3">
