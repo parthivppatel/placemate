@@ -207,7 +207,8 @@
             <h2>OTP Verification</h2>
             <p>We've sent a verification code to your email address. Please enter the code below to verify.</p>
             
-            <form id="otpForm">
+            <form id="otpForm" method="post">
+                {% csrf_token %}
                 <div class="otp-container">
                     <input type="text" class="otp-input" maxlength="1" autofocus oninput="moveToNext(this, 1)">
                     <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 2)">
@@ -220,7 +221,7 @@
                 <div class="error-message" id="errorMessage">Invalid OTP. Please try again.</div>
                 <div class="success-message" id="successMessage">OTP verified successfully!</div>
                 
-                <button type="submit" onclick="validateOTP(event)">Verify</button>
+                <button type="submit">Verify</button>
                 
                 <div class="resend-link">
                     <a href="#" id="resendLink" onclick="resendOTP(event)">Resend OTP</a>
