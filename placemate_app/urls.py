@@ -1,7 +1,11 @@
-from placemate_app.view import authentication
 from django.urls import path
 
+from .view.login import login
+from .view.dashboard import dashboard
+# from .view.logout import logout
+
 urlpatterns = [
-    path('', authentication.home,name="home"),
-    path('login/',authentication.login,name="login")
+    path('', dashboard, name="dashboard"),
+    path('login/', login, name="login"),
+    # path('logout/', logout, name="logout"),
 ]
