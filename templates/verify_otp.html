@@ -206,6 +206,13 @@
         <div class="form-container">
             <h2>OTP Verification</h2>
             <p>We've sent a verification code to your email address. Please enter the code below to verify.</p>
+
+            <!-- Display messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-box">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
             
             <form id="otpForm" method="post">
                 {% csrf_token %}
@@ -218,10 +225,12 @@
                     <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 6)">
                 </div>
                 
+                <input type="hidden" name="otp" id="hiddenOtp">
+
                 <div class="error-message" id="errorMessage">Invalid OTP. Please try again.</div>
                 <div class="success-message" id="successMessage">OTP verified successfully!</div>
                 
-                <button type="submit">Verify</button>
+                <button type="submit" onclick="submitOTP()">Verify</button>
                 
                 <div class="resend-link">
                     <a href="#" id="resendLink" onclick="resendOTP(event)">Resend OTP</a>
@@ -236,94 +245,90 @@
     </div>
 
     <script>
-        // Function to move to the next input field
-        function moveToNext(field, index) {
-            // Allow only numbers
-            field.value = field.value.replace(/[^0-9]/g, '');
-            
-            // Move to next field if this field is filled
-            if (field.value.length === 1) {
-                if (index < 6) {
-                    document.getElementsByClassName('otp-input')[index].focus();
-                }
+        document.addEventListener("DOMContentLoaded", function () {
+            let resendButton = document.getElementById("resendLink");
+            let countdownSpan = document.getElementById("countdown");
+            let timerDiv = document.getElementById("timer");
+            let submitButton = document.querySelector("button[type='submit']");
+            let otpInputs = document.querySelectorAll('.otp-input');
+            let hiddenOtp = document.getElementById('hiddenOtp');
+    
+            let countdown = 30; // Resend button disabled for 30 seconds
+            let otpExpiry = 60; // OTP valid for 1 minute
+            let otpExpired = false;
+    
+            function startCountdown() {
+                resendButton.style.pointerEvents = "none";
+                resendButton.style.opacity = "0.5";
+                timerDiv.style.display = "block";
+                countdownSpan.innerText = countdown;
+    
+                let interval = setInterval(() => {
+                    countdown--;
+                    countdownSpan.innerText = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        resendButton.style.pointerEvents = "auto";
+                        resendButton.style.opacity = "1";
+                        timerDiv.style.display = "none";
+                    }
+                }, 1000);
             }
-        }
-        
-        // Function to validate OTP
-        function validateOTP(event) {
-            event.preventDefault();
-            
-            // Get all input values
-            const inputs = document.getElementsByClassName('otp-input');
-            let otp = '';
-            
-            for (let i = 0; i < inputs.length; i++) {
-                otp += inputs[i].value;
-            }
-            
-            // Check if OTP is complete (6 digits)
-            if (otp.length !== 6) {
-                showError('Please enter all 6 digits');
-                return;
-            }
-            
-            // For demo purposes, let's say the valid OTP is "123456"
-            if (otp === "123456") {
-                document.getElementById('errorMessage').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-                
-                // Redirect after successful verification (in a real app)
+    
+            function startOTPTimer() {
                 setTimeout(() => {
-                    alert('Verification successful! Redirecting to reset password page.');
-                    // window.location.href = 'reset-password.html';
-                }, 2000);
-            } else {
-                showError('Invalid OTP. Please try again.');
+                    otpExpired = true;
+                    alert("OTP expired. Request a new one.");
+                    submitButton.disabled = true;
+                }, otpExpiry * 1000);
+            }
+    
+            resendButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                alert("New OTP sent!");
+                otpExpired = false;
+                submitButton.disabled = false;
+                startCountdown();
+                startOTPTimer();
+            });
+    
+            function prepareOTP(event) {
+                event.preventDefault();
+    
+                if (otpExpired) {
+                    alert("OTP has expired. Please request a new one.");
+                    return;
+                }
+    
+                let otpValue = '';
+                otpInputs.forEach(input => {
+                    otpValue += input.value;
+                });
+    
+                if (otpValue.length !== 6) {
+                    alert("Please enter the complete 6-digit OTP.");
+                    return;
+                }
+    
+                hiddenOtp.value = otpValue;
+                document.getElementById('otpForm').submit();
+            }
+    
+            document.getElementById('otpForm').addEventListener('submit', prepareOTP);
+    
+            startCountdown();
+            startOTPTimer();
+        });
+    
+        function moveToNext(input) {
+            if (input.value.length === 1) {
+                let next = input.nextElementSibling;
+                if (next && next.classList.contains('otp-input')) {
+                    next.focus();
+                }
             }
         }
-        
-        // Function to show error message
-        function showError(message) {
-            const errorElement = document.getElementById('errorMessage');
-            errorElement.innerText = message;
-            errorElement.style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-        }
-        
-        // Function to resend OTP
-        function resendOTP(event) {
-            event.preventDefault();
-            
-            // For demo purposes
-            alert('New OTP has been sent to your email!');
-            startCountdown();
-        }
-        
-        // Countdown timer
-        let countdownInterval;
-        function startCountdown() {
-            document.getElementById('resendLink').style.pointerEvents = 'none';
-            document.getElementById('resendLink').style.opacity = '0.5';
-            document.getElementById('timer').style.display = 'block';
-            
-            let seconds = 30;
-            document.getElementById('countdown').innerText = seconds;
-            
-            countdownInterval = setInterval(() => {
-                seconds--;
-                document.getElementById('countdown').innerText = seconds;
-                
-                if (seconds <= 0) {
-                    clearInterval(countdownInterval);
-                    document.getElementById('resendLink').style.pointerEvents = 'auto';
-                    document.getElementById('resendLink').style.opacity = '1';
-                    document.getElementById('timer').style.display = 'none';
-                }
-            }, 1000);
-        }
-        
-        // Start countdown on page load
-        window.onload = startCountdown;
     </script>
+    
 </body>
 </html>
