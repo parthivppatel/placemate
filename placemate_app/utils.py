@@ -38,3 +38,24 @@ def has_permission(role_name, permission_name):
         return False
 
     return RolePermission.objects.filter(role=role, permission=permission).exists()
+
+
+# Token generation for forgot password
+def generate_otp_token(email, otp):
+    payload = {
+        "email": email,
+        "otp": otp,
+        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=60),
+        "iat": datetime.datetime.now(datetime.timezone.utc),
+    }
+
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+# Token Generation for Reset-Password
+def generate_reset_token(user_id):
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5),  
+        "iat": datetime.datetime.now(datetime.timezone.utc),
+    }
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)

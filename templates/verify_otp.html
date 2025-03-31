@@ -153,6 +153,11 @@
             color: #7955b8;
             text-decoration: underline;
         }
+
+        .resend-link a.disabled {
+            color: #ccc;
+            pointer-events: none;
+        }
         
         .timer {
             color: var(--secondary-text);
@@ -214,7 +219,7 @@
                 {% endfor %}
             {% endif %}
             
-            <form id="otpForm" method="post">
+            <form id="otpForm" method="post" action="{% url 'verify-otp' %}">
                 {% csrf_token %}
                 <div class="otp-container">
                     <input type="text" class="otp-input" maxlength="1" autofocus oninput="moveToNext(this, 1)">
@@ -226,109 +231,66 @@
                 </div>
                 
                 <input type="hidden" name="otp" id="hiddenOtp">
-
-                <div class="error-message" id="errorMessage">Invalid OTP. Please try again.</div>
-                <div class="success-message" id="successMessage">OTP verified successfully!</div>
                 
-                <button type="submit" onclick="submitOTP()">Verify</button>
-                
-                <div class="resend-link">
-                    <a href="#" id="resendLink" onclick="resendOTP(event)">Resend OTP</a>
-                    <div class="timer" id="timer">Resend in <span id="countdown">30</span> seconds</div>
-                </div>
-                
-                <div class="links">
-                    <a href="{% url 'login' %}">Back to Login</a>
-                </div>
+                <button type="submit">Verify</button>
             </form>
+
+            <div class="resend-link">
+                <a href="{% url 'resend_otp' %}" id="resendLink" class="disabled">Resend OTP</a>
+                <div class="timer" id="timer">Resend in <span id="countdown">30</span> seconds</div>
+            </div>
+    
+                
+            <div class="links">
+                <a href="{% url 'login' %}">Back to Login</a>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let resendButton = document.getElementById("resendLink");
-            let countdownSpan = document.getElementById("countdown");
-            let timerDiv = document.getElementById("timer");
-            let submitButton = document.querySelector("button[type='submit']");
+        document.addEventListener('DOMContentLoaded', function () {
+            let countdownSpan = document.getElementById('countdown');
+            let resendLink = document.getElementById('resendLink');
+            let timerDiv = document.getElementById('timer');
             let otpInputs = document.querySelectorAll('.otp-input');
             let hiddenOtp = document.getElementById('hiddenOtp');
-    
-            let countdown = 30; // Resend button disabled for 30 seconds
-            let otpExpiry = 60; // OTP valid for 1 minute
-            let otpExpired = false;
-    
+            let countdown = 30;
+
             function startCountdown() {
-                resendButton.style.pointerEvents = "none";
-                resendButton.style.opacity = "0.5";
-                timerDiv.style.display = "block";
-                countdownSpan.innerText = countdown;
-    
                 let interval = setInterval(() => {
                     countdown--;
                     countdownSpan.innerText = countdown;
                     if (countdown <= 0) {
                         clearInterval(interval);
-                        resendButton.style.pointerEvents = "auto";
-                        resendButton.style.opacity = "1";
-                        timerDiv.style.display = "none";
+                        resendLink.classList.remove('disabled');
+                        timerDiv.style.display = 'none';
                     }
                 }, 1000);
             }
-    
-            function startOTPTimer() {
-                setTimeout(() => {
-                    otpExpired = true;
-                    alert("OTP expired. Request a new one.");
-                    submitButton.disabled = true;
-                }, otpExpiry * 1000);
-            }
-    
-            resendButton.addEventListener("click", function (event) {
-                event.preventDefault();
-                alert("New OTP sent!");
-                otpExpired = false;
-                submitButton.disabled = false;
-                startCountdown();
-                startOTPTimer();
-            });
-    
-            function prepareOTP(event) {
-                event.preventDefault();
-    
-                if (otpExpired) {
-                    alert("OTP has expired. Please request a new one.");
-                    return;
+
+            function moveToNext(input) {
+                if (input.value.length === 1) {
+                    let next = input.nextElementSibling;
+                    if (next && next.classList.contains('otp-input')) {
+                        next.focus();
+                    }
                 }
-    
-                let otpValue = '';
-                otpInputs.forEach(input => {
-                    otpValue += input.value;
-                });
-    
+            }
+
+            document.getElementById('otpForm').addEventListener('submit', function (event) {
+                let otpValue = Array.from(otpInputs).map(input => input.value).join('');
                 if (otpValue.length !== 6) {
-                    alert("Please enter the complete 6-digit OTP.");
+                    alert('Please enter all 6 digits of the OTP.');
+                    event.preventDefault();
                     return;
                 }
-    
                 hiddenOtp.value = otpValue;
-                document.getElementById('otpForm').submit();
-            }
-    
-            document.getElementById('otpForm').addEventListener('submit', prepareOTP);
-    
+            });
+
             startCountdown();
-            startOTPTimer();
         });
-    
-        function moveToNext(input) {
-            if (input.value.length === 1) {
-                let next = input.nextElementSibling;
-                if (next && next.classList.contains('otp-input')) {
-                    next.focus();
-                }
-            }
-        }
     </script>
+
     
 </body>
 </html>
