@@ -1,11 +1,9 @@
 import datetime
 import random
 import jwt
-from django.core.mail import send_mail
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
-from django.utils.html import escape
 
 from placemate import settings
 
