@@ -1,11 +1,7 @@
-from django.shortcuts import render,redirect
-from django.contrib.auth.hashers import check_password
+from django.shortcuts import render, redirect
 from django.contrib import messages
 
-from ..utils import generate_jwt_token
-
-from ..schema.users import User
-from ..schema.user_roles import UserRole
+from ..utils import authenticate_user, set_jwt_cookie
 
 def login(request):
     if request.method == "POST":
@@ -16,26 +12,15 @@ def login(request):
             messages.error(request, "Email and password are required.")
             return render(request, 'login.html', {'status': 400})
 
-        user = User.objects.filter(email__iexact=email).first()
-        print(user)
+        user, error_message = authenticate_user(email, password)
 
         if not user:
-            messages.error(request, "User does not exist.")
+            messages.error(request, error_message)
             return render(request, 'login.html', {'status': 400})
 
-        if not check_password(password, user.password):
-            messages.error(request, "Invalid email or password.")
-            return render(request, 'login.html', {'status': 401})
-        
-        user_role = UserRole.objects.filter(user=user).select_related("role").first()
-        role_name = user_role.role.name
-        print(role_name)
+        response = redirect("/")
+        response = set_jwt_cookie(response, user, error_message)
 
-        token = generate_jwt_token(user, role_name)
+        return response
 
-        respone = redirect("/")
-        respone.set_cookie("jwt_token", token, httponly=True, secure=True)
-
-        return respone
-
-    return render(request,'login.html')
+    return render(request, 'login.html')

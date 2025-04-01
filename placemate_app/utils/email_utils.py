@@ -13,11 +13,11 @@ def send_custom_email(email, subject, message, html_message=None):
     """
     send_mail(
         subject,
-        message,  # Plain text fallback
+        message,  
         settings.DEFAULT_FROM_EMAIL,
         [email],
         fail_silently=False,
-        html_message=html_message or message,  # Use HTML if provided
+        html_message=html_message or message,  
     )
 
 def send_otp_email(email, otp):
@@ -28,7 +28,12 @@ def send_otp_email(email, otp):
     :param otp: One-time password
     """
     subject = "Password Reset OTP - Placemate"
-    message = f"Dear {email},\nYour OTP for password reset is: {otp}\nThis OTP is valid for 1 minute.\nIf you did not request this, please ignore this email."
+    message = (
+        f"Dear {email},\n"
+        f"Your OTP for password reset is: {otp}\n"
+        "This OTP is valid for 1 minute.\n"
+        "If you did not request this, please ignore this email."
+    )
 
     html_message = f"""
         <html>
@@ -42,7 +47,7 @@ def send_otp_email(email, otp):
             <p><strong>Placemate Team</strong></p>
         </body>
         </html>
-        """
+    """
 
     send_custom_email(email, subject, message, html_message)
 
@@ -66,6 +71,6 @@ def send_welcome_email(email, username):
             <p><strong>Placemate Team</strong></p>
         </body>
         </html>
-        """
+    """
 
     send_custom_email(email, subject, message, html_message)
