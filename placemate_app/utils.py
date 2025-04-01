@@ -4,6 +4,8 @@ from django.conf import settings
 from .schema.permissions import Permission
 from .schema.role_permissions import RolePermission
 from .schema.roles import Role
+import random
+import string
 
 def generate_jwt_token(user, role):
 
@@ -59,3 +61,13 @@ def generate_reset_token(user_id):
         "iat": datetime.datetime.now(datetime.timezone.utc),
     }
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+
+def generate_random_password():
+    # Define the characters to choose from
+    characters = string.ascii_letters + string.digits + string.punctuation
+    
+    # Randomly select characters and combine them into a password
+    password = ''.join(random.choice(characters) for _ in range(12))
+    
+    return password
