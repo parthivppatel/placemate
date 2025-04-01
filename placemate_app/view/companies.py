@@ -7,7 +7,7 @@ from ..schema.users import User
 from ..schema.industry import Industry
 from ..schema.cities import City
 from ..schema.job_positions import JobPosition
-from ..utils import generate_random_password
+from ..utils.random_password_utils import generate_random_password
 from ..decorators import permission_required
 from django.contrib.auth.hashers import make_password
 
