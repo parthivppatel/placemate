@@ -1,7 +1,7 @@
 from django.db import models
 from .jobs import Job
 from .students import Student
-
+from .company_drives import CompanyDrive
 # Status Choices
 class ApplicationStatus(models.TextChoices):
     APPLIED = 'Applied', 'Applied'
@@ -13,6 +13,7 @@ class ApplicationStatus(models.TextChoices):
 class JobApplication(models.Model): 
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    drive = models.ForeignKey(CompanyDrive,on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=20,choices=ApplicationStatus.choices,default=ApplicationStatus.APPLIED)
     resume_link = models.CharField(max_length=500)
 
