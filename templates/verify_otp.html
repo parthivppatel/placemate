@@ -120,20 +120,22 @@
         }
 
         .error-box {
-            color: #e74c3c;
-            margin-top: 10px;
-            font-size: 14px;
-            text-align: center;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #dc3545;
         }
         
         .success-message {
             background-color: #d4edda;
             color: #155724;
             padding: 10px;
-            border-radius: 4px;
-            margin-top: 20px;
-            text-align: center;
-            display: none;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #8bdc35;
+            display: block !important;
         }
         
         .links {
@@ -163,7 +165,11 @@
             <!-- Display messages -->
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                    {% if message.tags == "success" %}
+                        <div class="success-message">{{ message }}</div>
+                    {% else %}
+                        <div class="error-box">{{ message }}</div>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
             
