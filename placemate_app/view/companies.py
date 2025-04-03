@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 from ..schema.user_roles import UserRole
 from ..schema.roles import Role
 from django.db import transaction
-from ..utils.email_utils import send_custom_email
+from ..utils.email_utils import send_registration_email
 
 
 @permission_required('register_company')
@@ -66,39 +66,14 @@ def register_company(request):
                 user_role = UserRole(user = user,role = role)
                 user_role.save()
 
+                send_registration_email(user.email,password)
+
                 return JsonResponse({"message": "Company added successfully!"}, status=201)
-            
-            subject = "Welcome to Placemate - Your Company Registration Details"
-            message = f"""
-            Dear User,
-
-            Welcome to Placemate! Your company registration is successful.
-
-            Here are your login credentials:
-            - Email: {data.get("email")}
-            - Password: {password}
-
-            Please use these credentials to log in and complete your profile.
-
-            If you have any questions, feel free to contact us.
-
-            Best regards,
-            Placemate Team
-            """
-            # send_custom_email(data.get)
 
         except ValidationError as e:
-            # if company:
-            #     company.delete()
-            # if user:
-            #     user.delete()
             return JsonResponse({"error": [str(err) for err in e.error_list]}, status=400)
         
         except Exception as e:
-            # if company:
-            #     company.delete()
-            # if user:
-            #     user.delete()
             return JsonResponse({"error": str(e)}, status=500)
         
     return JsonResponse({"error": "Invalid request method"}, status=405)
