@@ -1,0 +1,81 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 120px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    margin-left: 120px; /* This ensures content does not go behind sidebar */
+    padding: 20px;
+    width: calc(100% - 120px);
+    overflow-x: hidden;
+}
+
+/* Logo styles */
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Navigation items */
+.nav-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 0;
+    cursor: pointer;
+    text-decoration: none;
+    color: #333;
+    font-size: 12px;
+}
+
+.nav-item.active {
+    background-color: #f0f4ff;
+    border-left: 3px solid #6366F1;
+}
+
+.nav-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6C757D;
+}
+
+.nav-item.active .nav-icon {
+    color: #6366F1;
+}

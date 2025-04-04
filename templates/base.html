@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Placemate{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
+</head>
+<body>
+    {% include 'includes/_sidebar.html' %}
+    <div class="main-content">
+            {% block content %}{% endblock %}
+    </div>
+
+    <script src="{% static 'js/sidebar.js' %}"></script>
+</body>
+</html>
