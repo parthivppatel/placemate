@@ -1,20 +1,25 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from ..schema.companies import  Company
+from ..schema.companies import  Company,CompanySize,CompanyType,Category
 from ..schema.users import User
 from ..schema.industry import Industry
 from ..schema.cities import City
 from ..schema.job_positions import JobPosition
+from ..schema.jobs import Job
+from ..schema.company_drives import CompanyDrive
 from ..utils.random_password_utils import generate_random_password
 from ..decorators import permission_required
 from django.contrib.auth.hashers import make_password
 from ..schema.user_roles import UserRole
 from ..schema.roles import Role
 from django.db import transaction
-from ..utils.email_utils import send_registration_email
-
+from ..utils.email_utils import send_registration_email 
+from django.db.models import Q,When,Case,CharField,Value
+from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 @permission_required('register_company')
 def register_company(request):
@@ -77,3 +82,228 @@ def register_company(request):
             return JsonResponse({"error": str(e)}, status=500)
         
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+@permission_required('register_company','edit_company')
+def company_dropdowns(request):
+    data = {
+        "industries": list(Industry.objects.values("id", "name")),
+        "positions": list(JobPosition.objects.values("id", "name")),
+        "company_sizes": [
+            {"value": size.value, "label": size.label} for size in CompanySize
+        ],
+        "company_types": [
+            {"value": ctype.value, "label": ctype.label} for ctype in CompanyType
+        ],
+        "categories": [
+            {"value": cat.value, "label": cat.label} for cat in Category
+        ]
+    }
+
+    return JsonResponse({'data': data},status= 200)
+
+@permission_required('view_company')
+def view_company(request,id=0):
+    company = get_object_or_404(Company,id=id)
+    user = company.id
+
+    data={
+        "id" : user.id,
+        "name" : company.name,
+        "email" : company.id.email,
+        "phone" : company.id.phone,
+        "website" : company.website ,
+        "founded_year" : company.founded_year,
+        "category" : {
+            "value": company.category, 
+            "display": company.get_category_display()
+        },
+        "industry" :{
+            "value": safe_value(company.industry, "id"),
+            "display": safe_value(company.industry, "name"),
+        } ,
+        "company_size" : {
+            "value": company.company_size, 
+            "display": company.get_company_size_display()
+        },
+        "company_type" : {
+            "value": company.company_type, 
+            "display": company.get_company_type_display()
+        },
+        "headquater" : {
+            "value": safe_value(company.headquater, "id"), 
+            "display": safe_value(company.headquater, "cityname"),
+            "country_id":safe_deep_get(company.headquater,"state.country.id")
+        } ,
+        "contact_person_name" : company.contact_person_name ,
+        "contact_person_email" : company.contact_person_email,
+        "contact_person_position" : {
+            "value": safe_value(company.contact_person_position, "id"),
+            "display": safe_value(company.contact_person_position, "name"),
+        } ,
+        "address" : company.address,
+        "logo" : company.logo if company.logo else None
+    } 
+ 
+    return JsonResponse(data,status=200)
+
+
+# Frontend Structure
+# {
+#     "filters": {
+#         "industry" : 2,
+#         "search": "company"
+#     },
+#     "sort": {  "field": "company_type", "type": "asc"},
+#     "page" : 1,
+#     "perpage":10
+# }
+
+@permission_required('view_companies')       
+def list_companies(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        filters = data.get("filters", {})
+        sort = data.get("sort", {})
+        try:
+            page = int(data.get("page", 1))
+            perpage = int(data.get("perpage", 10))
+
+            if page < 1 or perpage < 1:
+                return ResponseModel([],"Page and per page must be positive integers",400)
+        except:
+            return ResponseModel([],"Page and per page must be valid integers.",400)
+
+
+        # data gathering
+        companies = Company.objects.select_related("industry", "id")
+
+        # companies = companies.annotate(
+        #     company_type_label=Case
+        #     (
+        #         *[When(company_type=value, then=Value(label)) for value, label in CompanyType.choices],
+        #         output_field=CharField()
+        #     )
+        # )
+
+        # filtering
+        if search := filters.get("search"):
+            companies = companies.filter(Q(name__icontains=search) | Q(id__email__icontains=search))
+        
+        if "industry" in filters:
+            companies = companies.filter(industry=filters["industry"])
+
+        #sorting
+        sort_field = sort.get("field", "").strip()  # Clean up any accidental whitespace
+        sort_type = sort.get("type", "asc").lower()
+        
+        ordering = "name"
+        if sort_field :
+            if sort_field == "industry":
+                ordering = "industry__name"
+            elif sort_field == "company_size":
+                ordering = "company_size"
+            elif sort_field == "email":
+                ordering = "id__email"
+            elif sort_field == "phone":
+                ordering = "id__phone"
+            # elif sort_field == "company_type":
+            #     ordering = "company_type_label"
+
+            if sort_type == "desc":
+                ordering = f"-{ordering}"
+
+        companies = companies.order_by(ordering)
+
+        #pagination
+        companies, total, pagination = paginate(companies, page, perpage)
+
+        #response
+        result = []
+        for company in companies:
+            result.append({
+                "id": company.id.id,
+                "company_name": company.name,
+                "email": company.id.email,
+                "phone": company.id.phone,
+                "company_size": company.get_company_size_display(),
+                "industry": safe_value(company.industry,"name")
+                # "company_type": company.get_company_type_display()
+            })
+
+        return ResponseModel(result,"Success",200,pagination,total)
+    
+    return ResponseModel(None,"Invalid request method", 405)
+
+@permission_required('edit_company')
+def edit_company(request,id=0):
+    if request.method == "POST":
+        try:
+            company = get_object_or_404(Company,id=id)
+            data = request.POST
+            # Update fields
+            company.name = data.get("name", company.name).strip()
+            company.website = data.get("website", company.website).strip()
+            company.founded_year=data.get("founded_year")
+            company.category = data.get("category")
+            company.id.email = data.get("email", company.id.email).strip()
+            company.id.phone = data.get("phone", company.id.phone)
+            company.company_size = data.get("company_size", company.company_size)
+            company.company_type = data.get("company_type", company.company_type)
+            company.contact_person_name = data.get("contact_person_name", company.contact_person_name).strip()
+            company.contact_person_email = data.get("contact_person_email", company.contact_person_email).strip()
+            company.address = data.get("address", company.address).strip()
+
+            industry_id = data.get("industry")
+            if industry_id:
+                company.industry = Industry.objects.get(id=industry_id)
+
+            hq_id = data.get("headquater")
+            if hq_id:
+                company.headquater = City.objects.get(id=hq_id)
+            
+            contact_pos_id = data.get("contact_person_position")
+            if contact_pos_id:
+                company.contact_person_position = JobPosition.objects.get(id=contact_pos_id)
+
+            if "logo" in request.FILES:
+                company.logo = request.FILES["logo"]
+
+            company.id.save()
+            company.save()
+
+            return JsonResponse({"message": "Company updated successfully", "status": 200})
+        
+        except Company.DoesNotExist:
+            return JsonResponse({"message": "Company not found", "status": 404})
+        except Exception as e:
+            return JsonResponse({"message": str(e), "status": 500})
+        
+    return ResponseModel(None,"Invalid request method", 405)
+
+@permission_required('delete_company')
+def delete_company(request,id):
+    if request.method == "DELETE":
+        try:
+            with transaction.atomic():
+                company = get_object_or_404(Company, id=id)
+                user = company.id
+
+                # Check for assigned jobs
+                if Job.objects.filter(company=company).exists():
+                    return JsonResponse({"message": "Cannot delete company with assigned jobs"}, status=400)
+                
+                # Check for company_drive mapping
+                if CompanyDrive.objects.filter(company=company).exists():
+                        return JsonResponse({"message": "Cannot delete company mapped in company_drive."}, status=400)
+                
+                # Delete company 
+                company.delete()
+                user.delete()
+
+                return JsonResponse({"message": "Company deleted successfully"}, status=200)
+        
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
