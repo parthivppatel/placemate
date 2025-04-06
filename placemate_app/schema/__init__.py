@@ -19,7 +19,7 @@ from .jobs import Job
 from .job_courses import JobCourses
 from .job_locations import JobLocation
 from .job_skills import JobSkill
-from .job_applications import JobApplication
+from .drive_applications import DriveApplication
 from .interviews import Interview
 from .company_drives import CompanyDrive
 from .placement_offers import PlacementOffer

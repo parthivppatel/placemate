@@ -20,7 +20,7 @@ from .schema.jobs import Job
 from .schema.job_courses import JobCourses
 from .schema.job_locations import JobLocation
 from .schema.job_skills import JobSkill
-from .schema.job_applications import JobApplication
+from .schema.drive_applications import DriveApplication
 from .schema.interviews import Interview 
 from .schema.placement_offers import PlacementOffer
 from .schema.notifications import Notification
@@ -41,7 +41,7 @@ admin.site.register(PlacementCellMember)
 admin.site.register(Authority)
 admin.site.register(Industry)
 admin.site.register(JobPosition)
-admin.site.register(JobApplication)
+admin.site.register(DriveApplication)
 admin.site.register(JobCourses)
 admin.site.register(JobLocation)
 admin.site.register(Notification)

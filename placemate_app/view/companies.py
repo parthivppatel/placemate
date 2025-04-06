@@ -175,7 +175,7 @@ def list_companies(request):
 
 
         # data gathering
-        companies = Company.objects.select_related("industry", "id")
+        companies = Company.objects.select_related("industry")
 
         # companies = companies.annotate(
         #     company_type_label=Case
@@ -186,7 +186,7 @@ def list_companies(request):
         # )
 
         # filtering
-        if search := filters.get("search"):
+        if search := filters.get("search","").strip():
             companies = companies.filter(Q(name__icontains=search) | Q(id__email__icontains=search))
         
         if "industry" in filters:
@@ -208,6 +208,8 @@ def list_companies(request):
                 ordering = "id__phone"
             # elif sort_field == "company_type":
             #     ordering = "company_type_label"
+            else:
+                ordering= "name"
 
             if sort_type == "desc":
                 ordering = f"-{ordering}"
@@ -307,3 +309,8 @@ def delete_company(request,id):
 
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+def get_industries(request):
+    industries = list(Industry.objects.values("id", "name").order_by("name"))
+    return JsonResponse({'data':industries},status=200)
+    
