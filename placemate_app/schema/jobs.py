@@ -28,7 +28,7 @@ class Job(models.Model):
     posted_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     tenth = models.FloatField(null=True, blank=True)
-    twelfth = models.FloatField(null=True, blank=True)
+    twelth = models.FloatField(null=True, blank=True)
     diploma = models.FloatField(null=True, blank=True)
     undergraduate = models.FloatField(null=True, blank=True)
 

@@ -1,7 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 from ..schema.companies import  Company,CompanySize,CompanyType,Category
 from ..schema.users import User
 from ..schema.industry import Industry
@@ -73,15 +72,15 @@ def register_company(request):
 
                 send_registration_email(user.email,password)
 
-                return JsonResponse({"message": "Company added successfully!"}, status=201)
+                return ResponseModel({},"Company added successfully!",201)
 
         except ValidationError as e:
-            return JsonResponse({"error": [str(err) for err in e.error_list]}, status=400)
+            return ResponseModel({},e.message,400)
         
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+            return ResponseModel({},str(e),500)
         
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+    return ResponseModel({},"Invalid request method",405)
 
 @permission_required('register_company','edit_company')
 def company_dropdowns(request):
@@ -99,7 +98,7 @@ def company_dropdowns(request):
         ]
     }
 
-    return JsonResponse({'data': data},status= 200)
+    return ResponseModel(data,"Dropdowns Get Succesfully",200)
 
 @permission_required('view_company')
 def view_company(request,id=0):
@@ -144,7 +143,7 @@ def view_company(request,id=0):
         "logo" : company.logo if company.logo else None
     } 
  
-    return JsonResponse(data,status=200)
+    return ResponseModel(data,"Company Fetched Successfully",200)
 
 
 # Frontend Structure
@@ -169,9 +168,9 @@ def list_companies(request):
             perpage = int(data.get("perpage", 10))
 
             if page < 1 or perpage < 1:
-                return ResponseModel([],"Page and per page must be positive integers",400)
+                return ResponseModel({},"Page and per page must be positive integers",400)
         except:
-            return ResponseModel([],"Page and per page must be valid integers.",400)
+            return ResponseModel({},"Page and per page must be valid integers.",400)
 
 
         # data gathering
@@ -232,7 +231,13 @@ def list_companies(request):
                 # "company_type": company.get_company_type_display()
             })
 
-        return ResponseModel(result,"Success",200,pagination,total)
+        response={
+            "data":result,
+            "total":total,
+            "pagination":pagination
+        }
+
+        return ResponseModel(response,"Success",200)
     
     return ResponseModel(None,"Invalid request method", 405)
 
@@ -273,17 +278,17 @@ def edit_company(request,id=0):
             company.id.save()
             company.save()
 
-            return JsonResponse({"message": "Company updated successfully", "status": 200})
+            return ResponseModel({},"Company updated successfully",200)
         
         except Company.DoesNotExist:
-            return JsonResponse({"message": "Company not found", "status": 404})
+            return ResponseModel({},"Company not found",404)
         except Exception as e:
-            return JsonResponse({"message": str(e), "status": 500})
+            return ResponseModel({},str(e),500)
         
-    return ResponseModel(None,"Invalid request method", 405)
+    return ResponseModel({},"Invalid request method", 405)
 
 @permission_required('delete_company')
-def delete_company(request,id):
+def delete_company(request,id=0):
     if request.method == "DELETE":
         try:
             with transaction.atomic():
@@ -292,25 +297,25 @@ def delete_company(request,id):
 
                 # Check for assigned jobs
                 if Job.objects.filter(company=company).exists():
-                    return JsonResponse({"message": "Cannot delete company with assigned jobs"}, status=400)
+                    return ResponseModel({},"Cannot delete company with assigned jobs",400)
                 
                 # Check for company_drive mapping
                 if CompanyDrive.objects.filter(company=company).exists():
-                        return JsonResponse({"message": "Cannot delete company mapped in company_drive."}, status=400)
+                        return ResponseModel({},"Cannot delete company mapped in company_drive",400)
                 
                 # Delete company 
                 company.delete()
                 user.delete()
 
-                return JsonResponse({"message": "Company deleted successfully"}, status=200)
+                return ResponseModel({},"Company deleted successfully",200)
         
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+            return ResponseModel({},str(e),500)
 
 
-    return JsonResponse({"error": "Invalid request method"}, status=400)
+    return ResponseModel({},"Invalid request method",400)
 
 def get_industries(request):
     industries = list(Industry.objects.values("id", "name").order_by("name"))
-    return JsonResponse({'data':industries},status=200)
+    return ResponseModel(industries,"Industries Fetch Succesfully",200)
     

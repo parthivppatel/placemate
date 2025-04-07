@@ -21,3 +21,26 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(10,3,5);
 INSERT INTO "Permissions" (id,name, description) VALUES (6,'delete_company', 'Permission to delete the company details');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(11,3,6);
 
+INSERT INTO "Permissions" (id,name, description) VALUES (7,'post_job', 'Permission to post the new jobs');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(12,2,7);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(13,3,7);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (8,'edit_job', 'Permission to edit the job details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(14,2,8);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(15,3,8);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (9,'view_jobs','Permission to view the job list');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(16,1,9);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(17,3,9);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (10,'view_job','Permission to view the specific job details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(18,1,10);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(19,2,10);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(20,3,10);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (11,'delete_job','Permission to delete the job details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(21,2,11);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(22,3,11);
+
+
+

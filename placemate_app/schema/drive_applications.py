@@ -1,5 +1,4 @@
-from django.db import models
-from .jobs import Job
+from django.db import models 
 from .students import Student
 from .company_drives import CompanyDrive
 # Status Choices
@@ -20,4 +19,4 @@ class DriveApplication(models.Model):
         db_table = 'drive_applications'
 
     def __str__(self):
-        return f"{self.student.first_name} {self.student.last_name} - {self.job.job_title} - {self.get_status_display()}"
+        return f"{self.student.first_name} {self.student.last_name} - {self.get_status_display()}"
