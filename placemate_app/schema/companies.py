@@ -20,13 +20,21 @@ class CompanyType(models.IntegerChoices):
     COOPERATIVE = 5, "Cooperative"
     MNC = 6, "Multinational Corporation"
     EDUCATIONAL = 7, "Educational Institution"
- 
+    
+class Category(models.TextChoices):
+    A = "A", "A"
+    A1 = "A1", "A1"
 
 class Company(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    name = models.CharField(max_length=255)
-    website = models.CharField(max_length=255, blank=True, null=True)
+    name = models.CharField(max_length=255,unique=True)
+    website = models.URLField(max_length=255, blank=True, null=True,unique=True)
     founded_year = models.PositiveIntegerField(null=True, blank=True)
+    category = models.CharField(
+        max_length=2,
+        choices=Category.choices,
+        default=Category.A
+    )
     industry = models.ForeignKey(Industry, on_delete=models.SET_NULL, null=True, blank=True)
     company_size = models.PositiveSmallIntegerField(
         choices=CompanySize.choices,
@@ -38,10 +46,11 @@ class Company(models.Model):
     )
     headquater = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     contact_person_name = models.CharField(max_length=255, blank=True, null=True)
-    contact_person_email = models.CharField(max_length=255, blank=True, null=True)
+    contact_person_email = models.EmailField(max_length=255, blank=True, null=True,unique=True)
     contact_person_position = models.ForeignKey(JobPosition, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.TextField(blank=True, null=True)
-    logo = models.CharField(max_length=255, blank=True, null=True)
+    # logo = models.CharField(max_length=255, blank=True, null=True)
+    logo = models.ImageField(upload_to="logos/", blank=True, null=True)
 
     class Meta:
         db_table = 'companies'

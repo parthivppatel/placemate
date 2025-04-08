@@ -2,9 +2,15 @@ from django.shortcuts import redirect
 from django.contrib import messages
 
 def logout(request):
-    respone = redirect("login")
-    respone.delete_cookie("jwt_token")
+    response = redirect("login")
 
-    list(messages.get_messages(request))
+    response.delete_cookie("jwt_token")
     
-    return respone
+    response.delete_cookie("otp_token")
+    
+    response.delete_cookie("reset_token")
+    
+    # Clear any existing messages from the session
+    messages.get_messages(request).used = True
+
+    return response

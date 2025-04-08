@@ -6,3 +6,4 @@ PyJWT==2.9.0
 python-dotenv==1.0.1
 sqlparse==0.5.3
 typing_extensions==4.12.2
+pillow==11.2.0

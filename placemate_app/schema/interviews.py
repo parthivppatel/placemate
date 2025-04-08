@@ -1,5 +1,5 @@
 from django.db import models
-from .job_applications import JobApplication
+from .drive_applications import DriveApplication
 
 # Interview Type Choices
 class InterviewType(models.TextChoices):
@@ -26,7 +26,7 @@ class InterviewResult(models.TextChoices):
     ON_HOLD = 'On-Hold', 'On-Hold'
 
 class Interview(models.Model):
-    application = models.ForeignKey(JobApplication, on_delete=models.CASCADE)
+    application = models.ForeignKey(DriveApplication, on_delete=models.CASCADE)
     round_number = models.IntegerField()
     interview_type = models.CharField(max_length=20,choices=InterviewType.choices)
     mode = models.CharField(max_length=10,choices=InterviewMode.choices)

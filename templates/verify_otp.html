@@ -28,16 +28,6 @@
             padding: 20px;
         }
         
-        /* .container {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-            overflow: hidden;
-            padding: 40px;
-        } */
-        
         .container {
             display: flex;
             flex-direction: column;
@@ -47,37 +37,6 @@
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            background-color: var(--primary-color);
-            padding: 25px 0;
-            text-align: center;
-        }
-        
-        .logo {
-            width: 120px;
-            height: 120px;
-            background-color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto;
-            color: var(--primary-color);
-            font-size: 36px;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .logo-text {
-            margin-top: 15px;
-            color: white;
-            font-size: 22px;
-            letter-spacing: 1px;
-        }
-        
-        .form-container {
-            padding: 40px 30px;
         }
         
         h2 {
@@ -93,7 +52,7 @@
             line-height: 1.6;
             text-align: center;
         }
-        
+
         .otp-container {
             display: flex;
             justify-content: space-between;
@@ -149,33 +108,34 @@
             transition: color 0.3s;
         }
         
-        .resend-link a:hover {
-            color: #7955b8;
-            text-decoration: underline;
+        .resend-link a.disabled {
+            color: #ccc;
+            pointer-events: none;
         }
-        
+
         .timer {
             color: var(--secondary-text);
             font-size: 14px;
             margin-top: 5px;
         }
-        
-        .error-message {
-            color: #e74c3c;
-            margin-top: 5px;
-            font-size: 14px;
-            text-align: center;
-            display: none;
+
+        .error-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #dc3545;
         }
         
         .success-message {
             background-color: #d4edda;
             color: #155724;
             padding: 10px;
-            border-radius: 4px;
-            margin-top: 20px;
-            text-align: center;
-            display: none;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #8bdc35;
+            display: block !important;
         }
         
         .links {
@@ -198,16 +158,22 @@
 </head>
 <body>
     <div class="container">
-        <!-- <div class="header">
-            <div class="logo">LOGO</div>
-            <div class="logo-text">Company Name</div>
-        </div> -->
-        
         <div class="form-container">
             <h2>OTP Verification</h2>
             <p>We've sent a verification code to your email address. Please enter the code below to verify.</p>
+
+            <!-- Display messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "success" %}
+                        <div class="success-message">{{ message }}</div>
+                    {% else %}
+                        <div class="error-box">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
             
-            <form id="otpForm" method="post">
+            <form id="otpForm" method="post" action="{% url 'verify-otp' %}">
                 {% csrf_token %}
                 <div class="otp-container">
                     <input type="text" class="otp-input" maxlength="1" autofocus oninput="moveToNext(this, 1)">
@@ -218,112 +184,64 @@
                     <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 6)">
                 </div>
                 
-                <div class="error-message" id="errorMessage">Invalid OTP. Please try again.</div>
-                <div class="success-message" id="successMessage">OTP verified successfully!</div>
+                <input type="hidden" name="otp" id="hiddenOtp">
                 
                 <button type="submit">Verify</button>
-                
-                <div class="resend-link">
-                    <a href="#" id="resendLink" onclick="resendOTP(event)">Resend OTP</a>
-                    <div class="timer" id="timer">Resend in <span id="countdown">30</span> seconds</div>
-                </div>
-                
-                <div class="links">
-                    <a href="{% url 'login' %}">Back to Login</a>
-                </div>
             </form>
+
+            <div class="resend-link">
+                <a href="{% url 'resend-otp' %}" id="resendLink" class="disabled">Resend OTP</a>
+                <div class="timer" id="timer">Resend in <span id="countdown">30</span> seconds</div>
+            </div>
+    
+            <div class="links">
+                <a href="{% url 'login' %}">Back to Login</a>
+            </div>
         </div>
     </div>
 
     <script>
-        // Function to move to the next input field
-        function moveToNext(field, index) {
-            // Allow only numbers
-            field.value = field.value.replace(/[^0-9]/g, '');
-            
-            // Move to next field if this field is filled
-            if (field.value.length === 1) {
-                if (index < 6) {
-                    document.getElementsByClassName('otp-input')[index].focus();
+        document.addEventListener('DOMContentLoaded', function () {
+            let countdownSpan = document.getElementById('countdown');
+            let resendLink = document.getElementById('resendLink');
+            let timerDiv = document.getElementById('timer');
+            let otpInputs = document.querySelectorAll('.otp-input');
+            let hiddenOtp = document.getElementById('hiddenOtp');
+            let countdown = 30;
+
+            function startCountdown() {
+                let interval = setInterval(() => {
+                    countdown--;
+                    countdownSpan.innerText = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        resendLink.classList.remove('disabled');
+                        timerDiv.style.display = 'none';
+                    }
+                }, 1000);
+            }
+
+            function moveToNext(input) {
+                if (input.value.length === 1) {
+                    let next = input.nextElementSibling;
+                    if (next && next.classList.contains('otp-input')) {
+                        next.focus();
+                    }
                 }
             }
-        }
-        
-        // Function to validate OTP
-        function validateOTP(event) {
-            event.preventDefault();
-            
-            // Get all input values
-            const inputs = document.getElementsByClassName('otp-input');
-            let otp = '';
-            
-            for (let i = 0; i < inputs.length; i++) {
-                otp += inputs[i].value;
-            }
-            
-            // Check if OTP is complete (6 digits)
-            if (otp.length !== 6) {
-                showError('Please enter all 6 digits');
-                return;
-            }
-            
-            // For demo purposes, let's say the valid OTP is "123456"
-            if (otp === "123456") {
-                document.getElementById('errorMessage').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-                
-                // Redirect after successful verification (in a real app)
-                setTimeout(() => {
-                    alert('Verification successful! Redirecting to reset password page.');
-                    // window.location.href = 'reset-password.html';
-                }, 2000);
-            } else {
-                showError('Invalid OTP. Please try again.');
-            }
-        }
-        
-        // Function to show error message
-        function showError(message) {
-            const errorElement = document.getElementById('errorMessage');
-            errorElement.innerText = message;
-            errorElement.style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-        }
-        
-        // Function to resend OTP
-        function resendOTP(event) {
-            event.preventDefault();
-            
-            // For demo purposes
-            alert('New OTP has been sent to your email!');
+
+            document.getElementById('otpForm').addEventListener('submit', function (event) {
+                let otpValue = Array.from(otpInputs).map(input => input.value).join('');
+                if (otpValue.length !== 6) {
+                    alert('Please enter all 6 digits of the OTP.');
+                    event.preventDefault();
+                    return;
+                }
+                hiddenOtp.value = otpValue;
+            });
+
             startCountdown();
-        }
-        
-        // Countdown timer
-        let countdownInterval;
-        function startCountdown() {
-            document.getElementById('resendLink').style.pointerEvents = 'none';
-            document.getElementById('resendLink').style.opacity = '0.5';
-            document.getElementById('timer').style.display = 'block';
-            
-            let seconds = 30;
-            document.getElementById('countdown').innerText = seconds;
-            
-            countdownInterval = setInterval(() => {
-                seconds--;
-                document.getElementById('countdown').innerText = seconds;
-                
-                if (seconds <= 0) {
-                    clearInterval(countdownInterval);
-                    document.getElementById('resendLink').style.pointerEvents = 'auto';
-                    document.getElementById('resendLink').style.opacity = '1';
-                    document.getElementById('timer').style.display = 'none';
-                }
-            }, 1000);
-        }
-        
-        // Start countdown on page load
-        window.onload = startCountdown;
+        });
     </script>
 </body>
 </html>

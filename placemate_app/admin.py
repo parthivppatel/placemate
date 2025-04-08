@@ -20,13 +20,12 @@ from .schema.jobs import Job
 from .schema.job_courses import JobCourses
 from .schema.job_locations import JobLocation
 from .schema.job_skills import JobSkill
-from .schema.job_applications import JobApplication
-from .schema.interviews import Interview
-from .schema.placement_drives import PlacementDrive
-from .schema.drive_companies import DriveCompany
-from .schema.drive_students import DriveStudent
+from .schema.drive_applications import DriveApplication
+from .schema.interviews import Interview 
 from .schema.placement_offers import PlacementOffer
 from .schema.notifications import Notification
+from .schema.company_drive_jobs import CompanyDriveJobs
+from .schema.company_drives import CompanyDrive
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Role)
@@ -42,7 +41,7 @@ admin.site.register(PlacementCellMember)
 admin.site.register(Authority)
 admin.site.register(Industry)
 admin.site.register(JobPosition)
-admin.site.register(JobApplication)
+admin.site.register(DriveApplication)
 admin.site.register(JobCourses)
 admin.site.register(JobLocation)
 admin.site.register(Notification)
@@ -51,8 +50,7 @@ admin.site.register(Student)
 admin.site.register(Skill)
 admin.site.register(Job)
 admin.site.register(JobSkill)
-admin.site.register(Interview)
-admin.site.register(PlacementDrive)
-admin.site.register(DriveCompany)
-admin.site.register(DriveStudent)
+admin.site.register(Interview) 
 admin.site.register(PlacementOffer) 
+admin.site.register(CompanyDriveJobs)
+admin.site.register(CompanyDrive)

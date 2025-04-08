@@ -4,7 +4,7 @@ from django.contrib import messages
 from .utils import decode_jwt_token, has_permission
 
  
-def permission_required(permission_name):
+def permission_required(*permission_names):
     def decorator(view_func):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
@@ -18,7 +18,7 @@ def permission_required(permission_name):
                 return redirect("login")
 
             user_role = payload["role"]
-            if not has_permission(user_role, permission_name):
+            if not any(has_permission(user_role, permission_name) for permission_name in permission_names): 
                 return render(request,"403.html")
 
             request.user_data = payload

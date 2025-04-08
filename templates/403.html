@@ -229,12 +229,14 @@
         </div>
         
         <div class="action-container">
-            <a  href="{% url 'login'%}" class="back-button" >Go Back</a>
+            <button class="back-button" onclick="goBack()">Go Back</button>
         </div>
     </div>
     
     <script>
- 
+        function goBack() {
+            window.history.back();
+        }
         
         // Create floating keys animation
         document.addEventListener('DOMContentLoaded', function() {
