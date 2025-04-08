@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StepAhead - Complete Your Profile</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6249c9;
+            --light-purple: #f2f0fa;
+            --white: #ffffff;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background-color: var(--light-purple);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            width: 140px;
+            margin-right: 1rem;
+        }
+        
+        .profile-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-header p {
+            color: #444;
+            margin-bottom: 0;
+        }
+        
+        .info-card {
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-title {
+            font-size: 1.5rem;
+            color: #444;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .avatar-placeholder {
+            width: 150px;
+            height: 150px;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+        }
+        
+        .avatar-icon {
+            font-size: 5rem;
+            color: #adb5bd;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .nav-tabs {
+            border-bottom: none;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: var(--light-purple);
+            color: var(--primary-color);
+            border-radius: 0.375rem;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #5438b8;
+            border-color: #5438b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="header d-flex align-items-center">
+            <!-- <img src="/api/placeholder/140/80" alt="StepAhead Logo" class="logo"> -->
+            <div class="profile-header">
+                <h1>Complete Your Profile</h1>
+                <p>Kindly fill in your personal and academic details to complete your profile and get the most out of our platform.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="info-card">
+                    <h2 class="info-title">Personal Information</h2>
+                    
+                    <div class="avatar-placeholder">
+                        <div class="avatar-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" placeholder="Enter your First Name">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" placeholder="Enter your Last Name">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Gender</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender" id="male" value="male">
+                                    <label class="form-check-label" for="male">Male</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender" id="female" value="female">
+                                    <label class="form-check-label" for="female">Female</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="text" class="form-control" id="dob" placeholder="DD/MM/YYY">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="mobile" class="form-label">Mobile Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text">+91</span>
+                                <input type="text" class="form-control" id="mobile" placeholder="Enter your Mobile Number">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Personal Email ID</label>
+                            <input type="email" class="form-control" id="email" placeholder="Enter your Email ID">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="info-card">
+                    <h2 class="info-title">Academic Information</h2>
+                    
+                    <form>
+                        <div class="mb-3">
+                            <label for="highestEducation" class="form-label">Education</label>
+                            <select class="form-select" id="highestEducation">
+                                <option selected disabled>Select your education</option>
+                                <option>High School</option>
+                                <option>Bachelor's Degree</option>
+                                <option>Master's Degree</option>
+                                <option>Ph.D.</option>
+                                <option>Other</option>  
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="university" class="form-label">University/College</label>
+                            <input type="text" class="form-control" id="university" placeholder="Enter your university/college name">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="specialization" class="form-label">Specialization/Major</label>
+                            <input type="text" class="form-control" id="specialization" placeholder="Enter your specialization">
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="yearOfPassing" class="form-label">Year of Passing</label>
+                                <select class="form-select" id="yearOfPassing">
+                                    <option selected disabled>Select year</option>
+                                    <option>2025</option>
+                                    <option>2024</option>
+                                    <option>2023</option>
+                                    <option>2022</option>
+                                    <option>2021</option>
+                                    <option>2020</option>
+                                    <option>Older</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cgpa" class="form-label">CGPA/Percentage</label>
+                                <input type="text" class="form-control" id="cgpa" placeholder="Enter your CGPA/Percentage">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="skills" class="form-label">Key Skills</label>
+                            <textarea class="form-control" id="skills" rows="3" placeholder="Enter your key skills (separated by commas)"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="certification" class="form-label">Certifications</label>
+                            <textarea class="form-control" id="certification" rows="3" placeholder="Enter your certifications (if any)"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary px-4 py-2">Save Profile</button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</script>
+</body>
+</html>
