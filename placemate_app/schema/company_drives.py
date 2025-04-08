@@ -13,10 +13,8 @@ class CompanyDrive(models.Model):
     id = models.AutoField(primary_key=True)
     drive_name = models.CharField(max_length=255)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    end_date = models.DateField(null=True, blank=True)
-    registration_start_date = models.DateField()
-    registration_end_date = models.DateField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField() 
     status = models.CharField(
         max_length=10,
         choices=DriveStatus.choices,
