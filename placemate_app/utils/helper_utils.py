@@ -36,10 +36,10 @@ def ResponseModel(data=None, message="Success", status=200):
 
 def update_mapper_by_id(model, main_field_id, related_field_id,main_id, incoming_ids):
     """
-    Update a mapper table (like JobSkill, JobCourse) using only IDs.
+    Update a mapper table (like DriveSkill, JobCourse) using only IDs.
 
     Args:
-        model (models.Model): The mapper model (e.g., JobSkill).
+        model (models.Model): The mapper model (e.g., DriveSkill).
         main_field_name (str): Name of the main object ForeignKey field (e.g., 'job').
         related_field_name (str): Name of the related object ForeignKey field (e.g., 'skill').
         main_id (int): ID of the main object.(job.id)

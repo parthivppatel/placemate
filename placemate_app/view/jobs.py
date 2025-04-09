@@ -1,11 +1,11 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from ..schema.jobs import Job,JobType,JobMode
+from ..schema.jobs import Job 
 from ..schema.companies import Company
-from ..schema.job_skills import JobSkill
-from ..schema.job_courses import JobCourses
-from ..schema.job_locations import JobLocation
+from ..schema.drive_skills import DriveSkill
+from ..schema.drive_courses import DriveCourses
+from ..schema.drive_locations import DriveLocation
 from ..schema.company_drive_jobs import CompanyDriveJobs
 from ..schema.placement_offers import PlacementOffer 
 from ..utils.random_password_utils import generate_random_password
@@ -43,11 +43,11 @@ def list_jobs(request):
         if search := filters.get("search","").strip():
             jobs = jobs.filter(Q(job_title__icontains=search) | Q(company__name__icontains=search))
 
-        if "job_type" in filters:
-            jobs = jobs.filter(job_type__iexact=filters['job_type'])
+        # if "job_type" in filters:
+        #     jobs = jobs.filter(job_type__iexact=filters['job_type'])
 
-        if "job_mode" in filters:
-            jobs = jobs.filter(job_mode__iexact=filters['job_mode'])
+        # if "job_mode" in filters:
+        #     jobs = jobs.filter(job_mode__iexact=filters['job_mode'])
         
         if "company" in filters:  
             jobs = jobs.filter(company__exact = filters['company'])
@@ -74,10 +74,10 @@ def list_jobs(request):
                 ordering = "company__name"
             elif sort_field == "job_title":
                 ordering = "job_title"
-            elif sort_field == "job_type":
-                ordering = "job_type"
-            elif sort_field == "job_mode":
-                ordering = "job_mode"
+            # elif sort_field == "job_type":
+            #     ordering = "job_type"
+            # elif sort_field == "job_mode":
+            #     ordering = "job_mode"
             else:
                 ordering = "posted_date"
         
@@ -96,8 +96,8 @@ def list_jobs(request):
                 "id": job.id,
                 "company": job.company.name,
                 "job_title": job.job_title,
-                "job_type": job.job_type,
-                "job_mode": job.job_mode,
+                # "job_type": job.job_type,
+                # "job_mode": job.job_mode,
                 "posted_date": job.posted_date.date()
             })
         
@@ -115,8 +115,8 @@ def list_jobs(request):
 def job_dropdowns(request):    
     data = {
         "companies": list(Company.objects.values("id", "name")),
-        "job_type": [type for type in JobType],
-        "job_mode": [mode for mode in JobMode]
+        # "job_type": [type for type in JobType],
+        # "job_mode": [mode for mode in JobMode]
     }
 
     return ResponseModel(data,"Job Dropdowns get successfully",200)
@@ -125,38 +125,38 @@ def job_dropdowns(request):
 def view_job(request,id=0):
     job = get_object_or_404(Job,id=id)
     
-    job_skills = JobSkill.objects.filter(job=job).select_related("skill")
-    job_courses = JobCourses.objects.filter(job=job).select_related("course")
-    job_locations = JobLocation.objects.filter(job=job).select_related("city")
+    # job_skills = JobSkill.objects.filter(job=job).select_related("skill")
+    # job_courses = JobCourses.objects.filter(job=job).select_related("course")
+    # job_locations = JobLocation.objects.filter(job=job).select_related("city")
 
     data={
         "job_title" : job.job_title,
         "job_description" : job.job_description,
-        "salary_package_min" : job.salary_package_min,
-        "salary_package_max" : job.salary_package_max,
-        "bond" : job.bond,
-        "minimum_cgpa" : job.minimum_cgpa ,
+        # "salary_package_min" : job.salary_package_min,
+        # "salary_package_max" : job.salary_package_max,
+        # "bond" : job.bond,
+        # "minimum_cgpa" : job.minimum_cgpa ,
         "posted_date" : job.posted_date.date(),
-        "tenth" : job.tenth,
-        "twelth" : job.twelth,
-        "diploma" : job.diploma,
-        "undergraduate" : job.diploma,
+        # "tenth" : job.tenth,
+        # "twelth" : job.twelth,
+        # "diploma" : job.diploma,
+        # "undergraduate" : job.diploma,
         "company" : {
             "value": job.company.name, 
             "display": job.company.id.id
         },
         "logo" : job.company.logo if job.company.logo else None,
-        "job_type" : {
-            "value": [type for type in JobType], 
-            "display": job.job_type
-        },
-        "job_mode" : {
-            "value": [mode for mode in JobMode], 
-            "display": job.job_mode
-        },
-        "skills": list({"id":js.skill.id,"name":js.skill.name} for js in job_skills),
-        "courses": list({"id":jc.course.id,"name":jc.course.name,"active":jc.course.is_active} for jc in job_courses),  
-        "locations": list({"id":jl.city.id,"cityname":jl.city.cityname} for jl in job_locations)   
+        # "job_type" : {
+        #     "value": [type for type in JobType], 
+        #     "display": job.job_type
+        # },
+        # "job_mode" : {
+        #     "value": [mode for mode in JobMode], 
+        #     "display": job.job_mode
+        # },
+        # "skills": list({"id":js.skill.id,"name":js.skill.name} for js in job_skills),
+        # "courses": list({"id":jc.course.id,"name":jc.course.name,"active":jc.course.is_active} for jc in job_courses),  
+        # "locations": list({"id":jl.city.id,"cityname":jl.city.cityname} for jl in job_locations)   
     } 
  
     return ResponseModel(data,"Job Fetched Successfully",200)
@@ -170,39 +170,48 @@ def post_job(request):
                 data = json.loads(request.body)
                 # print(data.get("company"))
                 company = Company.objects.get(id = data.get("company"))
-            
+
+                # job_type_input = data.get("job_type").strip()
+                # job_mode_input = data.get("job_mode").strip()
+
+                # if job_type_input not in JobType.values:
+                #     raise ValidationError(f"Invalid job_type: '{job_type_input}'. Must be one of {JobType.values}")
+
+                # if job_mode_input not in JobMode.values:
+                #     raise ValidationError(f"Invalid job_mode: '{job_mode_input}'. Must be one of {JobMode.values}")
+
                 job = Job(
                     company=company,
                     job_title = data.get("job_title").strip(),
                     job_description = data.get("job_description").strip(),
-                    job_type = data.get("job_type").strip(),
-                    job_mode = data.get("job_mode").strip(),
-                    salary_package_min = data.get("salary_package_min").strip(),
-                    salary_package_max = data.get("salary_package_max").strip(),
-                    bond = data.get("bond","").strip() or None,
-                    minimum_cgpa = data.get("minimum_cgpa","").strip() or None,
+                    # job_type = data.get("job_type").strip(),
+                    # job_mode = data.get("job_mode").strip(),
+                    # salary_package_min = data.get("salary_package_min").strip(),
+                    # salary_package_max = data.get("salary_package_max").strip(),
+                    # bond = data.get("bond","").strip() or None,
+                    # minimum_cgpa = data.get("minimum_cgpa","").strip() or None,
                     posted_date = datetime.now(),
-                    tenth = data.get("tenth","").strip() or None,
-                    twelth = data.get("twelth","").strip() or None,
-                    diploma = data.get("minimum_cgpa","").strip() or None,
-                    undergraduate = data.get("minimum_cgpa","").strip() or None,
+                    # tenth = data.get("tenth","").strip() or None,
+                    # twelth = data.get("twelth","").strip() or None,
+                    # diploma = data.get("minimum_cgpa","").strip() or None,
+                    # undergraduate = data.get("minimum_cgpa","").strip() or None,
                 )
-
+                job.full_clean()
                 job.save()
 
-                skills = data.get("skills", []) 
-                courses = data.get("courses", []) 
-                locations = data.get("locations", []) 
+                # skills = data.get("skills", []) 
+                # courses = data.get("courses", []) 
+                # locations = data.get("locations", []) 
 
-                # Prepare JobSkills instances
-                job_skills = [JobSkill(job_id=job.id, skill_id=skill_id) for skill_id in skills]
-                JobSkill.objects.bulk_create(job_skills)
+                # # Prepare JobSkills instances
+                # job_skills = [JobSkill(job_id=job.id, skill_id=skill_id) for skill_id in skills]
+                # JobSkill.objects.bulk_create(job_skills)
                 
-                job_courses = [JobCourses(job_id=job.id, course_id=course_id) for course_id in courses]
-                JobCourses.objects.bulk_create(job_courses)
+                # job_courses = [JobCourses(job_id=job.id, course_id=course_id) for course_id in courses]
+                # JobCourses.objects.bulk_create(job_courses)
                 
-                job_locations = [JobLocation(job_id=job.id, city_id=city_id) for city_id in locations]
-                JobLocation.objects.bulk_create(job_locations)
+                # job_locations = [JobLocation(job_id=job.id, city_id=city_id) for city_id in locations]
+                # JobLocation.objects.bulk_create(job_locations)
 
                 return ResponseModel({},"Job added successfully!",201)
 
@@ -241,22 +250,24 @@ def edit_job(request,id=0):
 
             job.job_title = data.get("job_title").strip()
             job.job_description = data.get("job_description").strip()
-            job.job_type = data.get("job_type").strip()
-            job.job_mode = data.get("job_mode").strip()
-            job.salary_package_min = data.get("salary_package_min").strip()
-            job.salary_package_max = data.get("salary_package_max").strip()
-            job.bond = data.get("bond","").strip() or None
-            job.minimum_cgpa = data.get("minimum_cgpa","").strip() or None
+            # job.job_type = data.get("job_type").strip()
+            # job.job_mode = data.get("job_mode").strip()
+            # job.salary_package_min = data.get("salary_package_min").strip()
+            # job.salary_package_max = data.get("salary_package_max").strip()
+            # job.bond = data.get("bond","").strip() or None
+            # job.minimum_cgpa = data.get("minimum_cgpa","").strip() or None
             job.updated_date = datetime.now()
-            job.tenth = data.get("tenth","").strip() or None
-            job.twelth = data.get("twelth","").strip() or None
-            job.diploma = data.get("minimum_cgpa","").strip() or None
-            job.undergraduate = data.get("minimum_cgpa","").strip() or None
+            # job.tenth = data.get("tenth","").strip() or None
+            # job.twelth = data.get("twelth","").strip() or None
+            # job.diploma = data.get("minimum_cgpa","").strip() or None
+            # job.undergraduate = data.get("minimum_cgpa","").strip() or None
+            
+            job.full_clean()
             job.save()
             
-            update_mapper_by_id(JobSkill,'job_id','skill_id',job.id,data.get('skills',[]))
-            update_mapper_by_id(JobCourses,'job_id','course_id',job.id,data.get('courses',[]))
-            update_mapper_by_id(JobLocation,'job_id','city_id',job.id,data.get('locations',[]))
+            # update_mapper_by_id(JobSkill,'job_id','skill_id',job.id,data.get('skills',[]))
+            # update_mapper_by_id(JobCourses,'job_id','course_id',job.id,data.get('courses',[]))
+            # update_mapper_by_id(JobLocation,'job_id','city_id',job.id,data.get('locations',[]))
 
             return ResponseModel({},"Job updated successfully",200)
         

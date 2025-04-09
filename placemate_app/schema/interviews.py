@@ -33,6 +33,8 @@ class Interview(models.Model):
     status = models.CharField(max_length=15,choices=InterviewStatus.choices,default=InterviewStatus.SCHEDULED)
     result = models.CharField(max_length=10,choices=InterviewResult.choices,null=True,blank=True)
     interview_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'interviews'
