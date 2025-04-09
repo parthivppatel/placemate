@@ -12,6 +12,8 @@ from .view.countries_states_cities import get_countries,get_states,get_cities
 from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
 from .view.companydrives import list_drives,add_drive
 
+from .view.students import list_students
+
 urlpatterns = [
     path('', dashboard, name="dashboard"),
 
@@ -45,5 +47,9 @@ urlpatterns = [
 
     path('get-countries/',get_countries,name="get_countries"),
     path('get-states/<int:country_id>/',get_states,name="get_states"),
-    path('get-cities/<int:state_id>/',get_cities,name="get_cities")
+    path('get-cities/<int:state_id>/',get_cities,name="get_cities"),
+
+    # Manage Students
+    path('students/list/', list_students, name='list_students')
+
 ]

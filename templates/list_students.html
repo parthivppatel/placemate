@@ -1,0 +1,144 @@
+{% extends "admin_base.html" %} {% load static %} {% block content %}
+<style>
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        text-transform: capitalize;
+    }
+
+    .status-placed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-processing {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-not-placed {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div>
+            <div class="header">
+                <div>
+                    <h2 class="mb-0">Student List</h2>
+                    <p class="text-muted">
+                        Manage registered students for placement opportunities.
+                    </p>
+                </div>
+
+                <!-- Profile and Notification -->
+                <div class="profile-section">
+                    <div class="notification-container">
+                        <div class="notification-icon" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                            <i class="bi bi-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </div>
+                    </div>
+                    <div class="profile-icon" data-bs-toggle="offcanvas" data-bs-target="#profileOffcanvas">
+                        <i class="bi bi-person"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register New Student Button -->
+            <div class="row mb-4">
+                <div class="col-12 text-end mb-3">
+                    <a href="" class="btn btn-outline-primary rounded-pill btn-register">
+                        Add New Students <i class="bi bi-plus"></i>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <div class="search-container">
+                        <input type="text" class="form-control rounded-pill" placeholder="Search by Name or Reg. No." />
+                        <div class="search-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="filters-container">
+                        <!-- Filtering can be added using GET parameters and backend processing -->
+                        <select class="form-select form-select-sm form-select-compact">
+                            <option value="">All Batches</option>
+                            <option value="2022-2026">2022-2026</option>
+                            <option value="2021-2025">2021-2025</option>
+                        </select>
+
+                        <select class="form-select form-select-sm form-select-compact">
+                            <option value="">All Courses</option>
+                            <option value="B.Tech CSE">B.Tech CSE</option>
+                            <option value="MCA">MCA</option>
+                        </select>
+
+                        <select class="form-select form-select-sm form-select-compact">
+                            <option value="">All Status</option>
+                            <option value="Placed">Placed</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Not Placed">Not Placed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="table-responsive rounded">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Name</th>
+                            <th>Registration No.</th>
+                            <th>Batch</th>
+                            <th>Course</th>
+                            <th>Placement Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if students %} {% for student in students %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ student.first_name }} {{ student.last_name }}</td>
+                            <td>{{ student.enrollment }}</td>
+                            <td>
+                                {{ student.joining_year }} - {{ student.joining_year|add:"4" }}
+                            </td>
+                            <td>{{ student.course }}</td>
+                            <td>
+                                <span
+                                    class="status-badge {% if student.placement_status == 'Placed' %} status-placed {% elif student.placement_status == 'Processing' %} status-processing {% elif student.placement_status == 'Not Placed' %} status-not-placed {% endif %}">
+                                    {{ student.placement_status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="" class="btn btn-sm btn-primary">View</a>
+                                <a href="" class="btn btn-sm btn-warning">Edit</a>
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteConfirmModal" data-student-id="{{ student.id }}">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %} {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">No students found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

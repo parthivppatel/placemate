@@ -42,5 +42,6 @@ INSERT INTO "Permissions" (id,name, description) VALUES (11,'delete_job','Permis
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(21,2,11);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(22,3,11);
 
-
-
+INSERT INTO "Permissions" (id, name, description)  VALUES (12, 'view_students', 'Permission to view students details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(23,2,12);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(24,3,12);

@@ -6,11 +6,11 @@
     </div>
 
     <div class="sidebar-nav">
-        <a href="/" class="sidebar-link" id="dashboard-link">
+        <a href="{% url 'dashboard' %}" class="sidebar-link" id="dashboard-link">
             <span class="sidebar-icon"><i class="bi bi-grid"></i></span>
             <span class="sidebar-text">Dashboard</span>
         </a>
-        <a href="" class="sidebar-link" id="students-link">
+        <a href="{% url 'list_students' %}" class="sidebar-link" id="students-link">
             <span class="sidebar-icon"><i class="bi bi-people"></i></span>
             <span class="sidebar-text">Students</span>
         </a>
