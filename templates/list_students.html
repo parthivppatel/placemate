@@ -3,27 +3,48 @@
 {% block content %}
 <style>
     .status-badge {
-        font-size: 0.8rem;
-        padding: 0.25rem 0.6rem;
-        border-radius: 50px;
-        display: inline-block;
-        min-width: 100px;
-        text-align: center;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 50px;
+    display: inline-block;
+    min-width: 100px;
+    text-align: center;
+    font-weight: 500;
     }
 
+    /* PLACED */
     .status-placed {
         background-color: #d1e7dd;
         color: #0f5132;
     }
 
-    .status-processing {
-        background-color: #cfe2ff;
-        color: #084298;
+    /* INTERNSHIP */
+    .status-intern {
+        background-color: #cff4fc;
+        color: #055160;
     }
 
+    /* JOB OFFER RECEIVED */
+    .status-offer {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    /* NOT PLACED */
     .status-not-placed {
         background-color: #f8d7da;
         color: #842029;
+    }
+
+    /* Optional fallback */
+    .status-unknown {
+        background-color: #e2e3e5;
+        color: #41464b;
+    }
+
+    
+    select.form-select-sm, .btn-outline-secondary {
+        min-width: 120px;
     }
 </style>
 
@@ -66,51 +87,47 @@
                 <div class="row mb-3 align-items-center">
                     <div class="col-md-6 mb-2 mb-md-0">
                         <div class="position-relative">
-                            <input type="text" class="form-control rounded-pill ps-4" name="search"
+                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y text-muted ms-3"></i>
+                            <input type="text" class="form-control rounded-pill ps-5 py-2 shadow-sm" name="search"
                                 placeholder="Search by Name or Reg. No." value="{{ request.GET.search|default:'' }}"
                                 onkeydown="if(event.key==='Enter'){ this.form.submit(); }">
-                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-2"></i>
-                        </div>
+                        </div>                        
                     </div>
-                    <div class="col-md-6 d-flex justify-content-md-end gap-2">
+                    <div class="col-md-6 d-flex flex-wrap justify-content-md-end gap-2">
                         <!-- Batch Filter -->
-                        <select class="form-select form-select-sm w-auto" name="batch" onchange="this.form.submit()">
-                            <option value="">All Batches</option>
+                        <select name="batch" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
+                            <option value="">All Batch</option>
                             {% for batch in filter_options.batches %}
-                            <option value="{{ batch }}" {% if request.GET.batch == batch %}selected{% endif %}>
-                                {{ batch }} - {{ batch|add:"4" }}
-                            </option>
+                            <option value="{{ batch }}" {% if request.GET.batch == batch|stringformat:"s" %}selected{% endif %}>{{ batch }}</option>
                             {% endfor %}
                         </select>
-
+                    
                         <!-- Course Filter -->
-                        <select class="form-select form-select-sm w-auto" name="course" onchange="this.form.submit()">
-                            <option value="">All Courses</option>
+                        <select name="course" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
+                            <option value="">All Course</option>
                             {% for course in filter_options.courses %}
-                            <option value="{{ course }}" {% if request.GET.course == course %}selected{% endif %}>
-                                {{ course }}
+                            <option value="{{ course.value }}" {% if request.GET.course == course.value|stringformat:"s" %}selected{% endif %}>
+                                {{ course.label }}
                             </option>
                             {% endfor %}
                         </select>
-                        
-
-                        <!-- Status Filter -->
-                        <select class="form-select form-select-sm w-auto" name="status" onchange="this.form.submit()">
+                    
+                        <!-- Placement Status Filter -->
+                        <select name="placement_status" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">All Status</option>
-                            {% for status in filter_options.statuses %}
-                            <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>
-                                {{ status }}
+                            {% for status in filter_options.placement_statuses %}
+                            <option value="{{ status.value }}" {% if request.GET.placement_status == status.value|stringformat:"s" %}selected{% endif %}>
+                                {{ status.label }}
                             </option>
                             {% endfor %}
                         </select>
-                        
-
+                    
                         <!-- Reset Filters Button -->
-                        <button type="button" class="btn btn-outline-secondary" id="resetFiltersBtn"
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm" id="resetFiltersBtn"
                             onclick="resetFilters()">
-                            Reset Filters
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
                         </button>
-                    </div>
+                    </div>   
                 </div>
             </form>
 
@@ -140,30 +157,35 @@
                             <td>
                                 {% with student.placement_status as status_code %}
                                 <span class="status-badge 
-                                    {% if status_code == 2 %}status-placed
-                                    {% elif status_code == 1 %}status-processing
+                                    {% if status_code == 1 %}status-placed
+                                    {% elif status_code == 2 %}status-intern
+                                    {% elif status_code == 3 %}status-offer
                                     {% elif status_code == 0 %}status-not-placed
+                                    {% else %}status-unknown
                                     {% endif %}">
-                                    {% if status_code == 2 %}
-                                    Placed
-                                    {% elif status_code == 1 %}
-                                    Processing
+                                    {% if status_code == 1 %}
+                                        Placed
+                                    {% elif status_code == 2 %}
+                                        Internship
+                                    {% elif status_code == 3 %}
+                                        Job Offer Received
                                     {% elif status_code == 0 %}
-                                    Not Placed
+                                        Not Placed
                                     {% else %}
-                                    Unknown
+                                        Unknown
                                     {% endif %}
                                 </span>
                                 {% endwith %}
-                            </td>
+                            </td>                            
                             <td>
                                 <a href="" class="btn btn-sm btn-primary" title="View">
                                     <i class="bi bi-eye-fill"></i>
                                 </a>
                                 <button class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
-                                    data-bs-target="#deleteConfirmModal" data-student-id="{{ student.id }}">
+                                        data-bs-target="#deleteConfirmModal" data-student-id="{{ student.id }}">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
+
                             </td>
                         </tr>
                         {% endfor %}
@@ -235,7 +257,7 @@
                 Are you sure you want to delete this student?
             </div>
             <div class="modal-footer">
-                <form method="POST" id="deleteStudentForm">
+                <form method="POST" id="deleteStudentForm" action="{% url 'delete_student' %}">
                     {% csrf_token %}
                     <input type="hidden" name="student_id" id="studentIdToDelete" />
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -253,29 +275,10 @@
     document.addEventListener("DOMContentLoaded", function () {
         // Reset Filters button handler
         function resetFilters() {
-            // Reset form fields
-            const form = document.getElementById('filterForm');
-            form.reset();
-
-            // Reset search input manually
-            const searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                searchInput.value = '';  // Clear the search input field
-            }
-
-            // Remove query parameters from the URL (batch, course, status, search)
-            const url = new URL(window.location);
-            url.searchParams.delete('search');
-            url.searchParams.delete('batch');
-            url.searchParams.delete('course');
-            url.searchParams.delete('status');
-
-            // Replace the current URL without reloading the page
-            window.history.replaceState({}, '', url);
-
-            // Submit the form to refresh the results
-            form.submit();
+            const baseUrl = window.location.origin + window.location.pathname;
+            window.location.href = baseUrl;
         }
+
 
         // Attach the reset function to the Reset Filters button (fixed ID)
         const resetButton = document.getElementById('resetFiltersBtn');  // Corrected ID here
@@ -293,6 +296,15 @@
                 window.history.replaceState({}, '', url);  // Update URL without page reload
             });
         }
+
+        // When a delete button is clicked, extract the student ID and set it in the hidden input field
+        document.querySelectorAll('button[data-bs-target="#deleteConfirmModal"]').forEach(button => {
+            button.addEventListener('click', function () {
+                const studentId = this.getAttribute('data-student-id');
+                const input = document.getElementById('studentIdToDelete');
+                if (input) input.value = studentId;
+            });
+        });
     });
 </script>
 
