@@ -1,27 +1,3 @@
-// Sample data for demonstration
-const students = [
-    { id: 1, name: "Parthiv Patel", regNo: "202412069", batch: "2024-2026", course: "M.Sc. IT", status: "Placed" },
-    { id: 2, name: "Rahul Sharma", regNo: "21CS102", batch: "2021-2025", course: "B.Tech CSE", status: "Placed" },
-    { id: 3, name: "Priya Singh", regNo: "21CS103", batch: "2021-2025", course: "B.Tech CSE", status: "Processing" },
-    { id: 4, name: "Arjun Nair", regNo: "21EC101", batch: "2021-2025", course: "B.Tech ECE", status: "Placed" },
-    { id: 5, name: "Sneha Gupta", regNo: "21EC102", batch: "2021-2025", course: "B.Tech ECE", status: "Not Placed" },
-    { id: 6, name: "Vikram Reddy", regNo: "21ME101", batch: "2021-2025", course: "B.Tech Mech", status: "Processing" },
-    { id: 7, name: "Neha Kapoor", regNo: "21EE101", batch: "2021-2025", course: "B.Tech EEE", status: "Placed" },
-    { id: 8, name: "Rajesh Kumar", regNo: "22CS101", batch: "2022-2026", course: "B.Tech CSE", status: "Not Placed" },
-    { id: 9, name: "Meera Iyer", regNo: "22CS102", batch: "2022-2026", course: "B.Tech CSE", status: "Processing" },
-    { id: 10, name: "Sameer Joshi", regNo: "22EC101", batch: "2022-2026", course: "B.Tech ECE", status: "Not Placed" },
-    { id: 11, name: "Anjali Menon", regNo: "22MCA101", batch: "2022-2024", course: "MCA", status: "Processing" },
-    { id: 12, name: "Rohan Das", regNo: "22MCA102", batch: "2022-2024", course: "MCA", status: "Placed" },
-    { id: 13, name: "Kiran Shah", regNo: "21MBA101", batch: "2021-2023", course: "MBA", status: "Placed" },
-    { id: 14, name: "Divya Krishnan", regNo: "21MBA102", batch: "2021-2023", course: "MBA", status: "Placed" },
-    { id: 15, name: "Aditi Verma", regNo: "20CS101", batch: "2020-2024", course: "B.Tech CSE", status: "Placed" },
-    { id: 16, name: "Varun Malhotra", regNo: "20CS102", batch: "2020-2024", course: "B.Tech CSE", status: "Placed" },
-    { id: 17, name: "Pallavi Desai", regNo: "20EC101", batch: "2020-2024", course: "B.Tech ECE", status: "Not Placed" },
-    { id: 18, name: "Akash Patel", regNo: "20ME101", batch: "2020-2024", course: "B.Tech Mech", status: "Processing" },
-    { id: 19, name: "Kavya Rajan", regNo: "22MBA101", batch: "2022-2024", course: "MBA", status: "Not Placed" },
-    { id: 20, name: "Siddharth Iyer", regNo: "22MBA102", batch: "2022-2024", course: "MBA", status: "Processing" }
-];
-
 document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
     let recordsPerPage = 10;
