@@ -50,6 +50,7 @@ class Company(models.Model):
     contact_person_position = models.ForeignKey(JobPosition, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.TextField(blank=True, null=True)
     # logo = models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
