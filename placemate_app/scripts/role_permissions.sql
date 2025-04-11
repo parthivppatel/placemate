@@ -46,6 +46,9 @@ INSERT INTO "Permissions" (id, name, description)  VALUES (12, 'view_students', 
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(23,2,12);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(24,3,12);
 
-INSERT INTO "Permissions" (id, name, description)  VALUES (13, 'delete_students', 'Permission to delete students');
+INSERT INTO "Permissions" (id, name, description) VALUES (13, 'delete_students', 'Permission to delete students');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(25,2,13);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(26,3,13);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (14, 'add_students', 'Permission to add/create students');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES (28, 3, 14);

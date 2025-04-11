@@ -10,4 +10,440 @@
 {% endblock %}
 
 {% block content %}
+
+<style>
+    h1 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    input,
+    select,
+    textarea {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border 0.3s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    }
+
+    .row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .col {
+        flex: 1;
+    }
+
+    .profile-upload {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: var(--light-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        overflow: hidden;
+        border: 2px solid var(--border-color);
+    }
+
+    .profile-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .upload-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .upload-btn:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .conditional-field {
+        display: none;
+    }
+
+    .register-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 30px;
+        transition: background-color 0.3s, transform 0.2s;
+        text-align: center;
+    }
+
+    .register-btn:hover {
+        background-color: #27ae60;
+        transform: translateY(-2px);
+    }
+
+    .error {
+        color: var(--danger-color);
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    /* Animation for successful registration */
+    @keyframes success-animation {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .success-animation {
+        animation: success-animation 0.5s ease;
+    }
+</style>
+
+<h1>Student Registration Form</h1>
+<form id="studentRegistrationForm" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <!-- Profile Picture -->
+    <div class="form-group">
+        <label>Profile Picture</label>
+        <div class="profile-upload">
+            <div class="profile-preview" id="profilePreview">
+                <img id="previewImage" src="/api/placeholder/100/100" alt="Profile Preview" style="display:none;">
+                <span id="previewText">No Image</span>
+            </div>
+            <input type="file" id="profilePicture" accept="image/*" style="display:none;">
+            <button type="button" class="upload-btn" id="uploadBtn">Upload Image</button>
+        </div>
+    </div>
+
+    <!-- Name Fields -->
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" required>
+                <div class="error" id="firstNameError">First name is required</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="middleName">Middle Name</label>
+                <input type="text" id="middleName" name="middleName">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" required>
+                <div class="error" id="lastNameError">Last name is required</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrollment and Details -->
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="enrollmentNo">Enrollment No. *</label>
+                <input type="number" id="enrollmentNo" name="enrollmentNo" required>
+                <div class="error" id="enrollmentNoError">Valid enrollment number is required</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="dob">Date of Birth *</label>
+                <input type="date" id="dob" name="dob" required>
+                <div class="error" id="dobError">Date of birth is required</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="gender">Gender *</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+                <div class="error" id="genderError">Please select a gender</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Details -->
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="joiningYear">Joining Year *</label>
+                <input type="number" id="joiningYear" name="joiningYear" min="2000" max="2100" required>
+                <div class="error" id="joiningYearError">Valid joining year is required</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="cgpa">CGPA *</label>
+                <input type="number" id="cgpa" name="cgpa" min="0" max="10" step="0.01" required>
+                <div class="error" id="cgpaError">CGPA must be between 0 and 10</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="course">Course *</label>
+                <select id="course" name="course" required>
+                    <option value="">Select Course</option>
+                    <option value="btech">B.Tech</option>
+                    <option value="mtech">M.Tech</option>
+                    <option value="bca">BCA</option>
+                    <option value="mca">MCA</option>
+                    <option value="bba">BBA</option>
+                    <option value="mba">MBA</option>
+                    <option value="bsc">B.Sc</option>
+                    <option value="msc">M.Sc</option>
+                </select>
+                <div class="error" id="courseError">Please select a course</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Placement Details -->
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="graduationStatus">Graduation Status *</label>
+                <select id="graduationStatus" name="graduationStatus" required>
+                    <option value="">Select Status</option>
+                    <option value="graduated">Graduated</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="dropped">Dropped Out</option>
+                </select>
+                <div class="error" id="graduationStatusError">Graduation status is required</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="placementStatus">Placement Status *</label>
+                <select id="placementStatus" name="placementStatus" required>
+                    <option value="">Select Status</option>
+                    <option value="placed">Placed</option>
+                    <option value="not_placed">Not Placed</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="in_progress">In Progress</option>
+                </select>
+                <div class="error" id="placementStatusError">Placement status is required</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="city">City *</label>
+                <input type="text" id="city" name="city" required>
+                <div class="error" id="cityError">City is required</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conditional Fields for Placed Students -->
+    <div class="row" id="placementDetailsRow">
+        <div class="col">
+            <div class="form-group conditional-field" id="companyField">
+                <label for="companyPlacedIn">Company Placed In *</label>
+                <input type="text" id="companyPlacedIn" name="companyPlacedIn">
+                <div class="error" id="companyError">Company name is required for placed students</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group conditional-field" id="packageField">
+                <label for="package">Package (LPA) *</label>
+                <input type="number" id="package" name="package" min="0" step="0.01">
+                <div class="error" id="packageError">Valid package amount is required</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address -->
+    <div class="form-group">
+        <label for="address">Address *</label>
+        <textarea id="address" name="address" rows="3" required></textarea>
+        <div class="error" id="addressError">Address is required</div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="register-btn" id="registerBtn">Register Student</button>
+</form>
+
+<script>
+    // Function to handle profile picture upload
+    document.getElementById('uploadBtn').addEventListener('click', function () {
+        document.getElementById('profilePicture').click();
+    });
+
+    document.getElementById('profilePicture').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = document.getElementById('previewImage');
+                img.src = event.target.result;
+                img.style.display = 'block';
+                document.getElementById('previewText').style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Show/hide conditional fields based on placement status
+    document.getElementById('placementStatus').addEventListener('change', function () {
+        const placementStatus = this.value;
+        const companyField = document.getElementById('companyField');
+        const packageField = document.getElementById('packageField');
+
+        if (placementStatus === 'placed') {
+            companyField.style.display = 'block';
+            packageField.style.display = 'block';
+            document.getElementById('companyPlacedIn').setAttribute('required', '');
+            document.getElementById('package').setAttribute('required', '');
+        } else {
+            companyField.style.display = 'none';
+            packageField.style.display = 'none';
+            document.getElementById('companyPlacedIn').removeAttribute('required');
+            document.getElementById('package').removeAttribute('required');
+        }
+    });
+
+    // Form validation
+    document.getElementById('studentRegistrationForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Reset all error messages
+        const errorElements = document.querySelectorAll('.error');
+        errorElements.forEach(el => el.style.display = 'none');
+
+        let hasError = false;
+
+        // Validate required fields
+        const requiredFields = [
+            { id: 'firstName', error: 'firstNameError' },
+            { id: 'lastName', error: 'lastNameError' },
+            { id: 'enrollmentNo', error: 'enrollmentNoError' },
+            { id: 'dob', error: 'dobError' },
+            { id: 'gender', error: 'genderError' },
+            { id: 'joiningYear', error: 'joiningYearError' },
+            { id: 'cgpa', error: 'cgpaError' },
+            { id: 'course', error: 'courseError' },
+            { id: 'graduationStatus', error: 'graduationStatusError' },
+            { id: 'placementStatus', error: 'placementStatusError' },
+            { id: 'city', error: 'cityError' },
+            { id: 'address', error: 'addressError' }
+        ];
+
+        requiredFields.forEach(field => {
+            const element = document.getElementById(field.id);
+            if (!element.value.trim()) {
+                document.getElementById(field.error).style.display = 'block';
+                hasError = true;
+            }
+        });
+
+        // Validate CGPA range
+        const cgpa = parseFloat(document.getElementById('cgpa').value);
+        if (isNaN(cgpa) || cgpa < 0 || cgpa > 10) {
+            document.getElementById('cgpaError').style.display = 'block';
+            hasError = true;
+        }
+
+        // Validate joining year
+        const joiningYear = parseInt(document.getElementById('joiningYear').value);
+        const currentYear = new Date().getFullYear();
+        if (isNaN(joiningYear) || joiningYear < 2000 || joiningYear > currentYear) {
+            document.getElementById('joiningYearError').style.display = 'block';
+            hasError = true;
+        }
+
+        // Validate conditional fields for placed students
+        if (document.getElementById('placementStatus').value === 'placed') {
+            if (!document.getElementById('companyPlacedIn').value.trim()) {
+                document.getElementById('companyError').style.display = 'block';
+                hasError = true;
+            }
+
+            const packageValue = parseFloat(document.getElementById('package').value);
+            if (isNaN(packageValue) || packageValue < 0) {
+                document.getElementById('packageError').style.display = 'block';
+                hasError = true;
+            }
+        }
+
+        // If no errors, proceed with form submission
+        if (!hasError) {
+            // For demonstration purposes, we'll show a success animation
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.textContent = "Student Registered Successfully!";
+            registerBtn.classList.add('success-animation');
+            registerBtn.style.backgroundColor = '#27ae60';
+
+            // In a real application, you would submit the form data to your backend here
+            console.log("Form submitted successfully!");
+
+            // Reset form after successful submission (optional)
+            setTimeout(() => {
+                // document.getElementById('studentRegistrationForm').reset();
+                // registerBtn.textContent = "Register Student";
+                // registerBtn.classList.remove('success-animation');
+                // document.getElementById('previewImage').style.display = 'none';
+                // document.getElementById('previewText').style.display = 'block';
+                // Hide conditional fields
+                // document.getElementById('companyField').style.display = 'none';
+                // document.getElementById('packageField').style.display = 'none';
+            }, 3000);
+        }
+    });
+</script>
 {% endblock %}

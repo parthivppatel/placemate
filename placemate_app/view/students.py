@@ -75,6 +75,8 @@ def student_registrations(request):
         "page_subtitle": "Add Student Details"
     })
 
+@permission_required('add_students')
+@csrf_exempt
 def student_manual_registrations(request):
     return render(request, "student_manual_registrations.html", {
         "page_title": "Student Manual Registrations",
