@@ -69,6 +69,19 @@ def format_student_data(paginated_students, page, perpage):
         for i, s in enumerate(paginated_students)
     ]
 
+def student_registrations(request):
+    return render(request, "student_registrations.html", {
+        "page_title": "Student Registrations",
+        "page_subtitle": "Add Student Details"
+    })
+
+@permission_required('add_students')
+@csrf_exempt
+def student_manual_registrations(request):
+    return render(request, "student_manual_registrations.html", {
+        "page_title": "Student Manual Registrations",
+        "page_subtitle": "Add Student Details"
+    })
 
 @permission_required('view_students')
 @csrf_exempt
@@ -130,7 +143,6 @@ def list_students(request):
             "graduation_statuses": graduation_status_options
         }
     })
-
 
 @permission_required('delete_students')
 @csrf_exempt

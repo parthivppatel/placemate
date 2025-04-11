@@ -12,7 +12,7 @@ from .view.countries_states_cities import get_countries,get_states,get_cities
 # from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
 from .view.companydrives import list_drives,add_drive,edit_drive,delete_drive,view_drive,drive_dropdowns
 
-from .view.students import list_students, delete_student
+from .view.students import student_registrations, student_manual_registrations, list_students, delete_student
 
 urlpatterns = [
     path('', dashboard, name="dashboard"),
@@ -54,6 +54,8 @@ urlpatterns = [
     path('get-cities/<int:state_id>/',get_cities,name="get_cities"),
 
     # Manage Students
+    path('students/manual_registrations/', student_manual_registrations, name='student_manual_registrations'),
+    path('students/registrations/', student_registrations, name='student_registrations'),
     path('students/list/', list_students, name='list_students'),
     path('students/delete/', delete_student, name='delete_student'),
 
