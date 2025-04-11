@@ -1,7 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from ..schema.jobs import Job
 from ..schema.companies import Company
 from ..schema.students import Student
 from ..schema.drive_skills import DriveSkill
@@ -184,28 +183,30 @@ def add_drive(request):
                 if not jobs or not isinstance(jobs, list):
                    return ResponseModel({}, "At least one job_id must be provided.", 400)
 
-                job_count = Job.objects.filter(id__in=jobs, company__id=company.id).count()
 
-                if(job_count!= len(jobs)):
-                    return ResponseModel({}, "One or more jobs do not belong to the specified company.", 400)
-                # print("here")
-                
-                # Prepare CompanyDriveJobs instances
-                companydrivejobs = [CompanyDriveJobs(company_drive_id=Companydrive.id, job_id=job_id) for job_id in jobs]
-                CompanyDriveJobs.objects.bulk_create(companydrivejobs)
-                
-                # Filter valid students (currently studying)
-                students = Student.objects.annotate(
-                    course_end_year=ExpressionWrapper(
-                        F('joining_year') + F('course__years'),
-                        output_field=IntegerField()
-                    )
-                ).filter(
-                    joining_year__lte=start_year,
-                    course_end_year__gte=start_year,
-                    graduation_status__in='Pursuing'
-                )
+#==================================================working on new logic=========================================
+                # job_count = Job.objects.filter(id__in=jobs, company__id=company.id).count()
 
+                # if(job_count!= len(jobs)):
+                #     return ResponseModel({}, "One or more jobs do not belong to the specified company.", 400)
+                # # print("here")
+                
+                # # Prepare CompanyDriveJobs instances
+                # companydrivejobs = [CompanyDriveJobs(company_drive_id=Companydrive.id, job_id=job_id) for job_id in jobs]
+                # CompanyDriveJobs.objects.bulk_create(companydrivejobs)
+                
+                # # Filter valid students (currently studying)
+                # students = Student.objects.annotate(
+                #     course_end_year=ExpressionWrapper(
+                #         F('joining_year') + F('course__years'),
+                #         output_field=IntegerField()
+                #     )
+                # ).filter(
+                #     joining_year__lte=start_year,
+                #     course_end_year__gte=start_year,
+                #     graduation_status__in='Pursuing'
+                # )
+#====================================================================================================
 
                 return ResponseModel({},"Drive added successfully!",201)
 

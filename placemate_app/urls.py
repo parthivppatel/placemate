@@ -9,7 +9,7 @@ from .view.logout import logout
 from .view.reset_password import reset_password
 from .view.companies import register_company,view_company,company_dropdowns,list_companies,edit_company,delete_company,get_industries
 from .view.countries_states_cities import get_countries,get_states,get_cities
-from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
+# from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
 from .view.companydrives import list_drives,add_drive
 
 from .view.students import list_students, delete_student
@@ -35,12 +35,12 @@ urlpatterns = [
     path('delete-company/<int:id>/',delete_company,name="delete_company"),
     path('company-dropdowns/',company_dropdowns,name="company_dropdowns"),
 
-    path('post-job/',post_job,name="post_job"),
-    path('edit-job/<int:id>/',edit_job,name="edit_job"),
-    path('list-jobs/',list_jobs,name="list_jobs"),
-    path('job-dropdowns/',job_dropdowns,name="job_dropdowns"),
-    path('view-job/<int:id>/',view_job,name="view_job"),
-    path('delete-job/<int:id>/',delete_job,name="delete_job"),
+    # path('post-job/',post_job,name="post_job"),
+    # path('edit-job/<int:id>/',edit_job,name="edit_job"),
+    # path('list-jobs/',list_jobs,name="list_jobs"),
+    # path('job-dropdowns/',job_dropdowns,name="job_dropdowns"),
+    # path('view-job/<int:id>/',view_job,name="view_job"),
+    # path('delete-job/<int:id>/',delete_job,name="delete_job"),
 
     path('list-drives/',list_drives,name="list_drives"),
     path('add-drive/',add_drive,name="add_drive"),

@@ -1,7 +1,7 @@
 from django.utils.html import escape
 from django.core.mail import send_mail
 from placemate import settings
-from ..schema.jobs import Job
+from ..schema.company_drive_jobs import CompanyDriveJobs
 
 def send_custom_email(email, subject, message, html_message=None):
     """
@@ -108,79 +108,79 @@ def send_registration_email(email, password):
 
     send_custom_email(email,subject,message,html_message)
 
-def send_drive_emails(drive, students,companydrivejobs):
-    company = drive.company
-    # drive_jobs = Job.objects.filter(company=company)
-    job_ids = [cdj.job_id for cdj in companydrivejobs]
-    jobs = Job.objects.filter(id__in=job_ids)
+# def send_drive_emails(drive, students,companydrivejobs):
+#     company = drive.company
+#     # drive_jobs = Job.objects.filter(company=company)
+#     job_ids = [cdj.job_id for cdj in companydrivejobs]
+#     jobs = CompanyDriveJobs.objects.filter(id__in=job_ids)
 
-    job_lines = ""
-    for i, job in enumerate(jobs, start=1):
-        job_lines += f"{i}. {job.job_title}: {job.job_description.strip()}\n\n"
+#     job_lines = ""
+#     for i, job in enumerate(jobs, start=1):
+#         job_lines += f"{i}. {job.job_title}: {job.job_description.strip()}\n\n"
 
-    subject = f"Placement Drive - {company.name} - {drive.drive_name}"
-    ug_package_line = (
-        f"UG Package (LPA): {drive.ug_package_min} - {drive.ug_package_max}"
-        if drive.ug_package_min and drive.ug_package_max
-        else "UG Package (LPA): -"
-    )
+#     subject = f"Placement Drive - {company.name} - {drive.drive_name}"
+#     ug_package_line = (
+#         f"UG Package (LPA): {drive.ug_package_min} - {drive.ug_package_max}"
+#         if drive.ug_package_min and drive.ug_package_max
+#         else "UG Package (LPA): -"
+#     )
 
-    pg_package_line = (
-        f"PG Package (LPA): {drive.pg_package_min} - {drive.pg_package_max}"
-        if drive.pg_package_min and drive.pg_package_max
-        else "PG Package (LPA): -"
-    )
+#     pg_package_line = (
+#         f"PG Package (LPA): {drive.pg_package_min} - {drive.pg_package_max}"
+#         if drive.pg_package_min and drive.pg_package_max
+#         else "PG Package (LPA): -"
+#     )
     
-    message_html = f"""
-    <html>
-      <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-        <p>Dear Students,</p>
+#     message_html = f"""
+#     <html>
+#       <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+#         <p>Dear Students,</p>
 
-        <p>
-          Upcoming placement drive of the company <strong>{company.name}</strong>
-          is scheduled on <strong>{drive.start_date.strftime('%Y-%m-%d %H:%M')}</strong>.
-        </p>
+#         <p>
+#           Upcoming placement drive of the company <strong>{company.name}</strong>
+#           is scheduled on <strong>{drive.start_date.strftime('%Y-%m-%d %H:%M')}</strong>.
+#         </p>
 
-        <h3>Details of the drive and eligibility criteria:</h3>
-        <ul>
-          <li><strong>Registration Starts on:</strong> {drive.start_date.strftime('%Y-%m-%d %H:%M')}</li>
-          <li><strong>Registration Ends on:</strong> {drive.end_date.strftime('%Y-%m-%d %H:%M')}</li>
-          <li><strong>Offer Type:</strong> {drive.job_type}</li>
-          <li><strong>Mode:</strong> {drive.job_mode}</li>
-          <li><strong>{ug_package_line}</strong></li>
-          <li><strong>{pg_package_line}</strong></li>
-          <li><strong>Stipend:</strong> ₹{drive.stipend or '-'}</li>
-          <li><strong>Bond details:</strong> {drive.bond or '-'}</li>
-        </ul>
+#         <h3>Details of the drive and eligibility criteria:</h3>
+#         <ul>
+#           <li><strong>Registration Starts on:</strong> {drive.start_date.strftime('%Y-%m-%d %H:%M')}</li>
+#           <li><strong>Registration Ends on:</strong> {drive.end_date.strftime('%Y-%m-%d %H:%M')}</li>
+#           <li><strong>Offer Type:</strong> {drive.job_type}</li>
+#           <li><strong>Mode:</strong> {drive.job_mode}</li>
+#           <li><strong>{ug_package_line}</strong></li>
+#           <li><strong>{pg_package_line}</strong></li>
+#           <li><strong>Stipend:</strong> ₹{drive.stipend or '-'}</li>
+#           <li><strong>Bond details:</strong> {drive.bond or '-'}</li>
+#         </ul>
 
-        <h3>Company Profile Details:</h3>
-        <p><strong>Name:</strong> {company.name}</p>
-        <p><strong>Description:</strong><br />{company.description or '-'}</p>
+#         <h3>Company Profile Details:</h3>
+#         <p><strong>Name:</strong> {company.name}</p>
+#         <p><strong>Description:</strong><br />{company.description or '-'}</p>
 
-        <h3>Job Roles:</h3>
-        <p>{job_lines}</p>
+#         <h3>Job Roles:</h3>
+#         <p>{job_lines}</p>
 
-        <p>
-          <strong>Note:</strong> All the students who are registering for a company are required
-          to attend the company process and cannot back out from the same, for any reason.
-          Anyone violating this norm will be strictly banned from the next eligible company.
-        </p>
+#         <p>
+#           <strong>Note:</strong> All the students who are registering for a company are required
+#           to attend the company process and cannot back out from the same, for any reason.
+#           Anyone violating this norm will be strictly banned from the next eligible company.
+#         </p>
 
-        <p>
-          <strong>Strict notice to all the students:</strong> No late registrations will be entertained
-          (no matter the reason). So, do keep in mind the registration deadline.
-          Research about the company and the job profile before registering.
-        </p>
+#         <p>
+#           <strong>Strict notice to all the students:</strong> No late registrations will be entertained
+#           (no matter the reason). So, do keep in mind the registration deadline.
+#           Research about the company and the job profile before registering.
+#         </p>
 
-        <p>Wish you luck!</p>
+#         <p>Wish you luck!</p>
 
-        <p><strong>Regards,<br />Student Placement Cell</strong></p>
-      </body>
-    </html>
-    """
+#         <p><strong>Regards,<br />Student Placement Cell</strong></p>
+#       </body>
+#     </html>
+#     """
 
-    message = message_html
-    email_list = [s.student_id.email for s in students]
+#     message = message_html
+#     email_list = [s.student_id.email for s in students]
 
-    for email in email_list:
-        send_custom_email(email,subject,message,message_html)
+#     for email in email_list:
+#         send_custom_email(email,subject,message,message_html)

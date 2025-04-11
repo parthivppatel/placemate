@@ -6,7 +6,7 @@ from ..schema.users import User
 from ..schema.industry import Industry
 from ..schema.cities import City
 from ..schema.job_positions import JobPosition
-from ..schema.jobs import Job
+from ..schema.company_drive_jobs import CompanyDriveJobs
 from ..schema.company_drives import CompanyDrive
 from ..utils.random_password_utils import generate_random_password
 from ..decorators import permission_required
@@ -296,8 +296,8 @@ def delete_company(request,id=0):
                 user = company.id
 
                 # Check for assigned jobs
-                if Job.objects.filter(company=company).exists():
-                    return ResponseModel({},"Cannot delete company with assigned jobs",400)
+                # if Job.objects.filter(company=company).exists():
+                #     return ResponseModel({},"Cannot delete company with assigned jobs",400)
                 
                 # Check for company_drive mapping
                 if CompanyDrive.objects.filter(company=company).exists():

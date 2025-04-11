@@ -16,7 +16,6 @@ from .schema.job_positions import JobPosition
 from .schema.companies import Company
 from .schema.students import Student
 from .schema.skills import Skill
-from .schema.jobs import Job
 from .schema.drive_courses import DriveCourses
 from .schema.drive_locations import DriveLocation
 from .schema.drive_skills import DriveSkill
@@ -48,7 +47,6 @@ admin.site.register(Notification)
 admin.site.register(Company)
 admin.site.register(Student)
 admin.site.register(Skill)
-admin.site.register(Job)
 admin.site.register(DriveSkill)
 admin.site.register(Interview) 
 admin.site.register(PlacementOffer) 

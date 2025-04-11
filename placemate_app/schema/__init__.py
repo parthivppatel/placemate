@@ -15,7 +15,6 @@ from .job_positions import JobPosition
 from .companies import Company
 from .students import Student
 from .skills import Skill
-from .jobs import Job
 from .drive_courses import DriveCourses
 from .drive_locations import DriveLocation
 from .drive_skills import DriveSkill
