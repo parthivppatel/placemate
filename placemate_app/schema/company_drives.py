@@ -50,7 +50,7 @@ class CompanyDrive(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'comapany_drives'
+        db_table = 'company_drives'
     
     def __str__(self):
         return self.drive_name
