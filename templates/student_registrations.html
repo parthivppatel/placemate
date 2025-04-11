@@ -1,0 +1,224 @@
+{% extends "admin_base.html" %}
+{% load static %}
+
+{% block header_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block header_subtitle %}
+{{ page_subtitle }}
+{% endblock %}
+
+{% block content %}
+<style>
+    .menu-item {
+        width: 100%;
+        height: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #333;
+        font-size: 12px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .menu-item.active {
+        color: #5E50F9;
+        border-left: 3px solid #5E50F9;
+        background-color: #f0f0ff;
+    }
+
+    .menu-item i {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .page-title h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .page-title p {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding-left: 20px;
+        border-left: 1px solid #eee;
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .user-avatar img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-size: 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-role {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .creation-method {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .creation-method h2 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 40px;
+    }
+
+    .method-cards {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+    }
+
+    .method-card {
+        width: 300px;
+        background: #fff;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .method-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .method-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .manual-icon {
+        background: linear-gradient(135deg, #FFB347, #FFCC33);
+    }
+
+    .ai-icon {
+        background: linear-gradient(135deg, #7B68EE, #9370DB);
+    }
+
+    .method-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .method-description {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+    }
+
+    .svg-icon {
+        width: 30px;
+        height: 30px;
+        fill: currentColor;
+    }
+</style>
+
+<div class="creation-method">
+    <h2>Select a student creation method</h2>
+    <div class="method-cards">
+        <div class="method-card">
+            <a href="{% url 'student_manual_registrations' %}" style="text-decoration: none;">
+            <div class="method-icon manual-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                    <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                </svg>
+            </div>
+            <h3 class="method-title">Manual</h3>
+            <p class="method-description">Manually input and customize complete student details with full control, ensuring accurate onboarding tailored to specific requirements.</p>
+            </a>
+        </div>
+
+        <div class="method-card">
+            <div class="method-icon ai-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                    <path
+                        d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16h-9v-6h9v6zm-10 0H3V5h8v14zm10-8H12V5h9v6z" />
+                </svg>
+            </div>
+            <h3 class="method-title">AI - Automated</h3>
+            <p class="method-description">AI-powered feature that automatically generate students based on provided
+                data, streamlining the process for placement officer, ensuring accuracy and efficiency in student
+                creation.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Remove active class from all menu items
+                menuItems.forEach(i => i.classList.remove('active'));
+
+                // Add active class to clicked item
+                this.classList.add('active');
+            });
+        });
+
+        const methodCards = document.querySelectorAll('.method-card');
+
+        methodCards.forEach(card => {
+            card.addEventListener('click', function () {
+                // Add selected styling or redirect to next page
+                methodCards.forEach(c => c.style.border = 'none');
+                this.style.border = '2px solid #5E50F9';
+
+                // Here you could also add logic to proceed to the next step
+                // For example: window.location.href = 'next-step.html';
+            });
+        });
+    });
+</script>
+{% endblock %}
