@@ -1,5 +1,5 @@
 import json
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -61,7 +61,7 @@ def format_student_data(paginated_students, page, perpage):
     return [
         {
             "sr_no": (page - 1) * perpage + i + 1,
-            "id": s.id,
+            "id": s.student_id.id,
             "enrollment": s.enrollment,
             "name": f"{s.first_name} {s.last_name}",
             "email": safe_value(s.student_id, "email"),
@@ -260,18 +260,30 @@ def list_students(request):
 @csrf_exempt
 def delete_student(request):
     if request.method != "POST":
-        return JsonResponse({"message": "Only POST requests are allowed."}, status=405)
+        messages.error(request, "Only POST requests are allowed.")
+        return redirect("list_students")
 
     student_id = request.POST.get("student_id")
     if not student_id:
-        return JsonResponse({"message": "student_id is required"}, status=400)
+        messages.error(request, "The 'student_id' field is required.")
+        return redirect("list_students")
 
     try:
-        student = Student.objects.get(id=student_id)
+        # Attempt to retrieve the student
+        student = Student.objects.get(student_id=student_id)
+        student_name = f"{student.first_name} {student.last_name}"  # For better logging
         student.delete()
-        return JsonResponse({
-            "message": f"Student {student_id} deleted successfully.",
-            "deleted_count": 1
-        }, status=200)
+
+        # Add success message and redirect
+        messages.success(request, f"The student '{student_name}' has been successfully removed from the system.")
+        return redirect("list_students")
+
     except Student.DoesNotExist:
-        return JsonResponse({"message": "Student does not exist."}, status=404)
+        # Handle case where student does not exist
+        messages.error(request, f"The student with the provided ID does not exist.")
+        return redirect("list_students")
+
+    except Exception as e:
+        # Handle unexpected errors
+        messages.error(request, f"An unexpected error occurred. Please try again later.")
+        return redirect("list_students")

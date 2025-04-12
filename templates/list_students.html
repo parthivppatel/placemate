@@ -1,22 +1,22 @@
 {% extends "admin_base.html" %}
 {% load static %}
 {% block header_title %}
-    Student List
+Student List
 {% endblock %}
 
 {% block header_subtitle %}
-    Manage registered students for placement opportunities.
+Manage registered students for placement opportunities.
 {% endblock %}
 {% block content %}
 <style>
     .status-badge {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.6rem;
-    border-radius: 50px;
-    display: inline-block;
-    min-width: 100px;
-    text-align: center;
-    font-weight: 500;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 50px;
+        display: inline-block;
+        min-width: 100px;
+        text-align: center;
+        font-weight: 500;
     }
 
     /* PLACED */
@@ -49,16 +49,48 @@
         color: #41464b;
     }
 
-    
-    select.form-select-sm, .btn-outline-secondary {
+
+    select.form-select-sm,
+    .btn-outline-secondary {
         min-width: 120px;
+    }
+
+    .error-box {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border-left: 4px solid #dc3545;
+        max-width: max-content;
+    }
+
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border-left: 4px solid #8bdc35;
+        display: block !important;
+        max-width: max-content;
     }
 </style>
 
 <div class="container-fluid p-0">
     <div class="row g-0">
-        <div>      
+        <div>
 
+            <!-- Display messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "success" %}
+                        <div class="success-message">{{ message }}</div>
+                    {% else %}
+                        <div class="error-box">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
             <!-- Actions Row -->
             <div class="row mb-4 mt-3">
                 <div class="col-12 text-end">
@@ -73,47 +105,46 @@
                 <div class="row mb-3 align-items-center">
                     <div class="col-md-6 mb-2 mb-md-0">
                         <div class="position-relative">
-                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y text-muted ms-3"></i>
+                            <i
+                                class="bi bi-search position-absolute top-50 start-0 translate-middle-y text-muted ms-3"></i>
                             <input type="text" class="form-control rounded-pill ps-5 py-2 shadow-sm" name="search"
                                 placeholder="Search by Name or Reg. No." value="{{ request.GET.search|default:'' }}"
                                 onkeydown="if(event.key==='Enter'){ this.form.submit(); }">
-                        </div>                        
+                        </div>
                     </div>
                     <div class="col-md-6 d-flex flex-wrap justify-content-md-end gap-2">
-                        <!-- Batch Filter -->
                         <select name="batch" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">All Batch</option>
                             {% for batch in filter_options.batches %}
-                            <option value="{{ batch }}" {% if request.GET.batch == batch|stringformat:"s" %}selected{% endif %}>{{ batch }}</option>
+                            <option value="{{ batch }}" {% if request.GET.batch == batch %}selected{% endif %}>{{ batch }}</option>
                             {% endfor %}
                         </select>
-                    
-                        <!-- Course Filter -->
+
                         <select name="course" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">All Course</option>
                             {% for course in filter_options.courses %}
-                            <option value="{{ course.value }}" {% if request.GET.course == course.value|stringformat:"s" %}selected{% endif %}>
+                            <option value="{{ course.value }}" {% if request.GET.course == course.value %}selected{% endif %}>
                                 {{ course.label }}
                             </option>
                             {% endfor %}
                         </select>
-                    
-                        <!-- Placement Status Filter -->
+
                         <select name="placement_status" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">All Status</option>
                             {% for status in filter_options.placement_statuses %}
-                            <option value="{{ status.value }}" {% if request.GET.placement_status == status.value|stringformat:"s" %}selected{% endif %}>
+                            <option value="{{ status.value }}" {% if request.GET.placement_status == status.value %}selected{% endif %}>
                                 {{ status.label }}
                             </option>
                             {% endfor %}
                         </select>
-                    
+
+
                         <!-- Reset Filters Button -->
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm" id="resetFiltersBtn"
-                            onclick="resetFilters()">
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm"
+                            id="resetFiltersBtn" onclick="resetFilters()">
                             <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
                         </button>
-                    </div>   
+                    </div>
                 </div>
             </form>
 
@@ -150,34 +181,33 @@
                                     {% else %}status-unknown
                                     {% endif %}">
                                     {% if status_code == 1 %}
-                                        Placed
+                                    Placed
                                     {% elif status_code == 2 %}
-                                        Internship
+                                    Internship
                                     {% elif status_code == 3 %}
-                                        Job Offer Received
+                                    Job Offer Received
                                     {% elif status_code == 0 %}
-                                        Not Placed
+                                    Not Placed
                                     {% else %}
-                                        Unknown
+                                    Unknown
                                     {% endif %}
                                 </span>
                                 {% endwith %}
-                            </td>                            
+                            </td>
                             <td>
                                 <a href="" class="btn btn-sm btn-primary" title="View">
                                     <i class="bi bi-eye-fill"></i>
                                 </a>
                                 <button class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
-                                        data-bs-target="#deleteConfirmModal" data-student-id="{{ student.id }}">
+                                    data-bs-target="#deleteConfirmModal" data-student-id="{{ student.student_id.id }}">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
-
                             </td>
                         </tr>
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="7">No students found.</td>
+                            <td colspan="8">No students found.</td> <!-- Updated colspan from 7 to 8 -->
                         </tr>
                         {% endif %}
                     </tbody>
@@ -246,9 +276,6 @@
                 <form method="POST" id="deleteStudentForm" action="{% url 'delete_student' %}">
                     {% csrf_token %}
                     <input type="hidden" name="student_id" id="studentIdToDelete" />
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancel
-                    </button>
                     <button type="submit" class="btn btn-danger">Confirm Delete</button>
                 </form>
             </div>
@@ -290,6 +317,16 @@
                 const input = document.getElementById('studentIdToDelete');
                 if (input) input.value = studentId;
             });
+        });
+
+        // Automatically hide messages after 6 seconds
+        const messages = document.querySelectorAll('.success-message, .error-box');
+        messages.forEach(message => {
+            setTimeout(() => {
+                message.style.transition = "opacity 0.5s ease";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500); // Remove the element after fading out
+            }, 6000); // 6 seconds
         });
     });
 </script>
