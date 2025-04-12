@@ -94,9 +94,11 @@ Manage registered students for placement opportunities.
             <!-- Actions Row -->
             <div class="row mb-4 mt-3">
                 <div class="col-12 text-end">
+                    {% if can_add_student %}
                     <a href="{% url 'student_registrations' %}" class="btn btn-outline-primary rounded-pill">
                         Add New Students <i class="bi bi-plus"></i>
                     </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -113,31 +115,33 @@ Manage registered students for placement opportunities.
                         </div>
                     </div>
                     <div class="col-md-6 d-flex flex-wrap justify-content-md-end gap-2">
+                        <!-- Batch Filter -->
                         <select name="batch" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">All Batch</option>
                             {% for batch in filter_options.batches %}
-                            <option value="{{ batch }}" {% if request.GET.batch == batch %}selected{% endif %}>{{ batch }}</option>
+                            <option value="{{ batch }}" {% if request.GET.batch == batch|stringformat:"s" %}selected{% endif %}>{{ batch }}</option>
                             {% endfor %}
                         </select>
 
+                        <!-- Course Filter -->
                         <select name="course" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">All Course</option>
                             {% for course in filter_options.courses %}
-                            <option value="{{ course.value }}" {% if request.GET.course == course.value %}selected{% endif %}>
+                            <option value="{{ course.value }}" {% if request.GET.course == course.value|stringformat:"s" %}selected{% endif %}>
                                 {{ course.label }}
                             </option>
                             {% endfor %}
                         </select>
 
+                        <!-- Placement Status Filter -->
                         <select name="placement_status" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">All Status</option>
                             {% for status in filter_options.placement_statuses %}
-                            <option value="{{ status.value }}" {% if request.GET.placement_status == status.value %}selected{% endif %}>
+                            <option value="{{ status.value }}" {% if request.GET.placement_status == status.value|stringformat:"s" %}selected{% endif %}>
                                 {{ status.label }}
                             </option>
                             {% endfor %}
                         </select>
-
 
                         <!-- Reset Filters Button -->
                         <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm"
@@ -195,13 +199,15 @@ Manage registered students for placement opportunities.
                                 {% endwith %}
                             </td>
                             <td>
-                                <a href="" class="btn btn-sm btn-primary" title="View">
+                                <a href="{% url 'view_student' student.student_id.id %}" class="btn btn-sm btn-primary" title="View">
                                     <i class="bi bi-eye-fill"></i>
                                 </a>
+                                {% if can_delete_student %}
                                 <button class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
                                     data-bs-target="#deleteConfirmModal" data-student-id="{{ student.student_id.id }}">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

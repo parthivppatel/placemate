@@ -87,8 +87,8 @@
     }
 
     .student-registration__profile-preview {
-        width: 100px;
-        height: 100px;
+        width: 150px; /* Increased size for better visibility */
+        height: 150px;
         border-radius: 50%;
         background-color: var(--light-bg);
         display: flex;
@@ -102,7 +102,7 @@
     .student-registration__profile-image {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: cover; /* Ensures the image fits well */
     }
 
     .student-registration__upload-btn {
@@ -171,9 +171,15 @@
             border-left: 4px solid #8bdc35;
             display: block !important;
         }
+
+    #studentRegistrationPreviewText {
+        font-size: 14px;
+        color: #888;
+    }
 </style>
 
 <h1 class="student-registration__heading">Student Registration Form</h1>
+
 <!-- Display Messages -->
 {% if messages %}
     {% for message in messages %}
@@ -184,6 +190,7 @@
         {% endif %}
     {% endfor %}
 {% endif %}
+
 <form id="studentRegistrationForm" method="post" enctype="multipart/form-data" action="{% url 'student_manual_registrations' %}">
     {% csrf_token %}
 
@@ -192,7 +199,7 @@
         <label class="student-registration__label">Profile Picture</label>
         <div class="student-registration__profile-upload">
             <div class="student-registration__profile-preview" id="studentRegistrationProfilePreview">
-                <img id="studentRegistrationPreviewImage" src="/static/images/placeholder.png" alt="Profile Preview" style="display:none;">
+                <img id="studentRegistrationPreviewImage" class="student-registration__profile-image" src="/static/images/placeholder.png" alt="Profile Preview" style="display:none;">
                 <span id="studentRegistrationPreviewText">No Image</span>
             </div>
             <input type="file" id="studentRegistrationProfilePicture" name="profile" accept="image/*" style="display:none;">
@@ -200,24 +207,7 @@
         </div>
     </div>
 
-    <div class="student-registration__row">
-        <!-- Email Field -->
-        <div class="student-registration__col">
-            <div class="student-registration__form-group">
-                <label for="studentRegistrationEmail" class="student-registration__label">Email *</label>
-                <input type="email" id="studentRegistrationEmail" name="email" class="student-registration__input" required>
-            </div>
-        </div>
-        <!-- Phone Number Field -->
-        <div class="student-registration__col">
-            <div class="student-registration__form-group">
-                <label for="studentRegistrationPhone" class="student-registration__label">Phone Number *</label>
-                <input type="tel" id="studentRegistrationPhone" name="phone" class="student-registration__input" required>
-            </div>
-        </div>
-    </div>
-        
-    <!-- Name Fields -->
+    <!-- Personal Details -->
     <div class="student-registration__row">
         <div class="student-registration__col">
             <div class="student-registration__form-group">
@@ -239,8 +229,39 @@
         </div>
     </div>
 
-    <!-- Enrollment and Details -->
     <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationEmail" class="student-registration__label">Email *</label>
+                <input type="email" id="studentRegistrationEmail" name="email" class="student-registration__input" required>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationPhone" class="student-registration__label">Phone Number *</label>
+                <input type="tel" id="studentRegistrationPhone" name="phone" class="student-registration__input" required>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationDob" class="student-registration__label">Date of Birth *</label>
+                <input type="date" id="studentRegistrationDob" name="dob" class="student-registration__input" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationGender" class="student-registration__label">Gender</label>
+                <select id="studentRegistrationGender" name="gender" class="student-registration__select">
+                    <option value="">Select Gender</option>
+                    {% for key, value in gender_choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
         <div class="student-registration__col">
             <div class="student-registration__form-group">
                 <label for="studentRegistrationEnrollmentNo" class="student-registration__label">Enrollment No. *</label>
@@ -249,20 +270,8 @@
         </div>
         <div class="student-registration__col">
             <div class="student-registration__form-group">
-                <label for="studentRegistrationDob" class="student-registration__label">Date of Birth</label>
-                <input type="date" id="studentRegistrationDob" name="dob" class="student-registration__input">
-            </div>
-        </div>
-        <div class="student-registration__col">
-            <div class="student-registration__form-group">
-                <label for="studentRegistrationGender" class="student-registration__label">Gender</label>
-                <select id="studentRegistrationGender" name="gender" class="student-registration__select">
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
-                </select>
+                <label for="studentRegistrationAddress" class="student-registration__label">Address</label>
+                <textarea id="studentRegistrationAddress" name="address" rows="3" class="student-registration__textarea"></textarea>
             </div>
         </div>
     </div>
@@ -277,7 +286,7 @@
         </div>
         <div class="student-registration__col">
             <div class="student-registration__form-group">
-                <label for="studentRegistrationCgpa" class="student-registration__label">CGPA</label>
+                <label for="studentRegistrationCgpa" class="student-registration__label">Current CGPA</label>
                 <input type="number" id="studentRegistrationCgpa" name="cgpa" min="0" max="10" step="0.01" class="student-registration__input">
             </div>
         </div>
@@ -294,33 +303,52 @@
         </div>
     </div>
 
-    <!-- Placement Details -->
     <div class="student-registration__row">
+        
         <div class="student-registration__col">
             <div class="student-registration__form-group">
-                <label for="studentRegistrationGraduationStatus" class="student-registration__label">Graduation Status</label>
-                <select id="studentRegistrationGraduationStatus" name="graduation_status" class="student-registration__select">
-                    <option value="Pursuing">Pursuing</option>
-                    <option value="Graduated">Graduated</option>
-                    <option value="Dropped">Dropped</option>
+                <label for="studentRegistrationPlacementStatus" class="student-registration__label">Placement Status</label>
+                <select id="studentRegistrationPlacementStatus" name="placement_status" class="student-registration__select">
+                    <option value="">Select Placement Status</option>
+                    {% for key, value in placement_status_choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
         <div class="student-registration__col">
             <div class="student-registration__form-group">
-                <label for="studentRegistrationPlacementStatus" class="student-registration__label">Placement Status</label>
-                <select id="studentRegistrationPlacementStatus" name="placement_status" class="student-registration__select">
-                    <option value="0">Not Placed</option>
-                    <option value="1">Placed</option>
+                <label for="studentRegistrationGraduationStatus" class="student-registration__label">Graduation Status</label>
+                <select id="studentRegistrationGraduationStatus" name="graduation_status" class="student-registration__select">
+                    <option value="">Select Graduation Status</option>
+                    {% for key, value in graduation_status_choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
     </div>
 
-    <!-- Address -->
-    <div class="student-registration__form-group">
-        <label for="studentRegistrationAddress" class="student-registration__label">Address</label>
-        <textarea id="studentRegistrationAddress" name="address" rows="3" class="student-registration__textarea"></textarea>
+    <!-- Placement Details -->
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationCompany" class="student-registration__label">Company Placed In</label>
+                <input type="text" id="studentRegistrationCompany" name="company_placed_in" class="student-registration__input">
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationJobRole" class="student-registration__label">Job Role</label>
+                <input type="text" id="studentRegistrationJobRole" name="job_role" class="student-registration__input">
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationPackage" class="student-registration__label">Package (LPA)</label>
+                <input type="number" id="studentRegistrationPackage" name="package" min="0" step="0.01" class="student-registration__input">
+            </div>
+        </div>
     </div>
 
     <!-- Submit Button -->
@@ -340,10 +368,16 @@
             reader.onload = function (event) {
                 const img = document.getElementById('studentRegistrationPreviewImage');
                 img.src = event.target.result;
-                img.style.display = 'block';
-                document.getElementById('studentRegistrationPreviewText').style.display = 'none';
+                img.style.display = 'block'; // Show the image
+                document.getElementById('studentRegistrationPreviewText').style.display = 'none'; // Hide the placeholder text
             }
             reader.readAsDataURL(file);
+        } else {
+            // Reset to placeholder if no file is selected
+            const img = document.getElementById('studentRegistrationPreviewImage');
+            img.src = "/static/images/placeholder.png";
+            img.style.display = 'none';
+            document.getElementById('studentRegistrationPreviewText').style.display = 'block';
         }
     });
 </script>

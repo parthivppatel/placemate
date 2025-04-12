@@ -1,0 +1,361 @@
+{% extends "admin_base.html" %}
+{% block header_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block header_subtitle %}
+{{ page_subtitle }}
+{% endblock %}
+
+{% block content %}
+<style>
+    .student-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .student-avatar {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        margin-right: 1.5rem;
+        border: 1px solid #dee2e6;
+        padding: 0.25rem;
+        background-color: #fff;
+        border-radius: 50%;
+    }
+
+    .student-name {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .section-card {
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .section-header {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .section-content {
+        padding: 1.5rem;
+    }
+
+    .detail-row {
+        margin-bottom: 1rem;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <a href="{% url 'list_students' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Students
+        </a>
+
+        <button class="btn btn-outline-primary me-2" id="toggleEditBtn">
+            <i class="bi bi-pencil"></i> Edit Student
+        </button>
+
+    </div>
+
+    <!-- Student Header -->
+    <div class="student-header">
+        <img src="{{ student.photo_url }}" alt="Student Photo" class="student-avatar" id="studentPhoto">
+        <div>
+            <h1 class="student-name" id="studentName">{{ student.name }}</h1>
+            <div>
+                <span class="badge bg-primary" id="studentDepartment">{{ student.department }}</span>
+                <span class="badge bg-info" id="studentBatch">{{ student.batch }}</span>
+                <span class="badge bg-success" id="placementStatus">{{ student.placement_status }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Details Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-person me-2"></i>Personal Details
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Enrollment Number</div>
+                        <div>{{ student.enrollment }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Date of Birth</div>
+                        <div>{{ student.dob }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Gender</div>
+                        <div>{{ student.gender }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Email</div>
+                        <div>{{ student.email }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Phone</div>
+                        <div>{{ student.phone }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Address</div>
+                        <div>{{ student.address }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">City</div>
+                        <div>{{ student.city }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Joining Year</div>
+                        <div>{{ student.joining_year }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Details Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-book me-2"></i>Academic Details
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Department</div>
+                        <div>{{ student.department }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Current CGPA</div>
+                        <div>{{ student.cgpa }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Graduation Status</div>
+                        <div>{{ student.graduation_status }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">10th Percentage</div>
+                        <div>{{ student.tenth_percentage }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">12th Percentage</div>
+                        <div>{{ student.twelfth_percentage }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Backlogs</div>
+                        <div>{{ student.backlogs }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Placement Details Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-briefcase me-2"></i>Placement Details
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Placement Status</div>
+                        <div>{{ student.placement_status }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Company Placed In</div>
+                        <div>{{ student.company_placed_in }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Job Role</div>
+                        <div>{{ student.job_role }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Package (LPA)</div>
+                        <div>{{ student.package }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Offer Date</div>
+                        <div>{{ student.offer_date }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Joining Date</div>
+                        <div>{{ student.joining_date }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Edit Student Modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Personal Details -->
+                    <h5 class="mb-3">Personal Details</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentNameInput" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="studentNameInput" name="name" value="{{ student.name }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentEmailInput" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="studentEmailInput" name="email" value="{{ student.email }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentPhoneInput" class="form-label">Phone</label>
+                                <input type="text" class="form-control" id="studentPhoneInput" name="phone" value="{{ student.phone }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentAddressInput" class="form-label">Address</label>
+                                <textarea class="form-control" id="studentAddressInput" name="address">{{ student.address }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentCityInput" class="form-label">City</label>
+                                <input type="text" class="form-control" id="studentCityInput" name="city" value="{{ student.city }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentDobInput" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="studentDobInput" name="dob" value="{{ student.dob }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Details -->
+                    <h5 class="mt-4 mb-3">Academic Details</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentDepartmentInput" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="studentDepartmentInput" name="department" value="{{ student.department }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentCgpaInput" class="form-label">Current CGPA</label>
+                                <input type="number" step="0.01" class="form-control" id="studentCgpaInput" name="cgpa" value="{{ student.cgpa }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentGraduationStatusInput" class="form-label">Graduation Status</label>
+                                <select class="form-select" id="studentGraduationStatusInput" name="graduation_status">
+                                    <option value="completed" {% if student.graduation_status == "completed" %}selected{% endif %}>Completed</option>
+                                    <option value="ongoing" {% if student.graduation_status == "ongoing" %}selected{% endif %}>Ongoing</option>
+                                    <option value="dropped" {% if student.graduation_status == "dropped" %}selected{% endif %}>Dropped</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentTenthPercentageInput" class="form-label">10th Percentage</label>
+                                <input type="number" step="0.01" class="form-control" id="studentTenthPercentageInput" name="tenth_percentage" value="{{ student.tenth_percentage }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentTwelfthPercentageInput" class="form-label">12th Percentage</label>
+                                <input type="number" step="0.01" class="form-control" id="studentTwelfthPercentageInput" name="twelfth_percentage" value="{{ student.twelfth_percentage }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentBacklogsInput" class="form-label">Backlogs</label>
+                                <input type="number" class="form-control" id="studentBacklogsInput" name="backlogs" value="{{ student.backlogs }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Placement Details -->
+                    <h5 class="mt-4 mb-3">Placement Details</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentPlacementStatusInput" class="form-label">Placement Status</label>
+                                <select class="form-select" id="studentPlacementStatusInput" name="placement_status">
+                                    <option value="placed" {% if student.placement_status == "placed" %}selected{% endif %}>Placed</option>
+                                    <option value="not_placed" {% if student.placement_status == "not_placed" %}selected{% endif %}>Not Placed</option>
+                                    <option value="internship" {% if student.placement_status == "internship" %}selected{% endif %}>Internship</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentCompanyInput" class="form-label">Company Placed In</label>
+                                <input type="text" class="form-control" id="studentCompanyInput" name="company_placed_in" value="{{ student.company_placed_in }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentJobRoleInput" class="form-label">Job Role</label>
+                                <input type="text" class="form-control" id="studentJobRoleInput" name="job_role" value="{{ student.job_role }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentPackageInput" class="form-label">Package (LPA)</label>
+                                <input type="number" step="0.01" class="form-control" id="studentPackageInput" name="package" value="{{ student.package }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentOfferDateInput" class="form-label">Offer Date</label>
+                                <input type="date" class="form-control" id="studentOfferDateInput" name="offer_date" value="{{ student.offer_date }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentJoiningDateInput" class="form-label">Joining Date</label>
+                                <input type="date" class="form-control" id="studentJoiningDateInput" name="joining_date" value="{{ student.joining_date }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editStudentModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+
+        document.getElementById('toggleEditBtn').addEventListener('click', function () {
+            editStudentModal.show();
+        });
+    });
+</script>
+{% endblock %}
