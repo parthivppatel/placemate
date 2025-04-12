@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.hashers import make_password, check_password
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -9,11 +10,12 @@ from ..decorators import permission_required
 from ..schema.users import User
 from ..schema.students import Student, PlacementStatus, GraduationStatus
 from ..schema.course import Course
+from ..schema.roles import Role
+from ..schema.user_roles import UserRole
 from ..schema.cities import City
 from ..utils.helper_utils import paginate, safe_value
 
 from django.contrib import messages
-from django.utils.dateparse import parse_date
 from django.db import IntegrityError
 
 def parse_json_data(request):
@@ -85,35 +87,84 @@ def student_registrations(request):
 def student_manual_registrations(request):
     if request.method == "POST":
         try:
-            data = request.POST
-            
-            # Basic user creation
+            # Sanitize input data
+            data = {key: value.strip() for key, value in request.POST.items()}
+
+            # Debugging logs
+            print("Received POST request for student registration")
+            print(f"Sanitized Request data: {data}")
+
+            # Validate required fields
+            required_fields = ['email', 'phone', 'enrollment', 'first_name', 'last_name', 'joining_year']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                messages.error(request, f"Missing required fields: {', '.join(missing_fields)}")
+                print(f"Missing fields: {missing_fields}")
+                return redirect("student_manual_registrations")
+
+            # Check if email, phone, or enrollment already exists
             email = data.get('email')
-            password = data.get('password') or "placemate@123"
-            role = 'STUDENT'
+            phone = data.get('phone')
+            enrollment = data.get('enrollment')
 
             if User.objects.filter(email=email).exists():
-                messages.error(request, "User with this email already exists.")
+                messages.error(request, f"User with email '{email}' already exists.")
+                print(f"Email already exists: {email}")
                 return redirect("student_manual_registrations")
-            
-            user = User.objects.create_user(email=email, password=password, role=role)
 
-            # Optional foreign keys
-            course = Course.objects.get(id=data.get('course')) if data.get('course') else None
-            city = City.objects.get(id=data.get('city')) if data.get('city') else None
+            if User.objects.filter(phone=phone).exists():
+                messages.error(request, f"User with phone number '{phone}' already exists.")
+                print(f"Phone number already exists: {phone}")
+                return redirect("student_manual_registrations")
+
+            if Student.objects.filter(enrollment=enrollment).exists():
+                messages.error(request, f"Student with enrollment number '{enrollment}' already exists.")
+                print(f"Enrollment number already exists: {enrollment}")
+                return redirect("student_manual_registrations")
+
+            # Create user with hashed password
+            password = data.get('password') or "placemate@123"
+            hashed_password = make_password(password)
+            user = User.objects.create(
+                email=email,
+                password=hashed_password,
+                phone=phone
+            )
+
+            # Assign role to user
+            student_role = Role.objects.filter(name="Student").first()
+            if not student_role:
+                messages.error(request, "Student role not found in the database.")
+                print("Student role not found.")
+                return redirect("student_manual_registrations")
+
+            UserRole.objects.create(user=user, role=student_role)
+
+            # Fetch optional foreign keys
+            course = Course.objects.filter(id=data.get('course')).first()
+            if not course and data.get('course'):
+                messages.error(request, "Invalid course selected.")
+                print(f"Invalid course ID: {data.get('course')}")
+                return redirect("student_manual_registrations")
+
+            city = City.objects.filter(id=data.get('city')).first()
+            if not city and data.get('city'):
+                messages.error(request, "Invalid city selected.")
+                print(f"Invalid city ID: {data.get('city')}")
+                return redirect("student_manual_registrations")
 
             # Create student profile
             student = Student.objects.create(
                 student_id=user,
-                enrollment=int(data.get('enrollment')),
+                enrollment=int(enrollment),
                 first_name=data.get('first_name'),
                 middle_name=data.get('middle_name') or None,
                 last_name=data.get('last_name'),
-                dob=parse_date(data.get('dob')),
+                dob=data.get('dob') or None,
                 gender=data.get('gender') or None,
                 joining_year=int(data.get('joining_year')),
                 cgpa=float(data.get('cgpa')) if data.get('cgpa') else None,
-                profile=data.get('profile'),
+                profile=data.get('profile') or "",
                 placement_status=int(data.get('placement_status', 0)),
                 graduation_status=data.get('graduation_status', 'Pursuing'),
                 course=course,
@@ -121,14 +172,21 @@ def student_manual_registrations(request):
                 address=data.get('address') or ""
             )
 
-            messages.success(request, f"Student {student.first_name} added successfully.")
+            # Success message
+            messages.success(request, f"Student {student.first_name} {student.last_name} added successfully.")
+            print(f"Student created successfully: {student}")
             return redirect("student_manual_registrations")
 
         except IntegrityError:
             messages.error(request, "Enrollment already exists.")
+            print("IntegrityError: Enrollment already exists.")
+        except ValueError as ve:
+            messages.error(request, f"Invalid data: {str(ve)}")
+            print(f"ValueError: {str(ve)}")
         except Exception as e:
-            messages.error(request, f"Error: {str(e)}")
-    
+            messages.error(request, f"An unexpected error occurred: {str(e)}")
+            print(f"Exception: {str(e)}")
+
     # GET request
     return render(request, "student_manual_registrations.html", {
         "page_title": "Student Manual Registrations",
