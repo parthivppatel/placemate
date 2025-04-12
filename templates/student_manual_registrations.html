@@ -12,58 +12,64 @@
 {% block content %}
 
 <style>
-    h1 {
+    .student-registration__heading {
         text-align: center;
         color: var(--primary-color);
         margin-bottom: 30px;
         font-weight: 600;
+        font-size: 28px;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--primary-color);
+        display: inline-block;
+        padding-bottom: 5px;
     }
 
-    .form-group {
+    .student-registration__form-group {
         margin-bottom: 20px;
     }
 
-    label {
+    .student-registration__label {
         display: block;
         margin-bottom: 8px;
         font-weight: 500;
     }
 
-    input,
-    select,
-    textarea {
+    .student-registration__input,
+    .student-registration__select,
+    .student-registration__textarea {
         width: 100%;
         padding: 10px 15px;
         border: 1px solid var(--border-color);
-        border-radius: 4px;
+        border-radius: 6px;
         font-size: 16px;
         transition: border 0.3s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
+    .student-registration__input:focus,
+    .student-registration__select:focus,
+    .student-registration__textarea:focus {
         outline: none;
         border-color: var(--primary-color);
         box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
     }
 
-    .row {
+    .student-registration__row {
         display: flex;
         gap: 20px;
     }
 
-    .col {
+    .student-registration__col {
         flex: 1;
     }
 
-    .profile-upload {
+    .student-registration__profile-upload {
         display: flex;
         align-items: center;
         margin-bottom: 20px;
     }
 
-    .profile-preview {
+    .student-registration__profile-preview {
         width: 100px;
         height: 100px;
         border-radius: 50%;
@@ -76,13 +82,13 @@
         border: 2px solid var(--border-color);
     }
 
-    .profile-preview img {
+    .student-registration__profile-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
 
-    .upload-btn {
+    .student-registration__upload-btn {
         background-color: var(--primary-color);
         color: white;
         border: none;
@@ -92,15 +98,15 @@
         transition: background-color 0.3s;
     }
 
-    .upload-btn:hover {
+    .student-registration__upload-btn:hover {
         background-color: var(--secondary-color);
     }
 
-    .conditional-field {
+    .student-registration__conditional-field {
         display: none;
     }
 
-    .register-btn {
+    .student-registration__submit-btn {
         display: block;
         width: 100%;
         padding: 12px;
@@ -114,131 +120,174 @@
         margin-top: 30px;
         transition: background-color 0.3s, transform 0.2s;
         text-align: center;
+
+        opacity: 1 !important;
+    visibility: visible !important;
+    /* Keep your existing styles */
+    display: block !important;
+    width: 100%;
+    padding: 12px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: center;
     }
 
-    .register-btn:hover {
+    .student-registration__submit-btn:hover {
         background-color: #27ae60;
         transform: translateY(-2px);
     }
 
-    .error {
+    .student-registration__error {
         color: var(--danger-color);
         font-size: 14px;
         margin-top: 5px;
         display: none;
     }
 
+    .student-registration__profile-upload:hover .student-registration__profile-preview {
+        border-color: var(--primary-color);
+        cursor: pointer;
+    }
+
+    .student-registration__form-container {
+        padding-bottom: 100px; /* Extra space at bottom */
+        min-height: calc(100vh - 200px); /* Minimum height */
+    }
+
     /* Animation for successful registration */
-    @keyframes success-animation {
-        0% {
-            transform: scale(1);
-        }
+    @keyframes student-registration__success-animation {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
 
-        50% {
-            transform: scale(1.05);
-        }
-
-        100% {
-            transform: scale(1);
+    @media screen and (max-width: 768px) {
+        .student-registration__row {
+            flex-direction: column;
         }
     }
 
-    .success-animation {
-        animation: success-animation 0.5s ease;
+    
+
+    .student-registration__form {
+        animation: student-registration__fadeIn 0.5s ease;
+    }
+
+    @keyframes student-registration__fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .student-registration__success-animation {
+        animation: student-registration__success-animation 0.5s ease;
     }
 </style>
 
-<h1>Student Registration Form</h1>
-<form id="studentRegistrationForm" method="post" enctype="multipart/form-data">
+<h1 class="student-registration__heading">Student Registration Form</h1>
+<div class="student-registration__form-container">
+<form id="studentRegistrationForm" class="student-registration__form" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <!-- Profile Picture -->
-    <div class="form-group">
-        <label>Profile Picture</label>
-        <div class="profile-upload">
-            <div class="profile-preview" id="profilePreview">
-                <img id="previewImage" src="/api/placeholder/100/100" alt="Profile Preview" style="display:none;">
-                <span id="previewText">No Image</span>
+    <div class="student-registration__form-group">
+        <label class="student-registration__label">Profile Picture</label>
+        <div class="student-registration__profile-upload">
+            <div class="student-registration__profile-preview" id="studentRegistrationProfilePreview">
+                <img id="studentRegistrationPreviewImage" src="/api/placeholder/100/100" alt="Profile Preview" style="display:none;">
+                <span id="studentRegistrationPreviewText">No Image</span>
             </div>
-            <input type="file" id="profilePicture" accept="image/*" style="display:none;">
-            <button type="button" class="upload-btn" id="uploadBtn">Upload Image</button>
+            <input type="file" id="studentRegistrationProfilePicture" accept="image/*" style="display:none;">
+            <button type="button" class="student-registration__upload-btn" id="studentRegistrationUploadBtn">Upload Image</button>
         </div>
     </div>
 
     <!-- Name Fields -->
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label for="firstName">First Name *</label>
-                <input type="text" id="firstName" name="firstName" required>
-                <div class="error" id="firstNameError">First name is required</div>
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationFirstName" class="student-registration__label">First Name *</label>
+                <input type="text" id="studentRegistrationFirstName" name="firstName" class="student-registration__input" required>
+                <div class="student-registration__error" id="studentRegistrationFirstNameError">First name is required</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="middleName">Middle Name</label>
-                <input type="text" id="middleName" name="middleName">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationMiddleName" class="student-registration__label">Middle Name</label>
+                <input type="text" id="studentRegistrationMiddleName" name="middleName" class="student-registration__input">
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="lastName">Last Name *</label>
-                <input type="text" id="lastName" name="lastName" required>
-                <div class="error" id="lastNameError">Last name is required</div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationLastName" class="student-registration__label">Last Name *</label>
+                <input type="text" id="studentRegistrationLastName" name="lastName" class="student-registration__input" required>
+                <div class="student-registration__error" id="studentRegistrationLastNameError">Last name is required</div>
             </div>
         </div>
     </div>
 
     <!-- Enrollment and Details -->
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label for="enrollmentNo">Enrollment No. *</label>
-                <input type="number" id="enrollmentNo" name="enrollmentNo" required>
-                <div class="error" id="enrollmentNoError">Valid enrollment number is required</div>
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationEnrollmentNo" class="student-registration__label">Enrollment No. *</label>
+                <input type="number" id="studentRegistrationEnrollmentNo" name="enrollmentNo" class="student-registration__input" required>
+                <div class="student-registration__error" id="studentRegistrationEnrollmentNoError">Valid enrollment number is required</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="dob">Date of Birth *</label>
-                <input type="date" id="dob" name="dob" required>
-                <div class="error" id="dobError">Date of birth is required</div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationDob" class="student-registration__label">Date of Birth *</label>
+                <input type="date" id="studentRegistrationDob" name="dob" class="student-registration__input" required>
+                <div class="student-registration__error" id="studentRegistrationDobError">Date of birth is required</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="gender">Gender *</label>
-                <select id="gender" name="gender" required>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationGender" class="student-registration__label">Gender *</label>
+                <select id="studentRegistrationGender" name="gender" class="student-registration__select" required>
                     <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
                     <option value="prefer_not_to_say">Prefer not to say</option>
                 </select>
-                <div class="error" id="genderError">Please select a gender</div>
+                <div class="student-registration__error" id="studentRegistrationGenderError">Please select a gender</div>
             </div>
         </div>
     </div>
 
     <!-- Academic Details -->
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label for="joiningYear">Joining Year *</label>
-                <input type="number" id="joiningYear" name="joiningYear" min="2000" max="2100" required>
-                <div class="error" id="joiningYearError">Valid joining year is required</div>
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationJoiningYear" class="student-registration__label">Joining Year *</label>
+                <input type="number" id="studentRegistrationJoiningYear" name="joiningYear" min="2000" max="2100" class="student-registration__input" required>
+                <div class="student-registration__error" id="studentRegistrationJoiningYearError">Valid joining year is required</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="cgpa">CGPA *</label>
-                <input type="number" id="cgpa" name="cgpa" min="0" max="10" step="0.01" required>
-                <div class="error" id="cgpaError">CGPA must be between 0 and 10</div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationCgpa" class="student-registration__label">CGPA *</label>
+                <input type="number" id="studentRegistrationCgpa" name="cgpa" min="0" max="10" step="0.01" class="student-registration__input" required>
+                <div class="student-registration__error" id="studentRegistrationCgpaError">CGPA must be between 0 and 10</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="course">Course *</label>
-                <select id="course" name="course" required>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationCourse" class="student-registration__label">Course *</label>
+                <select id="studentRegistrationCourse" name="course" class="student-registration__select" required>
                     <option value="">Select Course</option>
                     <option value="btech">B.Tech</option>
                     <option value="mtech">M.Tech</option>
@@ -249,112 +298,119 @@
                     <option value="bsc">B.Sc</option>
                     <option value="msc">M.Sc</option>
                 </select>
-                <div class="error" id="courseError">Please select a course</div>
+                <div class="student-registration__error" id="studentRegistrationCourseError">Please select a course</div>
             </div>
         </div>
     </div>
 
     <!-- Placement Details -->
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label for="graduationStatus">Graduation Status *</label>
-                <select id="graduationStatus" name="graduationStatus" required>
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationGraduationStatus" class="student-registration__label">Graduation Status *</label>
+                <select id="studentRegistrationGraduationStatus" name="graduationStatus" class="student-registration__select" required>
                     <option value="">Select Status</option>
                     <option value="graduated">Graduated</option>
                     <option value="in_progress">In Progress</option>
                     <option value="dropped">Dropped Out</option>
                 </select>
-                <div class="error" id="graduationStatusError">Graduation status is required</div>
+                <div class="student-registration__error" id="studentRegistrationGraduationStatusError">Graduation status is required</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="placementStatus">Placement Status *</label>
-                <select id="placementStatus" name="placementStatus" required>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationPlacementStatus" class="student-registration__label">Placement Status *</label>
+                <select id="studentRegistrationPlacementStatus" name="placementStatus" class="student-registration__select" required>
                     <option value="">Select Status</option>
                     <option value="placed">Placed</option>
                     <option value="not_placed">Not Placed</option>
                     <option value="not_interested">Not Interested</option>
                     <option value="in_progress">In Progress</option>
                 </select>
-                <div class="error" id="placementStatusError">Placement status is required</div>
+                <div class="student-registration__error" id="studentRegistrationPlacementStatusError">Placement status is required</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="city">City *</label>
-                <input type="text" id="city" name="city" required>
-                <div class="error" id="cityError">City is required</div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationCity" class="student-registration__label">City *</label>
+                <input type="text" id="studentRegistrationCity" name="city" class="student-registration__input" required>
+                <div class="student-registration__error" id="studentRegistrationCityError">City is required</div>
             </div>
         </div>
     </div>
 
     <!-- Conditional Fields for Placed Students -->
-    <div class="row" id="placementDetailsRow">
-        <div class="col">
-            <div class="form-group conditional-field" id="companyField">
-                <label for="companyPlacedIn">Company Placed In *</label>
-                <input type="text" id="companyPlacedIn" name="companyPlacedIn">
-                <div class="error" id="companyError">Company name is required for placed students</div>
+    <div class="student-registration__row" id="studentRegistrationPlacementDetailsRow">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group student-registration__conditional-field" id="studentRegistrationCompanyField">
+                <label for="studentRegistrationCompanyPlacedIn" class="student-registration__label">Company Placed In *</label>
+                <input type="text" id="studentRegistrationCompanyPlacedIn" name="companyPlacedIn" class="student-registration__input">
+                <div class="student-registration__error" id="studentRegistrationCompanyError">Company name is required for placed students</div>
             </div>
         </div>
-        <div class="col">
-            <div class="form-group conditional-field" id="packageField">
-                <label for="package">Package (LPA) *</label>
-                <input type="number" id="package" name="package" min="0" step="0.01">
-                <div class="error" id="packageError">Valid package amount is required</div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group student-registration__conditional-field" id="studentRegistrationPackageField">
+                <label for="studentRegistrationPackage" class="student-registration__label">Package (LPA) *</label>
+                <input type="number" id="studentRegistrationPackage" name="package" min="0" step="0.01" class="student-registration__input">
+                <div class="student-registration__error" id="studentRegistrationPackageError">Valid package amount is required</div>
             </div>
         </div>
     </div>
 
     <!-- Address -->
-    <div class="form-group">
-        <label for="address">Address *</label>
-        <textarea id="address" name="address" rows="3" required></textarea>
-        <div class="error" id="addressError">Address is required</div>
+    <div class="student-registration__form-group">
+        <label for="studentRegistrationAddress" class="student-registration__label">Address *</label>
+        <textarea id="studentRegistrationAddress" name="address" rows="3" class="student-registration__textarea" required></textarea>
+        <div class="student-registration__error" id="studentRegistrationAddressError">Address is required</div>
     </div>
 
     <!-- Submit Button -->
-    <button type="submit" class="register-btn" id="registerBtn">Register Student</button>
+    <!-- <button type="submit" class="student-registration__submit-btn" id="studentRegistrationSubmitBtn">Register Student</button> -->
+    <!-- Make the submit button more prominent -->
+    <!-- Replace your current button with this version -->
+<button type="submit" class="student-registration__submit-btn" id="studentRegistrationSubmitBtn" 
+style="position: sticky; bottom: 20px; margin-top: 50px; opacity: 1 !important; visibility: visible !important;">
+Register Student
+</button>
 </form>
+</div>
 
 <script>
     // Function to handle profile picture upload
-    document.getElementById('uploadBtn').addEventListener('click', function () {
-        document.getElementById('profilePicture').click();
+    document.getElementById('studentRegistrationUploadBtn').addEventListener('click', function () {
+        document.getElementById('studentRegistrationProfilePicture').click();
     });
 
-    document.getElementById('profilePicture').addEventListener('change', function (e) {
+    document.getElementById('studentRegistrationProfilePicture').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function (event) {
-                const img = document.getElementById('previewImage');
+                const img = document.getElementById('studentRegistrationPreviewImage');
                 img.src = event.target.result;
                 img.style.display = 'block';
-                document.getElementById('previewText').style.display = 'none';
+                document.getElementById('studentRegistrationPreviewText').style.display = 'none';
             }
             reader.readAsDataURL(file);
         }
     });
 
     // Show/hide conditional fields based on placement status
-    document.getElementById('placementStatus').addEventListener('change', function () {
+    document.getElementById('studentRegistrationPlacementStatus').addEventListener('change', function () {
         const placementStatus = this.value;
-        const companyField = document.getElementById('companyField');
-        const packageField = document.getElementById('packageField');
+        const companyField = document.getElementById('studentRegistrationCompanyField');
+        const packageField = document.getElementById('studentRegistrationPackageField');
 
         if (placementStatus === 'placed') {
             companyField.style.display = 'block';
             packageField.style.display = 'block';
-            document.getElementById('companyPlacedIn').setAttribute('required', '');
-            document.getElementById('package').setAttribute('required', '');
+            document.getElementById('studentRegistrationCompanyPlacedIn').setAttribute('required', '');
+            document.getElementById('studentRegistrationPackage').setAttribute('required', '');
         } else {
             companyField.style.display = 'none';
             packageField.style.display = 'none';
-            document.getElementById('companyPlacedIn').removeAttribute('required');
-            document.getElementById('package').removeAttribute('required');
+            document.getElementById('studentRegistrationCompanyPlacedIn').removeAttribute('required');
+            document.getElementById('studentRegistrationPackage').removeAttribute('required');
         }
     });
 
@@ -363,25 +419,25 @@
         e.preventDefault();
 
         // Reset all error messages
-        const errorElements = document.querySelectorAll('.error');
+        const errorElements = document.querySelectorAll('.student-registration__error');
         errorElements.forEach(el => el.style.display = 'none');
 
         let hasError = false;
 
         // Validate required fields
         const requiredFields = [
-            { id: 'firstName', error: 'firstNameError' },
-            { id: 'lastName', error: 'lastNameError' },
-            { id: 'enrollmentNo', error: 'enrollmentNoError' },
-            { id: 'dob', error: 'dobError' },
-            { id: 'gender', error: 'genderError' },
-            { id: 'joiningYear', error: 'joiningYearError' },
-            { id: 'cgpa', error: 'cgpaError' },
-            { id: 'course', error: 'courseError' },
-            { id: 'graduationStatus', error: 'graduationStatusError' },
-            { id: 'placementStatus', error: 'placementStatusError' },
-            { id: 'city', error: 'cityError' },
-            { id: 'address', error: 'addressError' }
+            { id: 'studentRegistrationFirstName', error: 'studentRegistrationFirstNameError' },
+            { id: 'studentRegistrationLastName', error: 'studentRegistrationLastNameError' },
+            { id: 'studentRegistrationEnrollmentNo', error: 'studentRegistrationEnrollmentNoError' },
+            { id: 'studentRegistrationDob', error: 'studentRegistrationDobError' },
+            { id: 'studentRegistrationGender', error: 'studentRegistrationGenderError' },
+            { id: 'studentRegistrationJoiningYear', error: 'studentRegistrationJoiningYearError' },
+            { id: 'studentRegistrationCgpa', error: 'studentRegistrationCgpaError' },
+            { id: 'studentRegistrationCourse', error: 'studentRegistrationCourseError' },
+            { id: 'studentRegistrationGraduationStatus', error: 'studentRegistrationGraduationStatusError' },
+            { id: 'studentRegistrationPlacementStatus', error: 'studentRegistrationPlacementStatusError' },
+            { id: 'studentRegistrationCity', error: 'studentRegistrationCityError' },
+            { id: 'studentRegistrationAddress', error: 'studentRegistrationAddressError' }
         ];
 
         requiredFields.forEach(field => {
@@ -393,56 +449,45 @@
         });
 
         // Validate CGPA range
-        const cgpa = parseFloat(document.getElementById('cgpa').value);
+        const cgpa = parseFloat(document.getElementById('studentRegistrationCgpa').value);
         if (isNaN(cgpa) || cgpa < 0 || cgpa > 10) {
-            document.getElementById('cgpaError').style.display = 'block';
+            document.getElementById('studentRegistrationCgpaError').style.display = 'block';
             hasError = true;
         }
 
         // Validate joining year
-        const joiningYear = parseInt(document.getElementById('joiningYear').value);
+        const joiningYear = parseInt(document.getElementById('studentRegistrationJoiningYear').value);
         const currentYear = new Date().getFullYear();
         if (isNaN(joiningYear) || joiningYear < 2000 || joiningYear > currentYear) {
-            document.getElementById('joiningYearError').style.display = 'block';
+            document.getElementById('studentRegistrationJoiningYearError').style.display = 'block';
             hasError = true;
         }
 
         // Validate conditional fields for placed students
-        if (document.getElementById('placementStatus').value === 'placed') {
-            if (!document.getElementById('companyPlacedIn').value.trim()) {
-                document.getElementById('companyError').style.display = 'block';
+        if (document.getElementById('studentRegistrationPlacementStatus').value === 'placed') {
+            if (!document.getElementById('studentRegistrationCompanyPlacedIn').value.trim()) {
+                document.getElementById('studentRegistrationCompanyError').style.display = 'block';
                 hasError = true;
             }
 
-            const packageValue = parseFloat(document.getElementById('package').value);
+            const packageValue = parseFloat(document.getElementById('studentRegistrationPackage').value);
             if (isNaN(packageValue) || packageValue < 0) {
-                document.getElementById('packageError').style.display = 'block';
+                document.getElementById('studentRegistrationPackageError').style.display = 'block';
                 hasError = true;
             }
         }
 
         // If no errors, proceed with form submission
         if (!hasError) {
-            // For demonstration purposes, we'll show a success animation
-            const registerBtn = document.getElementById('registerBtn');
+            const registerBtn = document.getElementById('studentRegistrationSubmitBtn');
             registerBtn.textContent = "Student Registered Successfully!";
-            registerBtn.classList.add('success-animation');
+            registerBtn.classList.add('student-registration__success-animation');
             registerBtn.style.backgroundColor = '#27ae60';
 
-            // In a real application, you would submit the form data to your backend here
             console.log("Form submitted successfully!");
 
-            // Reset form after successful submission (optional)
-            setTimeout(() => {
-                // document.getElementById('studentRegistrationForm').reset();
-                // registerBtn.textContent = "Register Student";
-                // registerBtn.classList.remove('success-animation');
-                // document.getElementById('previewImage').style.display = 'none';
-                // document.getElementById('previewText').style.display = 'block';
-                // Hide conditional fields
-                // document.getElementById('companyField').style.display = 'none';
-                // document.getElementById('packageField').style.display = 'none';
-            }, 3000);
+            // In a real application, you would submit the form here
+            // this.submit();
         }
     });
 </script>

@@ -1,15 +1,20 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 
 from ..decorators import permission_required
+from ..schema.users import User
 from ..schema.students import Student, PlacementStatus, GraduationStatus
 from ..schema.course import Course
+from ..schema.cities import City
 from ..utils.helper_utils import paginate, safe_value
 
+from django.contrib import messages
+from django.utils.dateparse import parse_date
+from django.db import IntegrityError
 
 def parse_json_data(request):
     try:
@@ -78,9 +83,58 @@ def student_registrations(request):
 @permission_required('add_students')
 @csrf_exempt
 def student_manual_registrations(request):
+    if request.method == "POST":
+        try:
+            data = request.POST
+            
+            # Basic user creation
+            email = data.get('email')
+            password = data.get('password') or "placemate@123"
+            role = 'STUDENT'
+
+            if User.objects.filter(email=email).exists():
+                messages.error(request, "User with this email already exists.")
+                return redirect("student_manual_registrations")
+            
+            user = User.objects.create_user(email=email, password=password, role=role)
+
+            # Optional foreign keys
+            course = Course.objects.get(id=data.get('course')) if data.get('course') else None
+            city = City.objects.get(id=data.get('city')) if data.get('city') else None
+
+            # Create student profile
+            student = Student.objects.create(
+                student_id=user,
+                enrollment=int(data.get('enrollment')),
+                first_name=data.get('first_name'),
+                middle_name=data.get('middle_name') or None,
+                last_name=data.get('last_name'),
+                dob=parse_date(data.get('dob')),
+                gender=data.get('gender') or None,
+                joining_year=int(data.get('joining_year')),
+                cgpa=float(data.get('cgpa')) if data.get('cgpa') else None,
+                profile=data.get('profile'),
+                placement_status=int(data.get('placement_status', 0)),
+                graduation_status=data.get('graduation_status', 'Pursuing'),
+                course=course,
+                city=city,
+                address=data.get('address') or ""
+            )
+
+            messages.success(request, f"Student {student.first_name} added successfully.")
+            return redirect("student_manual_registrations")
+
+        except IntegrityError:
+            messages.error(request, "Enrollment already exists.")
+        except Exception as e:
+            messages.error(request, f"Error: {str(e)}")
+    
+    # GET request
     return render(request, "student_manual_registrations.html", {
         "page_title": "Student Manual Registrations",
-        "page_subtitle": "Add Student Details"
+        "page_subtitle": "Add Student Details",
+        "courses": Course.objects.all(),
+        "cities": City.objects.all()
     })
 
 @permission_required('view_students')
