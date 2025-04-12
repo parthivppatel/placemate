@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student View</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Sidebar Styles (copied from your component) */
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-link.active {
+            color: #0d6efd;
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-container {
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 100px;
+            padding: 20px;
+        }
+        
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+        }
+        
+        .logout-link {
+            color: #dc3545;
+        }
+        
+        .logout-link:hover {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-text {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 100px;
+            }
+        }
+        
+        /* Student view page specific styles */
+        .student-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .student-avatar {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            margin-right: 1.5rem;
+            border: 1px solid #dee2e6;
+            padding: 0.25rem;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        
+        .student-name {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .section-card {
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .section-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        .detail-row {
+            margin-bottom: 1rem;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .placement-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .placement-card:hover {
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .company-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge {
+            margin-right: 0.5rem;
+        }
+        
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .editable-field {
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .editable-field:hover {
+            background-color: #e9ecef;
+            cursor: pointer;
+        }
+        
+        .modal-footer {
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar Component Start -->
+            <div class="col-auto sidebar">
+                <div class="logo-container">
+                    <img src="/static/images/da-logo.img" alt="Logo" class="img-fluid rounded-circle">
+                </div>
+                
+                <div class="sidebar-nav">
+                    <a href="dashboard.html" class="sidebar-link" id="dashboard-link">
+                        <span class="sidebar-icon"><i class="bi bi-grid"></i></span>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    <a href="students.html" class="sidebar-link active" id="students-link">
+                        <span class="sidebar-icon"><i class="bi bi-people"></i></span>
+                        <span class="sidebar-text">Students</span>
+                    </a>
+                    <a href="companies.html" class="sidebar-link" id="companies-link">
+                        <span class="sidebar-icon"><i class="bi bi-buildings"></i></span>
+                        <span class="sidebar-text">Companies</span>
+                    </a>
+                    <a href="drives.html" class="sidebar-link" id="drives-link">
+                        <span class="sidebar-icon"><i class="bi bi-briefcase"></i></span>
+                        <span class="sidebar-text">Drives</span>
+                    </a>
+                    <a href="reports.html" class="sidebar-link" id="reports-link">
+                        <span class="sidebar-icon"><i class="bi bi-bar-chart"></i></span>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <a href="logout.html" class="sidebar-link logout-link" id="logout-link">
+                        <span class="sidebar-icon"><i class="bi bi-box-arrow-right"></i></span>
+                        <span class="sidebar-text">Logout</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Sidebar Component End -->
+            
+            <!-- Main Content -->
+            <div class="col main-content">
+                <!-- Actions Bar -->
+                <div class="actions-bar">
+                    <div>
+                        <a href="student_list.html" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Students
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <button class="btn btn-outline-primary me-2" id="toggleEditBtn">
+                            <i class="bi bi-pencil"></i> Edit Student
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Add New Student
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Student Header -->
+                <div class="student-header">
+                    <img src="/api/placeholder/120/120" alt="Student Photo" class="student-avatar" id="studentPhoto">
+                    <div>
+                        <h1 class="student-name" id="studentName">Rahul Singh</h1>
+                        <div>
+                            <span class="badge bg-primary" id="studentDepartment">Computer Science</span>
+                            <span class="badge bg-info" id="studentBatch">2022-2026</span>
+                            <span class="badge bg-success" id="placementStatus">Placed</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Student Personal Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-person me-2"></i>Personal Details
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Enrollment Number</div>
+                                    <div id="enrollmentNumber" class="editable-field">CS20221234</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Date of Birth</div>
+                                    <div id="dob" class="editable-field">15 Aug 2001</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Gender</div>
+                                    <div id="gender" class="editable-field">Male</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Email</div>
+                                    <div id="email" class="editable-field">rahul.singh@example.com</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Phone</div>
+                                    <div id="phone" class="editable-field">+91 98765 43210</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Address</div>
+                                    <div id="address" class="editable-field">123 College Road, Hostel Block C</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">City</div>
+                                    <div id="city" class="editable-field">Bangalore</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Joining Year</div>
+                                    <div id="joiningYear" class="editable-field">2022</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Academic Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-book me-2"></i>Academic Details
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Department</div>
+                                    <div id="department" class="editable-field">Computer Science & Engineering</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Current CGPA</div>
+                                    <div id="cgpa" class="editable-field">8.75</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Graduation Status</div>
+                                    <div id="graduationStatus" class="editable-field">In Progress</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">10th Percentage</div>
+                                    <div id="tenthPercentage" class="editable-field">92%</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">12th Percentage</div>
+                                    <div id="twelfthPercentage" class="editable-field">88%</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Backlogs</div>
+                                    <div id="backlogs" class="editable-field">None</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Placement Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-briefcase me-2"></i>Placement Details
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Placement Status</div>
+                                    <div id="placementStatusDetail" class="editable-field">Placed</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Company Placed In</div>
+                                    <div id="companyPlacedIn" class="editable-field">TechSolutions Inc.</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Job Role</div>
+                                    <div id="jobRole" class="editable-field">Software Development Engineer</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Package (LPA)</div>
+                                    <div id="package" class="editable-field">12.5</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Offer Date</div>
+                                    <div id="offerDate" class="editable-field">March 15, 2025</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Joining Date</div>
+                                    <div id="joiningDate" class="editable-field">July 15, 2025</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="h6 mb-0">Placement History</h3>
+                                <span class="badge bg-secondary" id="applicationsCount">3 Applications</span>
+                            </div>
+                            
+                            <!-- Placement Card 1 -->
+                            <div class="placement-card" id="application1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h4 class="company-name">TechSolutions Inc.</h4>
+                                        <div class="mb-2">
+                                            <span class="badge bg-info">Software Development Engineer</span>
+                                            <span class="badge bg-success">Selected</span>
+                                        </div>
+                                        <div class="text-muted">
+                                            <small>Applied: Mar 10, 2025 | Offer: Mar 15, 2025 | Package: 12.5 LPA</small>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Placement Card 2 -->
+                            <div class="placement-card" id="application2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h4 class="company-name">InnovateTech Solutions</h4>
+                                        <div class="mb-2">
+                                            <span class="badge bg-info">Associate Developer</span>
+                                            <span class="badge bg-danger">Rejected</span>
+                                        </div>
+                                        <div class="text-muted">
+                                            <small>Applied: Feb 25, 2025 | Result: Mar 5, 2025 | Package: 10 LPA</small>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Placement Card 3 -->
+                            <div class="placement-card" id="application3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h4 class="company-name">DataSense Analytics</h4>
+                                        <div class="mb-2">
+                                            <span class="badge bg-info">Data Engineer</span>
+                                            <span class="badge bg-warning text-dark">In Process</span>
+                                        </div>
+                                        <div class="text-muted">
+                                            <small>Applied: Apr 2, 2025 | Interview: Apr 15, 2025 | Package: 14 LPA</small>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills & Documents Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-file-earmark-text me-2"></i>Skills & Documents
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-label mb-2">Technical Skills</div>
+                                <div id="technicalSkills" class="mb-3">
+                                    <span class="badge bg-secondary me-1 mb-1">Java</span>
+                                    <span class="badge bg-secondary me-1 mb-1">Python</span>
+                                    <span class="badge bg-secondary me-1 mb-1">JavaScript</span>
+                                    <span class="badge bg-secondary me-1 mb-1">React</span>
+                                    <span class="badge bg-secondary me-1 mb-1">SQL</span>
+                                    <span class="badge bg-secondary me-1 mb-1">Git</span>
+                                </div>
+                                
+                                <div class="detail-label mb-2">Soft Skills</div>
+                                <div id="softSkills" class="mb-3">
+                                    <span class="badge bg-light text-dark me-1 mb-1">Communication</span>
+                                    <span class="badge bg-light text-dark me-1 mb-1">Teamwork</span>
+                                    <span class="badge bg-light text-dark me-1 mb-1">Problem Solving</span>
+                                    <span class="badge bg-light text-dark me-1 mb-1">Leadership</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-label mb-2">Documents</div>
+                                <div class="list-group">
+                                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="bi bi-file-pdf me-2 text-danger"></i>
+                                            Resume
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">Download</span>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="bi bi-file-pdf me-2 text-danger"></i>
+                                            Offer Letter
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">Download</span>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="bi bi-file-pdf me-2 text-danger"></i>
+                                            Certificates
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">Download</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Student Modal -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalLabel">Edit Student Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="editName" value="Rahul Singh">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editEnrollmentNumber" class="form-label">Enrollment Number</label>
+                                <input type="text" class="form-control" id="editEnrollmentNumber" value="CS20221234">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="editDob" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="editDob" value="2001-08-15">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editGender" class="form-label">Gender</label>
+                                <select class="form-select" id="editGender">
+                                    <option value="Male" selected>Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editJoiningYear" class="form-label">Joining Year</label>
+                                <input type="number" class="form-control" id="editJoiningYear" value="2022">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="editEmail" value="rahul.singh@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editPhone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="editPhone" value="+91 98765 43210">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="editAddress" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="editAddress" value="123 College Road, Hostel Block C">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editCity" class="form-label">City</label>
+                                <input type="text" class="form-control" id="editCity" value="Bangalore">
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <h5>Academic Details</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editDepartment" class="form-label">Department</label>
+                                <select class="form-select" id="editDepartment">
+                                    <option value="Computer Science & Engineering" selected>Computer Science & Engineering</option>
+                                    <option value="Electronics & Communication">Electronics & Communication</option>
+                                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                    <option value="Civil Engineering">Civil Engineering</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editCgpa" class="form-label">Current CGPA</label>
+                                <input type="number" step="0.01" class="form-control" id="editCgpa" value="8.75">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="editTenthPercentage" class="form-label">10th Percentage</label>
+                                <input type="number" step="0.01" class="form-control" id="editTenthPercentage" value="92">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editTwelfthPercentage" class="form-label">12th Percentage</label>
+                                <input type="number" step="0.01" class="form-control" id="editTwelfthPercentage" value="88">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editBacklogs" class="form-label">Backlogs</label>
+                                <input type="number" class="form-control" id="editBacklogs" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editGraduationStatus" class="form-label">Graduation Status</label>
+                            <select class="form-select" id="editGraduationStatus">
+                                <option value="In Progress" selected>In Progress</option>
+                                <option value="Graduated">Graduated</option>
+                                <option value="Dropped Out">Dropped Out</option>
+                            </select>
+                        </div>
+                        
+                        <hr>
+                        <h5>Placement Details</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editPlacementStatus" class="form-label">Placement Status</label>
+                                <select class="form-select" id="editPlacementStatus">
+                                    <option value="Not Placed">Not Placed</option>
+                                    <option value="In Process">In Process</option>
+                                    <option value="Placed" selected>Placed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editCompanyPlacedIn" class="form-label">Company Placed In</label>
+                                <input type="text" class="form-control" id="editCompanyPlacedIn" value="TechSolutions Inc.">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="editJobRole" class="form-label">Job Role</label>
+                                <input type="text" class="form-control" id="editJobRole" value="Software Development Engineer">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editPackage" class="form-label">Package (LPA)</label>
+                                <input type="number" step="0.1" class="form-control" id="editPackage" value="12.5">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editOfferDate" class="form-label">Offer Date</label>
+                                <input type="date" class="form-control" id="editOfferDate" value="2025-03-15">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-danger" id="deleteStudentBtn">
+                            <i class="bi bi-trash"></i> Delete Student
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // This script would be replaced with actual data fetching from your backend
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize modal
+            const editStudentModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+            
+            // Edit button click handler
+            document.getElementById('toggleEditBtn').addEventListener('click', function() {
+                editStudentModal.show();
+            });
+            
+            // Save changes button click handler
+            document.getElementById('saveChangesBtn').addEventListener('click', function() {
+                // Here you would save the changes to your backend
+                // For demo purposes, we'll just close the modal
+                editStudentModal.hide();
+                
+                // Show a success message (in a real app)
+                alert('Student details updated successfully!');
+            });
+            // Delete button click handler
+            document.getElementById('deleteStudentBtn').addEventListener('click', function() {
+                // Here you would delete the student from your backend
+                // For demo purposes, we'll just close the modal
+                editStudentModal.hide();
+                
+                // Show a success message (in a real app)
+                alert('Student deleted successfully!');
+            });
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">   

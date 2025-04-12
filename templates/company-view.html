@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company View</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Sidebar Styles (copied from your component) */
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-link.active {
+            color: #0d6efd;
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-container {
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 100px;
+            padding: 20px;
+        }
+        
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+        }
+        
+        .logout-link {
+            color: #dc3545;
+        }
+        
+        .logout-link:hover {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-text {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 100px;
+            }
+        }
+        
+        /* Company view page specific styles */
+        .company-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .company-logo {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-right: 1.5rem;
+            border: 1px solid #dee2e6;
+            padding: 0.5rem;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+        
+        .company-name {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .section-card {
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .section-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        .detail-row {
+            margin-bottom: 1rem;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .job-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .job-card:hover {
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .job-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge {
+            margin-right: 0.5rem;
+        }
+        
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar Component Start -->
+            <div class="col-auto sidebar">
+                <div class="logo-container">
+                    <img src="/static/images/da-logo.img" alt="Logo" class="img-fluid rounded-circle">
+                </div>
+                
+                <div class="sidebar-nav">
+                    <a href="dashboard.html" class="sidebar-link" id="dashboard-link">
+                        <span class="sidebar-icon"><i class="bi bi-grid"></i></span>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    <a href="students.html" class="sidebar-link" id="students-link">
+                        <span class="sidebar-icon"><i class="bi bi-people"></i></span>
+                        <span class="sidebar-text">Students</span>
+                    </a>
+                    <a href="companies.html" class="sidebar-link active" id="companies-link">
+                        <span class="sidebar-icon"><i class="bi bi-buildings"></i></span>
+                        <span class="sidebar-text">Companies</span>
+                    </a>
+                    <a href="drives.html" class="sidebar-link" id="drives-link">
+                        <span class="sidebar-icon"><i class="bi bi-briefcase"></i></span>
+                        <span class="sidebar-text">Drives</span>
+                    </a>
+                    <a href="reports.html" class="sidebar-link" id="reports-link">
+                        <span class="sidebar-icon"><i class="bi bi-bar-chart"></i></span>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <a href="logout.html" class="sidebar-link logout-link" id="logout-link">
+                        <span class="sidebar-icon"><i class="bi bi-box-arrow-right"></i></span>
+                        <span class="sidebar-text">Logout</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Sidebar Component End -->
+            
+            <!-- Main Content -->
+            <div class="col main-content">
+                <!-- Actions Bar -->
+                <div class="actions-bar">
+                    <div>
+                        <a href="companylist.html" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Companies
+                        </a>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-primary me-2">
+                            <i class="bi bi-pencil"></i> Edit Company
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Add New Company
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Company Header -->
+                <div class="company-header">
+                    <img src="/api/placeholder/100/100" alt="Company Logo" class="company-logo">
+                    <div>
+                        <h1 class="company-name" id="companyName">Company Name</h1>
+                        <div>
+                            <span class="badge bg-success" id="companyStatus">Active</span>
+                            <span class="text-muted" id="companyJoined">Joined: January 2023</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Company Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-building me"></i>Company Details
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Industry</div>
+                                    <div id="industry">Information Technology</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Founded</div>
+                                    <div id="founded">2005</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Location</div>
+                                    <div id="location">Bangalore, India</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Website</div>
+                                    <div id="website"><a href="#" target="_blank">www.companyname.com</a></div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Email</div>
+                                    <div id="email">contact@companyname.com</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Phone</div>
+                                    <div id="phone">+91 98765 43210</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="detail-label">About</div>
+                                <div id="about">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam viverra neque in nulla facilisis, vitae fermentum turpis euismod. Praesent euismod velit eget metus pellentesque, eget euismod nibh tincidunt. Vivamus feugiat nisl quis sem sollicitudin, in sagittis massa rutrum.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Job and Drive Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-briefcase me-2"></i>Job & Drive Details
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="h6 mb-0">Active Drives</h3>
+                                <span class="badge bg-primary" id="activeDrivesCount">2 Active</span>
+                            </div>
+                            
+                            <!-- Job Card 1 -->
+                            <div class="job-card" id="job1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h4 class="job-title">Software Development Engineer</h4>
+                                        <div class="mb-2">
+                                            <span class="badge bg-info">Full-time</span>
+                                            <span class="badge bg-secondary">On-site</span>
+                                            <span class="badge bg-success">Open</span>
+                                        </div>
+                                        <div class="text-muted">
+                                            <small>Drive Date: Apr 15, 2025 | Applications: 45 | Positions: 10</small>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Job Card 2 -->
+                            <div class="job-card" id="job2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h4 class="job-title">UI/UX Designer</h4>
+                                        <div class="mb-2">
+                                            <span class="badge bg-info">Full-time</span>
+                                            <span class="badge bg-primary">Remote</span>
+                                            <span class="badge bg-success">Open</span>
+                                        </div>
+                                        <div class="text-muted">
+                                            <small>Drive Date: Apr 22, 2025 | Applications: 27 | Positions: 5</small>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="h6 mb-0">Past Drives</h3>
+                                <span class="badge bg-secondary" id="pastDrivesCount">3 Completed</span>
+                            </div>
+                            
+                            <!-- Past Job Card 1 -->
+                            <div class="job-card" id="pastJob1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h4 class="job-title">Product Manager</h4>
+                                        <div class="mb-2">
+                                            <span class="badge bg-info">Full-time</span>
+                                            <span class="badge bg-secondary">On-site</span>
+                                            <span class="badge bg-danger">Closed</span>
+                                        </div>
+                                        <div class="text-muted">
+                                            <small>Drive Date: Mar 10, 2025 | Applications: 32 | Hired: 3</small>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary">View Results</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // This script would be replaced with actual data fetching from your backend
+        document.addEventListener('DOMContentLoaded', function() {
+            // Example function to populate company data from backend
+            // In a real implementation, you would fetch this data via API
+            function populateCompanyData(companyData) {
+                // Populate company header
+                document.getElementById('companyName').textContent = companyData.name;
+                document.getElementById('companyStatus').textContent = companyData.status;
+                document.getElementById('companyJoined').textContent = 'Joined: ' + companyData.joinedDate;
+                
+                // Populate company details
+                document.getElementById('industry').textContent = companyData.industry;
+                document.getElementById('founded').textContent = companyData.founded;
+                document.getElementById('location').textContent = companyData.location;
+                document.getElementById('website').innerHTML = `<a href="${companyData.website}" target="_blank">${companyData.website}</a>`;
+                document.getElementById('email').textContent = companyData.email;
+                document.getElementById('phone').textContent = companyData.phone;
+                document.getElementById('about').textContent = companyData.about;
+                
+                // Drive counts
+                document.getElementById('activeDrivesCount').textContent = `${companyData.activeDrives} Active`;
+                document.getElementById('pastDrivesCount').textContent = `${companyData.pastDrives} Completed`;
+                
+                // You would also populate the job cards with real data here
+            }
+            
+            // Example data - in production, this would come from your backend
+            const sampleCompanyData = {
+                name: "TechSolutions Inc.",
+                status: "Active",
+                joinedDate: "January 2023",
+                industry: "Information Technology",
+                founded: "2005",
+                location: "Bangalore, India",
+                website: "www.techsolutions.com",
+                email: "hr@techsolutions.com",
+                phone: "+91 98765 43210",
+                about: "TechSolutions Inc. is a leading IT company specializing in software development, web applications, and mobile app development. The company has been recognized for its innovative solutions and client-focused approach.",
+                activeDrives: 2,
+                pastDrives: 3
+            };
+            
+            // Call the function with sample data
+            // In production, you would fetch real data from an API
+            populateCompanyData(sampleCompanyData);
+        });
+    </script>
+</body>
+</html> 

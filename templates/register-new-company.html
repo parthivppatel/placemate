@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register New Company - Placement Portal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-link.active {
+            color: #0d6efd;
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-container {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .main-content {
+            margin-left: 100px;
+            padding: 20px;
+        }
+        
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+        }
+        
+        .logout-link {
+            color: #dc3545;
+        }
+        
+        .logout-link:hover {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Profile styles */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .profile-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            color: #495057;
+            border: 2px solid #6c7ae0;
+            position: relative;
+            top: -5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-icon:hover {
+            border-color: #4e59c7;
+            transform: translateY(-2px);
+        }
+        
+        /* Notification styles */
+        .notification-container {
+            position: relative;
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .notification-icon:hover {
+            background-color: #e5e7ff;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Registration Form Styles */
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #6c7ae0;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 8px;
+        }
+        
+        .form-label {
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .logo-preview {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #6c7ae0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .logo-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .logo-preview-text {
+            color: #6c7ae0;
+            text-align: center;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn-register-company {
+            background-color: #6c7ae0;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 200px;
+        }
+        
+        .btn-register-company:hover {
+            background-color: #5563d0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(108, 122, 224, 0.3);
+        }
+        
+        .btn-cancel {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 200px;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* Form validation styles */
+        .form-control.is-invalid,
+        .was-validated .form-control:invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 80%;
+        }
+
+        /* Profile offcanvas styles */
+        .profile-offcanvas .offcanvas-header {
+            background-color: #f0f1ff;
+        }
+        
+        .profile-user-section {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 3px solid #6c7ae0;
+            padding: 3px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #495057;
+        }
+        
+        .profile-username {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #495057;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .profile-menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .profile-menu-item.danger {
+            color: #dc3545;
+        }
+        
+        .profile-menu-item.danger:hover {
+            background-color: #f8d7da;
+        }
+        
+        .profile-menu-icon {
+            width: 35px;
+            height: 35px;
+            background-color: #f0f1ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .profile-menu-icon.danger {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        /* Notification dialog */
+        .notification-modal .modal-header {
+            background-color: #f0f1ff;
+            border-bottom: 1px solid #e5e7ff;
+        }
+        
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-item.unread {
+            background-color: #f0f1ff;
+        }
+        
+        .notification-item.unread:hover {
+            background-color: #e5e7ff;
+        }
+        
+        .notification-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .notification-message {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: #adb5bd;
+            margin-top: 4px;
+        }
+        
+        .notification-actions {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-text {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar Component Start -->
+            <div class="col-auto sidebar">
+                <div class="logo-container">
+                    <img src="/static/images/da-logo.img" alt="Logo" class="img-fluid rounded-circle">
+                </div>
+                
+                <div class="sidebar-nav">
+                    <a href="dashboard.html" class="sidebar-link" id="dashboard-link">
+                        <span class="sidebar-icon"><i class="bi bi-grid"></i></span>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    <a href="students.html" class="sidebar-link" id="students-link">
+                        <span class="sidebar-icon"><i class="bi bi-people"></i></span>
+                        <span class="sidebar-text">Students</span>
+                    </a>
+                    <a href="companies.html" class="sidebar-link active" id="companies-link">
+                        <span class="sidebar-icon"><i class="bi bi-buildings"></i></span>
+                        <span class="sidebar-text">Companies</span>
+                    </a>
+                    <a href="drives.html" class="sidebar-link" id="drives-link">
+                        <span class="sidebar-icon"><i class="bi bi-briefcase"></i></span>
+                        <span class="sidebar-text">Drives</span>
+                    </a>
+                    <a href="reports.html" class="sidebar-link" id="reports-link">
+                        <span class="sidebar-icon"><i class="bi bi-bar-chart"></i></span>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <a href="logout.html" class="sidebar-link logout-link" id="logout-link">
+                        <span class="sidebar-icon"><i class="bi bi-box-arrow-right"></i></span>
+                        <span class="sidebar-text">Logout</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Sidebar Component End -->
+            
+            <!-- Main Content -->
+            <div class="col main-content">
+                <div class="header">
+                    <div>
+                        <h2 class="mb-0">Register New Company</h2>
+                        <p class="text-muted">Add a new company to the placement portal</p>
+                    </div>
+                    
+                    <!-- Enhanced Profile Section -->
+                    <div class="profile-section">
+                        <!-- Notification Bell -->
+                        <div class="notification-container">
+                            <div class="notification-icon" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                                <i class="bi bi-bell"></i>
+                                <span class="notification-badge">3</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Icon -->
+                        <div class="profile-icon" data-bs-toggle="offcanvas" data-bs-target="#profileOffcanvas">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Registration Form -->
+                <form id="companyRegistrationForm" class="needs-validation" novalidate>
+                    <!-- Company Information Section -->
+                    <div class="form-container">
+                        <div class="form-section">
+                            <h4 class="form-section-title">Company Information</h4>
+                            <div class="row g-3">
+                                <!-- Company Logo -->
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Company Logo</label>
+                                    <div class="logo-preview" id="logoPreview" onclick="document.getElementById('companyLogo').click()">
+                                        <div class="logo-preview-text">
+                                            <i class="bi bi-image fs-1"></i>
+                                            <p class="mb-0">Click to upload logo</p>
+                                            <!-- <small>(PNG or JPEG)</small> -->
+                                        </div>
+                                    </div>
+                                    <input type="file" class="file-input" id="companyLogo" accept="image/png, image/jpeg, image/img" required>
+                                    <div class="invalid-feedback">Please upload a company logo.</div>
+                                </div>
+                                
+                                <!-- Company Basic Info -->
+                                <div class="col-md-9">
+                                    <div class="row g-3">
+                                        <!-- Company Name -->
+                                        <div class="col-md-6">
+                                            <label for="companyName" class="form-label">Company Name*</label>
+                                            <input type="text" class="form-control" id="companyName" required>
+                                            <div class="invalid-feedback">Please enter company name.</div>
+                                        </div>
+                                        
+                                        <!-- Company Website -->
+                                        <div class="col-md-6">
+                                            <label for="companyWebsite" class="form-label">Company Website*</label>
+                                            <input type="url" class="form-control" id="companyWebsite" placeholder="https://example.com" required>
+                                            <div class="invalid-feedback">Please enter a valid website URL.</div>
+                                        </div>
+                                        
+                                        <!-- Founded Year -->
+                                        <div class="col-md-4">
+                                            <label for="foundedYear" class="form-label">Founded Year*</label>
+                                            <input type="number" class="form-control" id="foundedYear" min="1800" max="2025" required>
+                                            <div class="invalid-feedback">Please select a valid year.</div>
+                                        </div>
+                                        
+                                        <!-- Industry -->
+                                        <div class="col-md-4">
+                                            <label for="industry" class="form-label">Industry*</label>
+                                            <select class="form-select" id="industry" required>
+                                                <option value="" selected disabled>Select Industry</option>
+                                                <option value="Information Technology">Information Technology</option>
+                                                <option value="Banking & Finance">Banking & Finance</option>
+                                                <option value="Consulting">Consulting</option>
+                                                <option value="E-Commerce">E-Commerce</option>
+                                                <option value="Manufacturing">Manufacturing</option>
+                                                <option value="Healthcare">Healthcare</option>
+                                                <option value="Education">Education</option>
+                                                <option value="Real Estate">Real Estate</option>
+                                                <option value="Telecommunications">Telecommunications</option>
+                                                <option value="Retail">Retail</option>
+                                                <option value="Automotive">Automotive</option>
+                                                <option value="Entertainment">Entertainment</option>
+                                                <option value="Energy">Energy</option>
+                                                <option value="Media">Media</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                            <div class="invalid-feedback">Please select an industry.</div>
+                                        </div>
+                                        
+                                        <!-- Company Size -->
+                                        <div class="col-md-4">
+                                            <label for="companySize" class="form-label">Company Size*</label>
+                                            <select class="form-select" id="companySize" required>
+                                                <option value="" selected disabled>Select Size</option>
+                                                <option value="1-10 employees">1-10 employees</option>
+                                                <option value="11-50 employees">11-50 employees</option>
+                                                <option value="51-200 employees">51-200 employees</option>
+                                                <option value="201-500 employees">201-500 employees</option>
+                                                <option value="501-1,000 employees">501-1,000 employees</option>
+                                                <option value="1,001-5,000 employees">1,001-5,000 employees</option>
+                                                <option value="5,001-10,000 employees">5,001-10,000 employees</option>
+                                                <option value="10,001+ employees">10,001+ employees</option>
+                                            </select>
+                                            <div class="invalid-feedback">Please select company size.</div>
+                                        </div>
+                                        
+                                        <!-- Company Type -->
+                                        <div class="col-md-6">
+                                            <label for="companyType" class="form-label">Company Type*</label>
+                                            <select class="form-select" id="companyType" required>
+                                                <option value="" selected disabled>Select Type</option>
+                                                <option value="Private">Private</option>
+                                                <option value="Public">Public</option>
+                                                <option value="Government">Government</option>
+                                                <option value="Non-profit">Non-profit</option>
+                                                <option value="Startup">Startup</option>
+                                                <option value="MNC">MNC</option>
+                                            </select>
+                                            <div class="invalid-feedback">Please select company type.</div>
+                                        </div>
+                                        
+                                        <!-- Headquarters -->
+                                        <div class="col-md-6">
+                                            <label for="headquarters" class="form-label">Headquarters*</label>
+                                            <input type="text" class="form-control" id="headquarters" list="citiesList" required>
+                                            <datalist id="citiesList">
+                                                <option value="Mumbai">
+                                                <option value="Delhi">
+                                                <option value="Bangalore">
+                                                <option value="Chennai">
+                                                <option value="Hyderabad">
+                                                <option value="Kolkata">
+                                                <option value="Pune">
+                                                <option value="Ahmedabad">
+                                                <option value="Jaipur">
+                                                <option value="Lucknow">
+                                                <!-- Add more cities as needed -->
+                                            </datalist>
+                                            <div class="invalid-feedback">Please enter headquarters location.</div>
+                                        </div>
+
+                                        <!-- Company Description -->
+                                        <div class="col-md-12">
+                                            <label for="companyDescription" class="form-label">Company Description*</label>
+                                            <textarea class="form-control" id="companyDescription" rows="3" ></textarea>
+                                            <div class="invalid-feedback">Please enter company description. </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4 class="form-section-title">Contact Information</h4>
+                            <div class="row g-3">
+                                <!-- Contact Person Name -->
+                                <div class="col-md-4">
+                                    <label for="contactName" class="form-label">Contact Person Name*</label>
+                                    <input type="text" class="form-control" id="contactName" required>
+                                    <div class="invalid-feedback">Please enter contact person name.</div>
+                                </div>
+                                
+                                <!-- Contact Person Email -->
+                                <div class="col-md-4">
+                                    <label for="contactEmail" class="form-label">Contact Person Email*</label>
+                                    <input type="email" class="form-control" id="contactEmail" required>
+                                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                                </div>
+                                
+                                <!-- Contact Person Position -->
+                                <div class="col-md-4">
+                                    <label for="contactPosition" class="form-label">Contact Person Position*</label>
+                                    <select class="form-select" id="contactPosition" required>
+                                        <option value="" selected disabled>Select Position</option>
+                                        <option value="HR Manager">HR Manager</option>
+                                        <option value="Recruitment Manager">Recruitment Manager</option>
+                                        <option value="Talent Acquisition Specialist">Talent Acquisition Specialist</option>
+                                        <option value="HR Director">HR Director</option>
+                                        <option value="University Relations Manager">University Relations Manager</option>
+                                        <option value="Campus Recruitment Lead">Campus Recruitment Lead</option>
+                                        <option value="CEO">CEO</option>
+                                        <option value="CTO">CTO</option>
+                                        <option value="Department Head">Department Head</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select contact person position.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h4 class="form-section-title">Address Information</h4>
+                            <div class="row g-3">
+                                <!-- Address Line 1 -->
+                                <div class="col-md-6">
+                                    <label for="addressLine1" class="form-label">Address Line 1*</label>
+                                    <input type="text" class="form-control" id="addressLine1" required>
+                                    <div class="invalid-feedback">Please enter address line 1.</div>
+                                </div>
+                                
+                               
+                                
+                                <!-- Country -->
+                                <div class="w-100"></div>
+                                <div class="col-md-4">
+                                    <label for="country" class="form-label">Country*</label>
+                                    <select class="form-select" id="country" required>
+                                        <option value="" selected disabled>Select Country</option>
+                                        <option value="India">India</option>
+                                        <option value="United States">United States</option>
+                                        <option value="United Kingdom">United Kingdom</option>
+                                        <option value="Canada">Canada</option>
+                                        <option value="Australia">Australia</option>
+                                        <option value="Germany">Germany</option>
+                                        <option value="France">France</option>
+                                        <option value="Japan">Japan</option>
+                                        <option value="Singapore">Singapore</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a country.</div>
+                                </div>
+
+                                <!-- State -->
+                                <div class="col-md-4">
+                                    <label for="state" class="form-label">State*</label>
+                                    <select class="form-select" id="state" required>
+                                        <option value="" selected disabled>Select State</option>
+                                        <option value="Maharashtra">Maharashtra</option>
+                                        <option value="Karnataka">Karnataka</option>
+                                        <option value="Delhi">Delhi</option>
+                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                        <option value="Gujarat">Gujarat</option>
+                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                        <option valuse="West Bengal">West Bengal</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please enter state.</div>
+                                </div>
+
+                                <!-- City -->
+                                <div class="col-md-4">
+                                    <label for="city" class="form-label">City*</label>
+                                    <select class="form-select" id="city" required>
+                                        <option value="" selected disabled>Select City</option>
+                                        <option value="Mumbai">Mumbai</option>
+                                        <option value="Delhi">Delhi</option>
+                                        <option value="Bangalore">Bangalore</option>
+                                        <option value="Chennai">Chennai</option>
+                                        <option value="Hyderabad">Hyderabad</option>
+                                        <option value="Kolkata">Kolkata</option>
+                                        <option value="Pune">Pune</option>
+                                        <option value="Ahmedabad">Ahmedabad</option>
+                                        <option value="Jaipur">Jaipur</option>
+                                        <option value="Lucknow">Lucknow</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a city.</div>
+                                </div>
+                                
+                                <!-- Phone Number -->
+                                <div class="col-md-4">
+                                    <label for="phoneNumber" class="form-label">Phone Number*</label>
+                                    <input type="tel" class="form-control" id="phoneNumber" required>
+                                    <div class="invalid-feedback">Please enter phone number.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Buttons -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-center">
+                                <button type="button" class="btn btn-cancel me-2" onclick="window.location.href='companies.html'">Cancel</button>
+                                <button type="submit" class="btn btn-register-company">
+                                    <i class="bi bi-building-add me-2"></i> Register Company
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content notification-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="notification-list">
+                        <!-- Unread Notification Item -->
+                        <div class="notification-item unread">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="notification-title">New Company Registered</h6>
+                            </div>
+                            <p class="notification-message">Microsoft has been successfully registered</p>
+                            <div class="notification-time">10 mins ago</div>
+                        </div>
+                        
+                        <!-- Unread Notification Item -->
+                        <div class="notification-item unread">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="notification-title">Campus Drive Update</h6>
+                            </div>
+                            <p class="notification-message">TCS drive is scheduled for next week</p>
+                            <div class="notification-time">1 hour ago</div>
+                        </div>
+                        
+                        <!-- Read Notification Item -->
+                        <div class="notification-item">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="notification-title">Student Registration</h6>
+                            </div>
+                            <p class="notification-message">50 new students registered for placements</p>
+                            <div class="notification-time">Yesterday</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="notification-actions">
+                    <button class="btn btn-sm btn-primary" id="markAllReadBtn">Mark all as read</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Offcanvas -->
+    <div class="offcanvas offcanvas-end profile-offcanvas" tabindex="-1" id="profileOffcanvas" aria-labelledby="profileOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="profileOffcanvasLabel">User Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="profile-user-section">
+                ">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <div class="profile-username">John Doe</div>
+                                <div class="profile-role">Administrator</div>
+                            </div>
+                            <div class="profile-menu">
+                                <a href="profile.html" class="profile-menu-item">
+                                    <div class="profile-menu-icon">
+                                        <i class="bi bi-person-circle"></i>
+                                    </div>
+                                    <span>My Profile</span>
+                                </a>
+                                <a href="settings.html" class="profile-menu-item">
+                                    <div class="profile-menu-icon">
+                                        <i class="bi bi-gear"></i>
+                                    </div>
+                                    <span>Settings</span>
+                                </a>
+                                <a href="logout.html" class="profile-menu-item danger">
+                                    <div class="profile-menu-icon danger">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                    </div>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bootstrap JS -->
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <script>
+                        // Form validation
+                        (function () {
+                            'use strict';
+                            var forms = document.querySelectorAll('.needs-validation');
+                            Array.prototype.slice.call(forms).forEach(function (form) {
+                                form.addEventListener('submit', function (event) {
+                                    if (!form.checkValidity()) {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                    }
+                                    form.classList.add('was-validated');
+                                }, false);
+                            });
+                        })();
+
+                        // Logo preview functionality
+                        document.getElementById('companyLogo').addEventListener('change', function (event) {
+                            const file = event.target.files[0];
+                            const preview = document.getElementById('logoPreview');
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    preview.innerHTML = `<img src="${e.target.result}" alt="Company Logo">`;
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        });
+
+                        // Mark all notifications as read
+                        document.getElementById('markAllReadBtn').addEventListener('click', function () {
+                            const notifications = document.querySelectorAll('.notification-item.unread');
+                            notifications.forEach(notification => {
+                                notification.classList.remove('unread');
+                            });
+                        });
+                    </script>
+                </body>
+                </html>
+                
+                
+                

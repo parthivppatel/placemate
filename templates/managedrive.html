@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Drives - Placement Portal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            z-index: 100;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-link.active {
+            color: #0d6efd;
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-container {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .main-content {
+            margin-left: 100px;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .table-responsive {
+            background-color: #f0f1ff;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .table th {
+            background-color: #f0f1ff;
+            border: none;
+            font-weight: normal;
+        }
+        
+        .eye-icon {
+            cursor: pointer;
+        }
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .page-item.active .page-link {
+            background-color: #6c7ae0;
+            border-color: #6c7ae0;
+        }
+        
+        .page-link {
+            color: #6c7ae0;
+        }
+        
+        .page-info {
+            color: #6c757d;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-text {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="col-auto sidebar">
+                <div class="logo-container">
+                    <img src="/media/logos/images.png" alt="Logo" class="img-fluid rounded-circle">
+                </div>
+                <a href="dashboard.html" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="bi bi-grid"></i></span>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+                <a href="students.html" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="bi bi-people"></i></span>
+                    <span class="sidebar-text">Students</span>
+                </a>
+                <a href="drives.html" class="sidebar-link active">
+                    <span class="sidebar-icon"><i class="bi bi-briefcase"></i></span>
+                    <span class="sidebar-text">Drives</span>
+                </a>
+                <a href="reports.html" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="bi bi-bar-chart"></i></span>
+                    <span class="sidebar-text">Reports</span>
+                </a>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col main-content">
+                <div class="header">
+                    <div>
+                        <h2 class="mb-0">Manage Drives</h2>
+                        <p class="text-muted">Manage existing campus drives and create new ones effortlessly.</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-2">
+                                    <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-circle">
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-bold">Agalya S.A</p>
+                                    <p class="mb-0 text-muted small">Lead Placement Department</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#"><i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="row mb-4 align-items-center">
+                    <div class="col-md-6">
+                        <div class="search-container">
+                            <input type="text" class="form-control rounded-pill" placeholder="Search Drive or Company">
+                            <div class="search-icon">
+                                <i class="bi bi-search"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                        <button class="btn btn-outline-primary rounded-pill">
+                            Create New Drive <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-3 ms-auto">
+                        <select class="form-select">
+                            <option>Batch</option>
+                            <option>2024</option>
+                            <option>2023</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option>Status</option>
+                            <option>Completed</option>
+                            <option>In Progress</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-responsive rounded">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th width="5%">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                    </div>
+                                </th>
+                                <th width="5%"></th>
+                                <th>Drive Name</th>
+                                <th>Company Name</th>
+                                <th>Batch</th>
+                                <th>Drive Status</th>
+                                <th>No.of Rounds</th>
+                                <th>Eligible</th>
+                                <th>Opted-In</th>
+                                <th>Placed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="drivesTableBody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="showing-entries">
+                            Showing <span id="startRecord">1</span> to <span id="endRecord">10</span> of <span id="totalRecords">0</span> entries
+                        </div>
+                        <div>
+                            <select id="recordsPerPage" class="form-select form-select-sm" style="width: auto;">
+                                <option value="10" selected>10 records</option>
+                                <option value="25">25 records</option>
+                                <option value="50">50 records</option>
+                                <option value="100">100 records</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination" id="pagination">
+                            <!-- Pagination will be populated by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sample data for demonstration
+        const drives = [
+            { id: 1, driveName: "Zoho_2024", companyName: "Zoho", batch: "2024", status: "Completed", rounds: "04", eligible: "610", optedIn: "526", placed: "18" },
+            { id: 2, driveName: "TCS_2024", companyName: "TCS", batch: "2024", status: "Completed", rounds: "03", eligible: "580", optedIn: "520", placed: "25" },
+            { id: 3, driveName: "Infosys_2024", companyName: "Infosys", batch: "2024", status: "Completed", rounds: "04", eligible: "595", optedIn: "510", placed: "30" },
+            { id: 4, driveName: "Wipro_2024", companyName: "Wipro", batch: "2024", status: "Completed", rounds: "03", eligible: "600", optedIn: "505", placed: "22" },
+            { id: 5, driveName: "Accenture_2024", companyName: "Accenture", batch: "2024", status: "In Progress", rounds: "04", eligible: "590", optedIn: "515", placed: "0" },
+            { id: 6, driveName: "Cognizant_2024", companyName: "Cognizant", batch: "2024", status: "Completed", rounds: "03", eligible: "605", optedIn: "530", placed: "27" },
+            { id: 7, driveName: "IBM_2024", companyName: "IBM", batch: "2024", status: "Completed", rounds: "04", eligible: "585", optedIn: "518", placed: "20" },
+            { id: 8, driveName: "Amazon_2024", companyName: "Amazon", batch: "2024", status: "Scheduled", rounds: "05", eligible: "450", optedIn: "430", placed: "0" },
+            { id: 9, driveName: "Microsoft_2024", companyName: "Microsoft", batch: "2024", status: "Scheduled", rounds: "04", eligible: "430", optedIn: "415", placed: "0" },
+            { id: 10, driveName: "Oracle_2024", companyName: "Oracle", batch: "2024", status: "In Progress", rounds: "03", eligible: "500", optedIn: "485", placed: "0" },
+            { id: 11, driveName: "Adobe_2024", companyName: "Adobe", batch: "2024", status: "Completed", rounds: "04", eligible: "400", optedIn: "380", placed: "15" },
+            { id: 12, driveName: "Salesforce_2024", companyName: "Salesforce", batch: "2024", status: "Scheduled", rounds: "03", eligible: "420", optedIn: "400", placed: "0" },
+            { id: 13, driveName: "Deloitte_2024", companyName: "Deloitte", batch: "2024", status: "Completed", rounds: "04", eligible: "550", optedIn: "520", placed: "23" },
+            { id: 14, driveName: "Capgemini_2024", companyName: "Capgemini", batch: "2024", status: "Completed", rounds: "03", eligible: "570", optedIn: "540", placed: "25" },
+            { id: 15, driveName: "HCL_2024", companyName: "HCL", batch: "2024", status: "In Progress", rounds: "04", eligible: "580", optedIn: "550", placed: "0" },
+            { id: 16, driveName: "Tech Mahindra_2024", companyName: "Tech Mahindra", batch: "2024", status: "Completed", rounds: "03", eligible: "540", optedIn: "510", placed: "20" },
+            { id: 17, driveName: "LTI_2024", companyName: "LTI", batch: "2024", status: "Scheduled", rounds: "04", eligible: "530", optedIn: "500", placed: "0" },
+            { id: 18, driveName: "MindTree_2024", companyName: "MindTree", batch: "2024", status: "Completed", rounds: "03", eligible: "520", optedIn: "490", placed: "18" },
+            { id: 19, driveName: "SAP_2024", companyName: "SAP", batch: "2024", status: "In Progress", rounds: "04", eligible: "480", optedIn: "460", placed: "0" },
+            { id: 20, driveName: "VMware_2024", companyName: "VMware", batch: "2024", status: "Scheduled", rounds: "03", eligible: "460", optedIn: "440", placed: "0" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentPage = 1;
+            let recordsPerPage = 10;
+            
+            const tableBody = document.getElementById('drivesTableBody');
+            const pagination = document.getElementById('pagination');
+            const recordsPerPageSelect = document.getElementById('recordsPerPage');
+            const startRecordSpan = document.getElementById('startRecord');
+            const endRecordSpan = document.getElementById('endRecord');
+            const totalRecordsSpan = document.getElementById('totalRecords');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            // Initialize with data
+            renderTable();
+            renderPagination();
+            updateRecordInfo();
+            
+            // Event listeners
+            recordsPerPageSelect.addEventListener('change', function() {
+                recordsPerPage = parseInt(this.value);
+                currentPage = 1; // Reset to first page when changing records per page
+                renderTable();
+                renderPagination();
+                updateRecordInfo();
+            });
+            
+            selectAllCheckbox.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.drive-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+            
+            // Functions
+            function renderTable() {
+                tableBody.innerHTML = '';
+                
+                const start = (currentPage - 1) * recordsPerPage;
+                const end = start + recordsPerPage;
+                const paginatedDrives = drives.slice(start, end);
+                
+                paginatedDrives.forEach(drive => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input drive-checkbox" type="checkbox" value="${drive.id}">
+                            </div>
+                        </td>
+                        <td>
+                            <span class="eye-icon"><i class="bi bi-eye"></i></span>
+                        </td>
+                        <td>${drive.driveName}</td>
+                        <td>${drive.companyName}</td>
+                        <td>${drive.batch}</td>
+                        <td>${drive.status}</td>
+                        <td>${drive.rounds}</td>
+                        <td>${drive.eligible}</td>
+                        <td>${drive.optedIn}</td>
+                        <td>${drive.placed}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            function renderPagination() {
+                const totalPages = Math.ceil(drives.length / recordsPerPage);
+                pagination.innerHTML = '';
+                
+                // Previous button
+                const prevLi = document.createElement('li');
+                prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+                prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
+                prevLi.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTable();
+                        renderPagination();
+                        updateRecordInfo();
+                    }
+                });
+                pagination.appendChild(prevLi);
+                
+                // Page numbers
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentPage = i;
+                        renderTable();
+                        renderPagination();
+                        updateRecordInfo();
+                    });
+                    pagination.appendChild(li);
+                }
+                
+                // Next button
+                const nextLi = document.createElement('li');
+                nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
+                nextLi.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderTable();
+                        renderPagination();
+                        updateRecordInfo();
+                    }
+                });
+                pagination.appendChild(nextLi);
+            }
+            
+            function updateRecordInfo() {
+                const totalRecords = drives.length;
+                const start = (currentPage - 1) * recordsPerPage + 1;
+                const end = Math.min(start + recordsPerPage - 1, totalRecords);
+                
+                startRecordSpan.textContent = start;
+                endRecordSpan.textContent = end;
+                totalRecordsSpan.textContent = totalRecords;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!-- Sidebar Component with Logout Option -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Component</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-link.active {
+            color: #0d6efd;
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-container {
+            padding: 15px;
+            text-align: center;
+            /* border-bottom: 1px solid #dee2e6; */
+        }
+        
+        .main-content {
+            margin-left: 100px;
+            padding: 20px;
+        }
+        
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+            /* border-top: 1px solid #dee2e6; */
+        }
+        
+        .logout-link {
+            color: #dc3545;
+        }
+        
+        .logout-link:hover {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-text {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Example of how to use the sidebar component in a page structure -->
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar Component Start -->
+            <div class="col-auto sidebar">
+                <div class="logo-container">
+                    <img src="/static/images/da-logo.img" alt="Logo" class="img-fluid rounded-circle">
+                </div>
+                
+                <div class="sidebar-nav">
+                    <a href="dashboard.html" class="sidebar-link" id="dashboard-link">
+                        <span class="sidebar-icon"><i class="bi bi-grid"></i></span>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    <a href="students.html" class="sidebar-link" id="students-link">
+                        <span class="sidebar-icon"><i class="bi bi-people"></i></span>
+                        <span class="sidebar-text">Students</span>
+                    </a>
+                    <a href="companies.html" class="sidebar-link" id="companies-link">
+                        <span class="sidebar-icon"><i class="bi bi-buildings"></i></span>
+                        <span class="sidebar-text">Companies</span>
+                    </a>
+                    <a href="drives.html" class="sidebar-link" id="drives-link">
+                        <span class="sidebar-icon"><i class="bi bi-briefcase"></i></span>
+                        <span class="sidebar-text">Drives</span>
+                    </a>
+                    <a href="reports.html" class="sidebar-link" id="reports-link">
+                        <span class="sidebar-icon"><i class="bi bi-bar-chart"></i></span>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <a href="logout.html" class="sidebar-link logout-link" id="logout-link">
+                        <span class="sidebar-icon"><i class="bi bi-box-arrow-right"></i></span>
+                        <span class="sidebar-text">Logout</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Sidebar Component End -->
+            
+            <!-- Main Content Placeholder -->
+            <div class="col main-content">
+                <h2>Your page content goes here</h2>
+                <p>Replace this with your page-specific content.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Script to set active class based on current page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get current page filename
+            const currentPage = window.location.pathname.split('/').pop();
+            
+            // Set active class based on current page
+            if (currentPage === 'dashboard.html' || currentPage === '' || currentPage === '/') {
+                document.getElementById('dashboard-link').classList.add('active');
+            } else if (currentPage === 'students.html') {
+                document.getElementById('students-link').classList.add('active');
+            } else if (currentPage === 'companies.html') {
+                document.getElementById('companies-link').classList.add('active');
+            } else if (currentPage === 'drives.html') {
+                document.getElementById('drives-link').classList.add('active');
+            } else if (currentPage === 'reports.html') {
+                document.getElementById('reports-link').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

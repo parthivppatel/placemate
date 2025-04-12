@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placemate Student List - Placement Portal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-link.active {
+            color: #0d6efd;
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-container {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .main-content {
+            margin-left: 100px;
+            padding: 20px;
+        }
+        
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+            /* border-top: 1px solid #dee2e6; */
+        }
+        
+        .logout-link {
+            color: #dc3545;
+        }
+        
+        .logout-link:hover {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 300px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .table-responsive {
+            background-color: #f0f1ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            background-color: #f0f1ff;
+            border: none;
+            font-weight: normal;
+        }
+        
+        .eye-icon, .delete-icon, .trash-icon {
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        
+        .eye-icon {
+            color: #6c7ae0;
+        }
+        
+        .delete-icon, .trash-icon {
+            color: #dc3545;
+        }
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 15px;
+            margin-bottom: 0;
+        }
+        
+        .page-item.active .page-link {
+            background-color: #6c7ae0;
+            border-color: #6c7ae0;
+        }
+        
+        .page-link {
+            color: #6c7ae0;
+        }
+        
+        .page-info {
+            color: #6c757d;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        /* Enhanced Profile styles */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .profile-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            color: #495057;
+            border: 2px solid #6c7ae0;
+            position: relative;
+            top: -5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-icon:hover {
+            border-color: #4e59c7;
+            transform: translateY(-2px);
+        }
+        
+        /* Notification styles */
+        .notification-container {
+            position: relative;
+        }
+        
+        .notification-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 60%;
+            background-color: #f0f1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .notification-icon:hover {
+            background-color: #e5e7ff;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Notification dialog */
+        .notification-modal .modal-header {
+            background-color: #f0f1ff;
+            border-bottom: 1px solid #e5e7ff;
+        }
+        
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-item.unread {
+            background-color: #f0f1ff;
+        }
+        
+        .notification-item.unread:hover {
+            background-color: #e5e7ff;
+        }
+        
+        .notification-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .notification-message {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: #adb5bd;
+            margin-top: 4px;
+        }
+        
+        .notification-actions {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .form-select-compact {
+            max-width: 200px;
+            margin-left: 5px;
+        }
+        
+        .btn-register {
+            min-width: 200px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-text {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 60px;
+            }
+            
+            .search-container, .form-select-compact {
+                max-width: 100%;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 100px;
+            }
+        }
+
+        /* Profile offcanvas styles */
+        .profile-offcanvas .offcanvas-header {
+            background-color: #f0f1ff;
+        }
+        
+        .profile-user-section {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 3px solid #6c7ae0;
+            padding: 3px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #495057;
+        }
+        
+        .profile-username {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #495057;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .profile-menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .profile-menu-item.danger {
+            color: #dc3545;
+        }
+        
+        .profile-menu-item.danger:hover {
+            background-color: #f8d7da;
+        }
+        
+        .profile-menu-icon {
+            width: 35px;
+            height: 35px;
+            background-color: #f0f1ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .profile-menu-icon.danger {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        /* Filter section styles */
+        .filters-container {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+        
+        .filter-label {
+            margin-right: 5px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        /* Status badge styles */
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+        }
+        
+        .status-placed {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-processing {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+        
+        .status-not-placed {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar Component Start -->
+            <div class="col-auto sidebar">
+                <div class="logo-container">
+                    <img src="/static/images/da-logo.img" alt="Logo" class="img-fluid rounded-circle">
+                </div>
+                
+                <div class="sidebar-nav">
+                    <a href="dashboard.html" class="sidebar-link" id="dashboard-link">
+                        <span class="sidebar-icon"><i class="bi bi-grid"></i></span>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    <a href="students.html" class="sidebar-link active" id="students-link">
+                        <span class="sidebar-icon"><i class="bi bi-people"></i></span>
+                        <span class="sidebar-text">Students</span>
+                    </a>
+                    <a href="companies.html" class="sidebar-link" id="companies-link">
+                        <span class="sidebar-icon"><i class="bi bi-buildings"></i></span>
+                        <span class="sidebar-text">Companies</span>
+                    </a>
+                    <a href="drives.html" class="sidebar-link" id="drives-link">
+                        <span class="sidebar-icon"><i class="bi bi-briefcase"></i></span>
+                        <span class="sidebar-text">Drives</span>
+                    </a>
+                    <a href="reports.html" class="sidebar-link" id="reports-link">
+                        <span class="sidebar-icon"><i class="bi bi-bar-chart"></i></span>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <a href="logout.html" class="sidebar-link logout-link" id="logout-link">
+                        <span class="sidebar-icon"><i class="bi bi-box-arrow-right"></i></span>
+                        <span class="sidebar-text">Logout</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Sidebar Component End -->
+            
+            <!-- Main Content -->
+            <div class="col main-content">
+                <div class="header">
+                    <div>
+                        <h2 class="mb-0">Student List</h2>
+                        <p class="text-muted">Manage registered students for placement opportunities.</p>
+                    </div>
+                    
+                    <!-- Enhanced Profile Section -->
+                    <div class="profile-section">
+                        <!-- Notification Bell -->
+                        <div class="notification-container">
+                            <div class="notification-icon" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                                <i class="bi bi-bell"></i>
+                                <span class="notification-badge">3</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Icon -->
+                        <div class="profile-icon" data-bs-toggle="offcanvas" data-bs-target="#profileOffcanvas">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Register New Student Button (above the search and filter) -->
+                <div class="row mb-4">
+                    <div class="col-12 text-end mb-3">
+                        <button class="btn btn-outline-primary rounded-pill btn-register">
+                            Add New Students <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Search box on the left -->
+                        <div class="search-container">
+                            <input type="text" class="form-control rounded-pill" placeholder="Search by Name or Reg. No.">
+                            <div class="search-icon">
+                                <i class="bi bi-search"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <!-- Filter dropdowns on the right -->
+                        <div class="filters-container">
+                            <select class="form-select form-select-sm form-select-compact">
+                                <option value="">All Batches</option>
+                                <option value="2022-2026">2022-2026</option>
+                                <option value="2021-2025">2021-2025</option>
+                                <option value="2020-2024">2020-2024</option>
+                            </select>
+                            
+                            <select class="form-select form-select-sm form-select-compact">
+                                <option value="">All Courses</option>
+                                <option value="B.Tech CSE">B.Tech CSE</option>
+                                <option value="B.Tech ECE">B.Tech ECE</option>
+                                <option value="B.Tech EEE">B.Tech EEE</option>
+                                <option value="B.Tech Mech">B.Tech Mech</option>
+                                <option value="MCA">MCA</option>
+                                <option value="MBA">MBA</option>
+                            </select>
+                            
+                            <select class="form-select form-select-sm form-select-compact">
+                                <option value="">All Status</option>
+                                <option value="Placed">Placed</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Not Placed">Not Placed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-responsive rounded">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Name</th>
+                                <th>Registration No.</th>
+                                <th>Batch</th>
+                                <th>Course</th>
+                                <th>Placement Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="showing-entries">
+                            Showing <span id="startRecord">1</span> to <span id="endRecord">10</span> of <span id="totalRecords">0</span> entries
+                        </div>
+                        <div>
+                            <select id="recordsPerPage" class="form-select form-select-sm" style="width: auto;">
+                                <option value="10" selected>10 records</option>
+                                <option value="25">25 records</option>
+                                <option value="50">50 records</option>
+                                <option value="100">100 records</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav aria-label="Page navigation">
+                    <ul class="pagination" id="pagination">
+                        <!-- Pagination will be populated by JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this student record?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content notification-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="notification-list">
+                        <!-- Unread Notification Item -->
+                        <div class="notification-item unread">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="notification-title">New Company Registered</h6>
+                            </div>
+                            <p class="notification-message">Microsoft has been successfully registered</p>
+                            <div class="notification-time">10 mins ago</div>
+                        </div>
+                        
+                        <!-- Unread Notification Item -->
+                        <div class="notification-item unread">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="notification-title">Campus Drive Update</h6>
+                            </div>
+                            <p class="notification-message">TCS drive is scheduled for next week</p>
+                            <div class="notification-time">1 hour ago</div>
+                        </div>
+                        
+                        <!-- Read Notification Item -->
+                        <div class="notification-item">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="notification-title">Student Registration</h6>
+                            </div>
+                            <p class="notification-message">50 new students registered for placements</p>
+                            <div class="notification-time">Yesterday</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="notification-actions">
+                    <button class="btn btn-sm btn-primary" id="markAllReadBtn">Mark all as read</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Offcanvas -->
+    <div class="offcanvas offcanvas-end profile-offcanvas" tabindex="-1" id="profileOffcanvas" aria-labelledby="profileOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="profileOffcanvasLabel">User Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="profile-user-section">
+                <div class="profile-avatar">
+                    <i class="bi bi-person"></i>
+                </div>
+                <h5 class="profile-username">Agalya S.A</h5>
+                <p class="profile-role">Lead Placement Department</p>
+            </div>
+            
+            <div class="profile-menu mt-3">
+                <a href="#" class="profile-menu-item">
+                    <div class="profile-menu-icon">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div>
+                        <span>My Profile</span>
+                    </div>
+                </a>
+                
+                <a href="#" class="profile-menu-item">
+                    <div class="profile-menu-icon">
+                        <i class="bi bi-key"></i>
+                    </div>
+                    <div>
+                        <span>Change Password</span>
+                    </div>
+                </a>
+                
+                <a href="#" class="profile-menu-item">
+                    <div class="profile-menu-icon">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                    <div>
+                        <span>Settings</span>
+                    </div>
+                </a>
+                
+                <a href="logout.html" class="profile-menu-item danger">
+                    <div class="profile-menu-icon danger">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+                    <div>
+                        <span>Logout</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sample data for demonstration
+        const students = [
+            { id: 1, name: "Parthiv Patel", regNo: "202412069", batch: "2024-2026", course: "M.Sc. IT", status: "Placed" },
+            { id: 2, name: "Rahul Sharma", regNo: "21CS102", batch: "2021-2025", course: "B.Tech CSE", status: "Placed" },
+            { id: 3, name: "Priya Singh", regNo: "21CS103", batch: "2021-2025", course: "B.Tech CSE", status: "Processing" },
+            { id: 4, name: "Arjun Nair", regNo: "21EC101", batch: "2021-2025", course: "B.Tech ECE", status: "Placed" },
+            { id: 5, name: "Sneha Gupta", regNo: "21EC102", batch: "2021-2025", course: "B.Tech ECE", status: "Not Placed" },
+            { id: 6, name: "Vikram Reddy", regNo: "21ME101", batch: "2021-2025", course: "B.Tech Mech", status: "Processing" },
+            { id: 7, name: "Neha Kapoor", regNo: "21EE101", batch: "2021-2025", course: "B.Tech EEE", status: "Placed" },
+            { id: 8, name: "Rajesh Kumar", regNo: "22CS101", batch: "2022-2026", course: "B.Tech CSE", status: "Not Placed" },
+            { id: 9, name: "Meera Iyer", regNo: "22CS102", batch: "2022-2026", course: "B.Tech CSE", status: "Processing" },
+            { id: 10, name: "Sameer Joshi", regNo: "22EC101", batch: "2022-2026", course: "B.Tech ECE", status: "Not Placed" },
+            { id: 11, name: "Anjali Menon", regNo: "22MCA101", batch: "2022-2024", course: "MCA", status: "Processing" },
+            { id: 12, name: "Rohan Das", regNo: "22MCA102", batch: "2022-2024", course: "MCA", status: "Placed" },
+            { id: 13, name: "Kiran Shah", regNo: "21MBA101", batch: "2021-2023", course: "MBA", status: "Placed" },
+            { id: 14, name: "Divya Krishnan", regNo: "21MBA102", batch: "2021-2023", course: "MBA", status: "Placed" },
+            { id: 15, name: "Aditi Verma", regNo: "20CS101", batch: "2020-2024", course: "B.Tech CSE", status: "Placed" },
+            { id: 16, name: "Varun Malhotra", regNo: "20CS102", batch: "2020-2024", course: "B.Tech CSE", status: "Placed" },
+            { id: 17, name: "Pallavi Desai", regNo: "20EC101", batch: "2020-2024", course: "B.Tech ECE", status: "Not Placed" },
+            { id: 18, name: "Akash Patel", regNo: "20ME101", batch: "2020-2024", course: "B.Tech Mech", status: "Processing" },
+            { id: 19, name: "Kavya Rajan", regNo: "22MBA101", batch: "2022-2024", course: "MBA", status: "Not Placed" },
+            { id: 20, name: "Siddharth Iyer", regNo: "22MBA102", batch: "2022-2024", course: "MBA", status: "Processing" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentPage = 1;
+            let recordsPerPage = 10;
+            let studentToDelete = null;
+            
+            const tableBody = document.getElementById('studentsTableBody');
+            const pagination = document.getElementById('pagination');
+            const recordsPerPageSelect = document.getElementById('recordsPerPage');
+            const startRecordSpan = document.getElementById('startRecord');
+            const endRecordSpan = document.getElementById('endRecord');
+            const totalRecordsSpan = document.getElementById('totalRecords');
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            
+            // Initialize with data
+            renderTable();
+            renderPagination();
+            updateRecordInfo();
+            
+            // Event listeners
+            recordsPerPageSelect.addEventListener('change', function() {
+                recordsPerPage = parseInt(this.value);
+                currentPage = 1; // Reset to first page when changing records per page
+                renderTable();
+                renderPagination();
+                updateRecordInfo();
+            });
+            
+            // Handle confirm delete button
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (studentToDelete !== null) {
+                    // Find the index of the student to delete
+                    const index = students.findIndex(student => student.id === studentToDelete);
+                    
+                    // Remove the student if found
+                    if (index !== -1) {
+                        students.splice(index, 1);
+                        
+                        // Recalculate current page if necessary
+                        const totalPages = Math.ceil(students.length / recordsPerPage);
+                        if (currentPage > totalPages && totalPages > 0) {
+                            currentPage = totalPages;
+                        }
+                        
+                        // Re-render the table and pagination
+                        renderTable();
+                        renderPagination();
+                        updateRecordInfo();
+                    }
+                    
+                    // Reset studentToDelete
+                    studentToDelete = null;
+                    
+                    // Hide the modal
+                    deleteModal.hide();
+                }
+            });
+            
+            // Mark all notifications as read
+            markAllReadBtn.addEventListener('click', function() {
+                const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                unreadNotifications.forEach(notification => {
+                    notification.classList.remove('unread');
+                });
+                
+                // Update notification badge
+                document.querySelector('.notification-badge').style.display = 'none';
+            });
+            
+            // Functions
+            function renderTable() {
+                tableBody.innerHTML = '';
+                
+                const start = (currentPage - 1) * recordsPerPage;
+                const end = start + recordsPerPage;
+                const paginatedStudents = students.slice(start, end);
+                
+                paginatedStudents.forEach((student, index) => {
+                    const row = document.createElement('tr');
+                    const serialNumber = start + index + 1; // Calculate serial number
+                    
+                    // Determine status badge class
+                    let statusBadgeClass = '';
+                    if (student.status === 'Placed') {
+                        statusBadgeClass = 'status-placed';
+                    } else if (student.status === 'Processing') {
+                        statusBadgeClass = 'status-processing';
+                    } else if (student.status === 'Not Placed') {   
+                        statusBadgeClass = 'status-not-placed';
+                    }
+                    row.innerHTML = `
+                        <td>${serialNumber}</td>
+                        <td>${student.name}</td>
+                        <td>${student.regNo}</td>
+                        <td>${student.batch}</td>
+                        <td>${student.course}</td>
+                        <td><span class="status-badge ${statusBadgeClass}">${student.status}</span></td>
+                        <td>
+                            <i class="bi bi-eye-fill eye-icon" title="View Details"></i>
+                            
+                            <i class="bi bi-trash-fill delete-icon" title="Delete" data-id="${student.id}" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"></i>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                // Add event listeners to delete icons
+                const deleteIcons = document.querySelectorAll('.delete-icon');
+                deleteIcons.forEach(icon => {
+                    icon.addEventListener('click', function() {
+                        studentToDelete = parseInt(this.getAttribute('data-id'));
+                    });
+                });
+            }
+            function renderPagination() {
+                pagination.innerHTML = '';
+                
+                const totalPages = Math.ceil(students.length / recordsPerPage);
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageItem = document.createElement('li');
+                    pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+                    pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    
+                    pageItem.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        currentPage = i;
+                        renderTable();
+                        renderPagination();
+                        updateRecordInfo();
+                    });
+                    
+                    pagination.appendChild(pageItem);
+                }
+            }
+            function updateRecordInfo() {
+                const totalRecords = students.length;
+                const start = (currentPage - 1) * recordsPerPage + 1;
+                const end = Math.min(currentPage * recordsPerPage, totalRecords);
+                
+                startRecordSpan.innerText = start;
+                endRecordSpan.innerText = end;
+                totalRecordsSpan.innerText = totalRecords;
+            }
+        });
+    </script>
+</body>
+</html>
+<!-- Compare this snippet from templates/base.html: -->
+<!-- {% load static %} -->
+<!-- <!DOCTYPE html> -->
+<!-- <html lang="en"> -->
+<!-- <head> --> 
