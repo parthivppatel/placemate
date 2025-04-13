@@ -7,7 +7,7 @@ from .view.verify_otp import verify_otp, resend_otp
 from .view.dashboard import dashboard
 from .view.logout import logout
 from .view.reset_password import reset_password
-from .view.companies import register_company,view_company,company_dropdowns,list_companies,edit_company,delete_company,get_industries
+from .view.companies import register_company,view_company,list_companies,edit_company,delete_company,get_industries
 from .view.countries_states_cities import get_countries,get_states,get_cities
 # from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
 from .view.companydrives import list_drives,add_drive,edit_drive,delete_drive,view_drive,drive_dropdowns
@@ -33,7 +33,7 @@ urlpatterns = [
     path('list-companies/',list_companies,name="list_companies"),
     path('edit-company/<int:id>/',edit_company,name="edit_company"),
     path('delete-company/<int:id>/',delete_company,name="delete_company"),
-    path('company-dropdowns/',company_dropdowns,name="company_dropdowns"),
+    # path('company-dropdowns/',company_dropdowns,name="company_dropdowns"),
 
     # path('post-job/',post_job,name="post_job"),
     # path('edit-job/<int:id>/',edit_job,name="edit_job"),

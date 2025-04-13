@@ -13,7 +13,7 @@ from ..schema.course import Course
 from ..schema.roles import Role
 from ..schema.user_roles import UserRole
 from ..schema.cities import City
-from ..utils.helper_utils import paginate, safe_value
+from ..utils.helper_utils import paginate, safe_value,validate_pagination
 
 from django.contrib import messages
 from django.db import IntegrityError
@@ -22,17 +22,6 @@ def parse_json_data(request):
     try:
         return json.loads(request.body.decode('utf-8'))
     except (json.JSONDecodeError, UnicodeDecodeError):
-        return None
-
-
-def validate_pagination(data):
-    try:
-        page = int(data.get("page", 1))
-        perpage = int(data.get("perpage", 10))
-        if page < 1 or perpage < 1:
-            raise ValueError
-        return page, perpage
-    except ValueError:
         return None
 
 

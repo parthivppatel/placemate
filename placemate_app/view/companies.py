@@ -16,7 +16,7 @@ from ..schema.roles import Role
 from django.db import transaction
 from ..utils.email_utils import send_registration_email 
 from django.db.models import Q,When,Case,CharField,Value
-from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel
+from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,validate_pagination
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -82,23 +82,23 @@ def register_company(request):
         
     return ResponseModel({},"Invalid request method",405)
 
-@permission_required('register_company','edit_company')
-def company_dropdowns(request):
-    data = {
-        "industries": list(Industry.objects.values("id", "name")),
-        "positions": list(JobPosition.objects.values("id", "name")),
-        "company_sizes": [
-            {"value": size.value, "label": size.label} for size in CompanySize
-        ],
-        "company_types": [
-            {"value": ctype.value, "label": ctype.label} for ctype in CompanyType
-        ],
-        "categories": [
-            {"value": cat.value, "label": cat.label} for cat in Category
-        ]
-    }
+# @permission_required('register_company','edit_company')
+# def company_dropdowns(request):
+#     data = {
+#         "industries": list(Industry.objects.values("id", "name")),
+#         "positions": list(JobPosition.objects.values("id", "name")),
+#         "company_sizes": [
+#             {"value": size.value, "label": size.label} for size in CompanySize
+#         ],
+#         "company_types": [
+#             {"value": ctype.value, "label": ctype.label} for ctype in CompanyType
+#         ],
+#         "categories": [
+#             {"value": cat.value, "label": cat.label} for cat in Category
+#         ]
+#     }
 
-    return ResponseModel(data,"Dropdowns Get Succesfully",200)
+#     return ResponseModel(data,"Dropdowns Get Succesfully",200)
 
 @permission_required('view_company')
 def view_company(request,id=0):
@@ -157,21 +157,17 @@ def view_company(request,id=0):
 #     "perpage":10
 # }
 
-@permission_required('view_companies')       
+@permission_required('view_companies')  
 def list_companies(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        filters = data.get("filters", {})
+    page,perpage = 1,10
+    if request.method == "GET":
+        data = request.GET
+        # filters = data.get("filters", {})
         sort = data.get("sort", {})
-        try:
-            page = int(data.get("page", 1))
-            perpage = int(data.get("perpage", 10))
-
-            if page < 1 or perpage < 1:
-                return ResponseModel({},"Page and per page must be positive integers",400)
-        except:
-            return ResponseModel({},"Page and per page must be valid integers.",400)
-
+        validate_pg = validate_pagination(data)
+        if validate_pg is None:
+            return ResponseModel({},"Page and perpage must be valid positive integers", 400)
+        page, perpage = validate_pg
 
         # data gathering
         companies = Company.objects.select_related("industry")
@@ -185,11 +181,14 @@ def list_companies(request):
         # )
 
         # filtering
-        if search := filters.get("search","").strip():
+        if search := data.get("search","").strip():
             companies = companies.filter(Q(name__icontains=search) | Q(id__email__icontains=search))
         
-        if "industry" in filters:
-            companies = companies.filter(industry=filters["industry"])
+        if industry:= data.get("industry","").strip():
+            companies = companies.filter(industry=industry)
+
+        if company_size:= data.get("company_size","").strip():
+            companies = companies.filter(company_size=company_size)
 
         #sorting
         sort_field = sort.get("field", "").strip()  # Clean up any accidental whitespace
@@ -218,28 +217,37 @@ def list_companies(request):
         #pagination
         companies, total, pagination = paginate(companies, page, perpage)
 
-        #response
         result = []
         for company in companies:
             result.append({
                 "id": company.id.id,
-                "company_name": company.name,
+                "name": company.name,
                 "email": company.id.email,
                 "phone": company.id.phone,
                 "company_size": company.get_company_size_display(),
                 "industry": safe_value(company.industry,"name")
                 # "company_type": company.get_company_type_display()
             })
+        filter_options={      
+            "industries": list(Industry.objects.values("id", "name")),
+            "company_sizes": [
+                {"value": size.value, "label": size.label} for size in CompanySize
+            ],
+         }
+        # response={
+        #     "data":result,
+        #     "total":total,
+        #     "pagination":pagination
+        # } 
+        return render(request, "companies_list.html", {
+        "data": result,
+        "total": total,
+        "pagination": pagination,
+        "filter_options": filter_options
+        })
 
-        response={
-            "data":result,
-            "total":total,
-            "pagination":pagination
-        }
+    return ResponseModel({},"Invalid request method", 405)
 
-        return ResponseModel(response,"Success",200)
-    
-    return ResponseModel(None,"Invalid request method", 405)
 
 @permission_required('edit_company')
 def edit_company(request,id=0):

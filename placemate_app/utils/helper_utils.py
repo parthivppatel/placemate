@@ -11,6 +11,16 @@ def safe_deep_get(obj, attrs, default=None):
         obj = getattr(obj, attr, None)
     return obj
 
+def validate_pagination(data):
+    try:
+        page = int(data.get("page", 1))
+        perpage = int(data.get("perpage", 10))
+        if page < 1 or perpage < 1:
+            raise ValueError
+        return page, perpage
+    except ValueError:
+        return None
+
 def paginate(queryset, page, perpage):
     total = queryset.count()
     start = (page - 1) * perpage
@@ -20,6 +30,7 @@ def paginate(queryset, page, perpage):
     pagination = {
         "page": page,
         "perpage": perpage,
+        "start_index":start,
         "next": page + 1 if end < total else None,
         "previous": page - 1 if page > 1 else None
     }
