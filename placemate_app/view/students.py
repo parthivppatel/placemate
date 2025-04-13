@@ -1,5 +1,5 @@
 import json
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -8,12 +8,14 @@ from django.views.decorators.csrf import csrf_exempt
 
 from ..decorators import permission_required
 from ..schema.users import User
-from ..schema.students import Student, PlacementStatus, GraduationStatus
+from ..schema.students import Student, PlacementStatus, GraduationStatus, Gender, Company
 from ..schema.course import Course
 from ..schema.roles import Role
 from ..schema.user_roles import UserRole
 from ..schema.cities import City
 from ..utils.helper_utils import paginate, safe_value,validate_pagination
+
+from ..utils.jwt_utils import has_permission, get_user_from_jwt
 
 from django.contrib import messages
 from django.db import IntegrityError
@@ -50,7 +52,7 @@ def format_student_data(paginated_students, page, perpage):
     return [
         {
             "sr_no": (page - 1) * perpage + i + 1,
-            "id": s.id,
+            "id": s.student_id.id,
             "enrollment": s.enrollment,
             "name": f"{s.first_name} {s.last_name}",
             "email": safe_value(s.student_id, "email"),
@@ -65,6 +67,8 @@ def format_student_data(paginated_students, page, perpage):
         for i, s in enumerate(paginated_students)
     ]
 
+@permission_required('add_students')
+@csrf_exempt
 def student_registrations(request):
     return render(request, "student_registrations.html", {
         "page_title": "Student Registrations",
@@ -79,36 +83,41 @@ def student_manual_registrations(request):
             # Sanitize input data
             data = {key: value.strip() for key, value in request.POST.items()}
 
-            # Debugging logs
-            print("Received POST request for student registration")
-            print(f"Sanitized Request data: {data}")
-
             # Validate required fields
             required_fields = ['email', 'phone', 'enrollment', 'first_name', 'last_name', 'joining_year']
             missing_fields = [field for field in required_fields if not data.get(field)]
             if missing_fields:
                 messages.error(request, f"Missing required fields: {', '.join(missing_fields)}")
-                print(f"Missing fields: {missing_fields}")
                 return redirect("student_manual_registrations")
 
             # Check if email, phone, or enrollment already exists
             email = data.get('email')
             phone = data.get('phone')
-            enrollment = data.get('enrollment')
+
+            # Ensure enrollment is an integer
+            try:
+                enrollment = int(data.get('enrollment').strip())
+            except ValueError:
+                messages.error(request, "Enrollment must be a valid integer.")
+                return redirect("student_manual_registrations")
+
+            # Debugging: Log the enrollment value
+            print(f"Checking enrollment: {enrollment}")
+
+            # Query the database for existing enrollment
+            existing_student = Student.objects.filter(enrollment=enrollment).first()
+            if existing_student:
+                # Debugging: Log the existing student details
+                print(f"Existing student found: {existing_student}")
+                messages.error(request, f"Student with enrollment number '{enrollment}' already exists.")
+                return redirect("student_manual_registrations")
 
             if User.objects.filter(email=email).exists():
                 messages.error(request, f"User with email '{email}' already exists.")
-                print(f"Email already exists: {email}")
                 return redirect("student_manual_registrations")
 
             if User.objects.filter(phone=phone).exists():
                 messages.error(request, f"User with phone number '{phone}' already exists.")
-                print(f"Phone number already exists: {phone}")
-                return redirect("student_manual_registrations")
-
-            if Student.objects.filter(enrollment=enrollment).exists():
-                messages.error(request, f"Student with enrollment number '{enrollment}' already exists.")
-                print(f"Enrollment number already exists: {enrollment}")
                 return redirect("student_manual_registrations")
 
             # Create user with hashed password
@@ -120,11 +129,14 @@ def student_manual_registrations(request):
                 phone=phone
             )
 
+            if Student.objects.filter(student_id=user).exists():
+                messages.error(request, "A student record already exists for this user.")
+                return redirect("student_manual_registrations")
+
             # Assign role to user
             student_role = Role.objects.filter(name="Student").first()
             if not student_role:
                 messages.error(request, "Student role not found in the database.")
-                print("Student role not found.")
                 return redirect("student_manual_registrations")
 
             UserRole.objects.create(user=user, role=student_role)
@@ -133,19 +145,24 @@ def student_manual_registrations(request):
             course = Course.objects.filter(id=data.get('course')).first()
             if not course and data.get('course'):
                 messages.error(request, "Invalid course selected.")
-                print(f"Invalid course ID: {data.get('course')}")
                 return redirect("student_manual_registrations")
 
             city = City.objects.filter(id=data.get('city')).first()
             if not city and data.get('city'):
                 messages.error(request, "Invalid city selected.")
-                print(f"Invalid city ID: {data.get('city')}")
                 return redirect("student_manual_registrations")
+
+            company = None
+            if data.get('company_placed_in'):
+                company = Company.objects.filter(name=data.get('company_placed_in')).first()
+                if not company:
+                    messages.error(request, "Invalid company selected.")
+                    return redirect("student_manual_registrations")
 
             # Create student profile
             student = Student.objects.create(
                 student_id=user,
-                enrollment=int(enrollment),
+                enrollment=enrollment,
                 first_name=data.get('first_name'),
                 middle_name=data.get('middle_name') or None,
                 last_name=data.get('last_name'),
@@ -158,30 +175,35 @@ def student_manual_registrations(request):
                 graduation_status=data.get('graduation_status', 'Pursuing'),
                 course=course,
                 city=city,
-                address=data.get('address') or ""
+                address=data.get('address') or "",
+                company_placedIn=company,
+                package=float(data.get('package')) if data.get('package') else None
             )
 
             # Success message
             messages.success(request, f"Student {student.first_name} {student.last_name} added successfully.")
-            print(f"Student created successfully: {student}")
             return redirect("student_manual_registrations")
 
-        except IntegrityError:
+        except IntegrityError as e:
+            # Debugging: Log the IntegrityError
+            print(f"IntegrityError: {e}")
             messages.error(request, "Enrollment already exists.")
-            print("IntegrityError: Enrollment already exists.")
         except ValueError as ve:
             messages.error(request, f"Invalid data: {str(ve)}")
-            print(f"ValueError: {str(ve)}")
         except Exception as e:
+            # Debugging: Log the unexpected error
+            print(f"Unexpected error: {e}")
             messages.error(request, f"An unexpected error occurred: {str(e)}")
-            print(f"Exception: {str(e)}")
 
     # GET request
     return render(request, "student_manual_registrations.html", {
         "page_title": "Student Manual Registrations",
         "page_subtitle": "Add Student Details",
         "courses": Course.objects.all(),
-        "cities": City.objects.all()
+        "cities": City.objects.all(),
+        "gender_choices": Gender.choices,
+        "placement_status_choices": PlacementStatus.choices,
+        "graduation_status_choices": GraduationStatus.choices
     })
 
 @permission_required('view_students')
@@ -204,13 +226,23 @@ def list_students(request):
         paginated_students, total, pagination_data = paginate(students, page, perpage)
         result = format_student_data(paginated_students, page, perpage)
 
+        # Check if the user has the 'add_students' and 'delete_students' permissions
+        user_payload = get_user_from_jwt(request)
+        user_role = user_payload.get("role") if user_payload else None
+        can_add_student = has_permission(user_role, 'add_students')
+        can_delete_student = has_permission(user_role, 'delete_students')
+
         return JsonResponse({
             "data": result,
             "total": total,
-            "pagination": pagination_data
+            "pagination": pagination_data,
+            "permissions": {
+                "can_add_students": can_add_student,
+                "can_delete_students": can_delete_student
+            }
         }, status=200)
 
-    # GET request
+    # Handle GET request
     try:
         page = int(request.GET.get("page", 1))
         perpage = int(request.GET.get("perpage", 10))
@@ -232,6 +264,12 @@ def list_students(request):
     placement_status_options = [{"value": val, "label": label} for val, label in PlacementStatus.choices]
     graduation_status_options = [{"value": val, "label": label} for val, label in GraduationStatus.choices]
 
+    # Check if the user has the 'add_students' and 'delete_students' permissions
+    user_payload = get_user_from_jwt(request)
+    user_role = user_payload.get("role") if user_payload else None
+    can_add_student = has_permission(user_role, 'add_students')
+    can_delete_student = has_permission(user_role, 'delete_students')
+
     return render(request, "list_students.html", {
         "students": paginated_students,
         "pagination": pagination_data,
@@ -242,25 +280,81 @@ def list_students(request):
             "courses": course_options,
             "placement_statuses": placement_status_options,
             "graduation_statuses": graduation_status_options
-        }
+        },
+        "can_add_student": can_add_student,
+        "can_delete_student": can_delete_student
     })
 
 @permission_required('delete_students')
 @csrf_exempt
 def delete_student(request):
     if request.method != "POST":
-        return JsonResponse({"message": "Only POST requests are allowed."}, status=405)
+        messages.error(request, "Only POST requests are allowed.")
+        return redirect("list_students")
 
     student_id = request.POST.get("student_id")
     if not student_id:
-        return JsonResponse({"message": "student_id is required"}, status=400)
+        messages.error(request, "The 'student_id' field is required.")
+        return redirect("list_students")
 
     try:
-        student = Student.objects.get(id=student_id)
+        # Attempt to retrieve the student
+        student = Student.objects.get(student_id=student_id)
+        student_name = f"{student.first_name} {student.last_name}"  # For better logging
         student.delete()
-        return JsonResponse({
-            "message": f"Student {student_id} deleted successfully.",
-            "deleted_count": 1
-        }, status=200)
+
+        # Add success message and redirect
+        messages.success(request, f"The student '{student_name}' has been successfully removed from the system.")
+        return redirect("list_students")
+
     except Student.DoesNotExist:
-        return JsonResponse({"message": "Student does not exist."}, status=404)
+        # Handle case where student does not exist
+        messages.error(request, f"The student with the provided ID does not exist.")
+        return redirect("list_students")
+
+    except Exception as e:
+        # Handle unexpected errors
+        messages.error(request, f"An unexpected error occurred. Please try again later.")
+        return redirect("list_students")
+
+@permission_required('view_students')
+@csrf_exempt
+def view_student(request, student_id):
+    try:
+        # Retrieve the student by ID
+        student = Student.objects.select_related("student_id", "course", "company_placedIn").get(student_id=student_id)
+
+        # Prepare the student details for rendering
+        student_details = {
+            "id": student.student_id.id,
+            "name": f"{student.first_name} {student.last_name}",
+            "email": student.student_id.email,
+            "phone": student.student_id.phone,
+            "enrollment": student.enrollment,
+            "course": student.course.name if student.course else "N/A",
+            "batch": f"{student.joining_year} - {student.joining_year + 4}",
+            "cgpa": student.cgpa or "N/A",
+            "placement_status": PlacementStatus(student.placement_status).label if student.placement_status is not None else "N/A",
+            "graduation_status": student.get_graduation_status_display(),
+            "company_placedIn": student.company_placedIn.name if student.company_placedIn else "N/A",
+            "package": f"{student.package} LPA" if student.package else "N/A",
+            "address": student.address or "N/A",
+            "profile": student.profile or "N/A",
+        }
+
+        # Render the student details page
+        return render(request, "view_student.html", {
+            "student": student_details,
+            "page_title": "View Student",
+            "page_subtitle": f"Details of {student.first_name} {student.last_name}"
+        })
+
+    except Student.DoesNotExist:
+        # Handle case where student does not exist
+        messages.error(request, "The requested student does not exist.")
+        return redirect("list_students")
+
+    except Exception as e:
+        # Handle unexpected errors
+        messages.error(request, f"An unexpected error occurred: {str(e)}")
+        return redirect("list_students")
