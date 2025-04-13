@@ -20,6 +20,7 @@ from ..utils.jwt_utils import has_permission, get_user_from_jwt
 from django.contrib import messages
 from django.db import IntegrityError
 
+
 def parse_json_data(request):
     try:
         return json.loads(request.body.decode('utf-8'))
@@ -170,7 +171,6 @@ def student_manual_registrations(request):
                 gender=data.get('gender') or None,
                 joining_year=int(data.get('joining_year')),
                 cgpa=float(data.get('cgpa')) if data.get('cgpa') else None,
-                profile=data.get('profile') or "",
                 placement_status=int(data.get('placement_status', 0)),
                 graduation_status=data.get('graduation_status', 'Pursuing'),
                 course=course,
@@ -324,6 +324,9 @@ def view_student(request, student_id):
         # Retrieve the student by ID
         student = Student.objects.select_related("student_id", "course", "company_placedIn").get(student_id=student_id)
 
+        # Fetch the list of courses
+        courses = Course.objects.filter(is_active=True).order_by("name").values("id", "name")
+
         # Prepare the student details for rendering
         student_details = {
             "id": student.student_id.id,
@@ -332,7 +335,8 @@ def view_student(request, student_id):
             "phone": student.student_id.phone,
             "enrollment": student.enrollment,
             "course": student.course.name if student.course else "N/A",
-            "batch": f"{student.joining_year} - {student.joining_year + 4}",
+            "batch": f"{student.joining_year} - {student.joining_year + 4}" if student.joining_year else "N/A",
+            "joining_year": student.joining_year or "N/A",  # Ensure joining_year is handled properly
             "cgpa": student.cgpa or "N/A",
             "placement_status": PlacementStatus(student.placement_status).label if student.placement_status is not None else "N/A",
             "graduation_status": student.get_graduation_status_display(),
@@ -340,13 +344,16 @@ def view_student(request, student_id):
             "package": f"{student.package} LPA" if student.package else "N/A",
             "address": student.address or "N/A",
             "profile": student.profile or "N/A",
+            "dob": student.dob.strftime('%Y-%m-%d') if student.dob else "N/A",
+            "gender": student.gender if student.gender else "",  
         }
 
         # Render the student details page
         return render(request, "view_student.html", {
             "student": student_details,
             "page_title": "View Student",
-            "page_subtitle": f"Details of {student.first_name} {student.last_name}"
+            "page_subtitle": f"Details of {student.first_name} {student.last_name}",
+            "courses": courses,  # Pass courses to the template
         })
 
     except Student.DoesNotExist:
@@ -358,3 +365,74 @@ def view_student(request, student_id):
         # Handle unexpected errors
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return redirect("list_students")
+
+@permission_required('edit_students')
+@csrf_exempt
+def edit_student(request, student_id):
+    try:
+        # Retrieve the student by ID
+        student = Student.objects.select_related("student_id", "course", "company_placedIn").get(student_id=student_id)
+
+        if request.method == "POST":
+            # Sanitize input data
+            data = {key: value.strip() for key, value in request.POST.items()}
+
+            # Validate required fields
+            required_fields = ['name', 'email', 'phone', 'graduation_status', 'placement_status', 'dob', 'enrollment']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                messages.error(request, f"Missing required fields: {', '.join(missing_fields)}")
+                return redirect("view_student", student_id=student_id)
+
+            # Update student details
+            student.enrollment = int(data.get('enrollment')) if data.get('enrollment') else student.enrollment
+            student.first_name, _, student.last_name = data.get('name').partition(' ')
+            student.student_id.email = data.get('email')
+            student.student_id.phone = data.get('phone')
+            student.address = data.get('address') or ""
+            student.city = City.objects.filter(id=data.get('city')).first() if data.get('city') else None
+            student.dob = data.get('dob') or None  # Ensure dob is updated
+            student.gender = data.get('gender') or None  # Ensure gender is updated
+            student.cgpa = float(data.get('cgpa')) if data.get('cgpa') else None
+            student.graduation_status = data.get('graduation_status')
+
+            # Map placement_status string to integer
+            placement_status_map = {
+                "not_placed": PlacementStatus.NOT_PLACED,
+                "placed": PlacementStatus.PLACED,
+                "internship": PlacementStatus.INTERN,
+                "job_offer": PlacementStatus.JOB_OFFER,
+            }
+            student.placement_status = placement_status_map.get(data.get('placement_status').lower(), PlacementStatus.NOT_PLACED)
+
+            student.company_placedIn = Company.objects.filter(name=data.get('company_placed_in')).first() if data.get('company_placed_in') else None
+            student.package = float(data.get('package')) if data.get('package') else None
+            student.course = Course.objects.filter(id=data.get('course')).first() if data.get('course') else None
+            student.student_id.save()  # Save changes to the User model
+            student.save()  # Save changes to the Student model
+
+            # Success message
+            messages.success(request, f"Student {student.first_name} {student.last_name} updated successfully.")
+            return redirect("view_student", student_id=student_id)
+
+        # GET request: Render the edit form
+        return render(request, "view_student.html", {
+            "student": student,
+            "page_title": "Edit Student",
+            "page_subtitle": f"Edit details of {student.first_name} {student.last_name}",
+            "courses": Course.objects.all(),
+            "cities": City.objects.all(),
+            "placement_status_choices": PlacementStatus.choices,
+            "graduation_status_choices": GraduationStatus.choices
+        })
+
+    except Student.DoesNotExist:
+        # Handle case where student does not exist
+        messages.error(request, "The requested student does not exist.")
+        return redirect("list_students")
+
+    except Exception as e:
+        # Handle unexpected errors
+        messages.error(request, f"An unexpected error occurred: {str(e)}")
+        return redirect("list_students")
+

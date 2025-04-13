@@ -191,21 +191,8 @@
     {% endfor %}
 {% endif %}
 
-<form id="studentRegistrationForm" method="post" enctype="multipart/form-data" action="{% url 'student_manual_registrations' %}">
+<form id="studentRegistrationForm" method="post" action="{% url 'student_manual_registrations' %}">
     {% csrf_token %}
-
-    <!-- Profile Picture -->
-    <div class="student-registration__form-group">
-        <label class="student-registration__label">Profile Picture</label>
-        <div class="student-registration__profile-upload">
-            <div class="student-registration__profile-preview" id="studentRegistrationProfilePreview">
-                <img id="studentRegistrationPreviewImage" class="student-registration__profile-image" src="/static/images/placeholder.png" alt="Profile Preview" style="display:none;">
-                <span id="studentRegistrationPreviewText">No Image</span>
-            </div>
-            <input type="file" id="studentRegistrationProfilePicture" name="profile" accept="image/*" style="display:none;">
-            <button type="button" class="student-registration__upload-btn" id="studentRegistrationUploadBtn">Upload Image</button>
-        </div>
-    </div>
 
     <!-- Personal Details -->
     <div class="student-registration__row">
@@ -304,11 +291,10 @@
     </div>
 
     <div class="student-registration__row">
-        
         <div class="student-registration__col">
             <div class="student-registration__form-group">
-                <label for="studentRegistrationPlacementStatus" class="student-registration__label">Placement Status</label>
-                <select id="studentRegistrationPlacementStatus" name="placement_status" class="student-registration__select">
+                <label for="studentRegistrationPlacementStatus" class="student-registration__label">Placement Status *</label>
+                <select id="studentRegistrationPlacementStatus" name="placement_status" class="student-registration__select" required>
                     <option value="">Select Placement Status</option>
                     {% for key, value in placement_status_choices %}
                         <option value="{{ key }}">{{ value }}</option>
@@ -318,8 +304,8 @@
         </div>
         <div class="student-registration__col">
             <div class="student-registration__form-group">
-                <label for="studentRegistrationGraduationStatus" class="student-registration__label">Graduation Status</label>
-                <select id="studentRegistrationGraduationStatus" name="graduation_status" class="student-registration__select">
+                <label for="studentRegistrationGraduationStatus" class="student-registration__label">Graduation Status *</label>
+                <select id="studentRegistrationGraduationStatus" name="graduation_status" class="student-registration__select" required>
                     <option value="">Select Graduation Status</option>
                     {% for key, value in graduation_status_choices %}
                         <option value="{{ key }}">{{ value }}</option>
