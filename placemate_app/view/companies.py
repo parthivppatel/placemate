@@ -15,6 +15,7 @@ from ..schema.user_roles import UserRole
 from ..schema.roles import Role
 from django.db import transaction
 from ..utils.email_utils import send_registration_email 
+from ..utils.jwt_utils import has_permission,get_user_from_jwt
 from django.db.models import Q,When,Case,CharField,Value
 from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,validate_pagination
 from django.views.decorators.csrf import csrf_exempt
@@ -49,6 +50,7 @@ def validate_company_data(request,data):
         messages.error(request, f"Missing required fields: {', '.join(missing_fields)}")
         context = get_company_registration_context()
         return render(request,'company_registration.html',context)
+    
     # Integer Checking
     fields=["founded_year", "company_size", "company_type", "industry", "contact_person_position"]
     for field in fields:
@@ -57,7 +59,7 @@ def validate_company_data(request,data):
             continue  # Skip if field is optional and empty
         
         try:
-            if int(value) <= 0:
+            if int(value) < 0:
                 raise ValueError
         except (ValueError, TypeError):
             messages.error(request, f"{field.replace('_', ' ').capitalize()} must be a positive integer.")
@@ -178,8 +180,9 @@ def register_company(request):
             # return ResponseModel({},str(e),500)
             return render(request, "company_registration.html", context)
 
-        
-    return ResponseModel({},"Invalid request method",405)
+    context = get_company_registration_context()
+    messages.error(request,"Invalid request method passed")
+    return render(request,"company_registration.html", context)
 
 # @permission_required('register_company','edit_company')
 # def company_dropdowns(request):
@@ -230,6 +233,7 @@ def view_company(request,id=0):
         "headquater" : {
             "value": safe_value(company.headquater, "id"), 
             "display": safe_value(company.headquater, "cityname"),
+            "country": safe_deep_get(company.headquater, "state.country.name"),
             "country_id":safe_deep_get(company.headquater,"state.country.id")
         } ,
         "contact_person_name" : company.contact_person_name ,
@@ -239,10 +243,11 @@ def view_company(request,id=0):
             "display": safe_value(company.contact_person_position, "name"),
         } ,
         "address" : company.address,
+        "created_at" : company.created_at,
         "logo" : company.logo if company.logo else None
     } 
  
-    return ResponseModel(data,"Company Fetched Successfully",200)
+    return render(request,'view_company.html',data)
 
 
 # Frontend Structure
@@ -333,19 +338,31 @@ def list_companies(request):
                 {"value": size.value, "label": size.label} for size in CompanySize
             ],
          }
+        
+        # Check if the user has the 'add_students' and 'delete_students' permissions
+        user_payload = get_user_from_jwt(request)
+        user_role = user_payload.get("role") if user_payload else None
+        add_company = has_permission(user_role, 'register_company')
+        view_company = has_permission(user_role, 'view_company')
+        delete_company = has_permission(user_role, 'delete_company')
         # response={
         #     "data":result,
         #     "total":total,
         #     "pagination":pagination
         # } 
         return render(request, "companies_list.html", {
-        "data": result,
-        "total": total,
-        "pagination": pagination,
-        "filter_options": filter_options
+            "data": result,
+            "total": total,
+            "pagination": pagination,
+            "filter_options": filter_options,
+            "permissions":{
+                "add_company" : add_company,
+                "view_company" : view_company,
+                "delete_company" : delete_company
+            }
         })
-
-    return ResponseModel({},"Invalid request method", 405)
+    
+    return redirect("dashboard")
 
 
 @permission_required('edit_company')
@@ -395,11 +412,15 @@ def edit_company(request,id=0):
     return ResponseModel({},"Invalid request method", 405)
 
 @permission_required('delete_company')
-def delete_company(request,id=0):
-    if request.method == "DELETE":
+def delete_company(request):
+    if request.method == "POST":
+        company_id = request.POST.get("company_id")
+        if not company_id:
+            messages.error(request, "company id is required to delete.")
+            return redirect("list_companies")
         try:
             with transaction.atomic():
-                company = get_object_or_404(Company, id=id)
+                company = get_object_or_404(Company, id=company_id)
                 user = company.id
 
                 # Check for assigned jobs
@@ -408,21 +429,29 @@ def delete_company(request,id=0):
                 
                 # Check for company_drive mapping
                 if CompanyDrive.objects.filter(company=company).exists():
-                        return ResponseModel({},"Cannot delete company mapped in company_drive",400)
+                    messages.error(request,"Cannot delete company mapped in company_drive")
+                    return redirect('list_companies')
+                    # return ResponseModel({},"Cannot delete company mapped in company_drive",400)
                 
                 # Delete company 
                 company.delete()
                 user.delete()
 
-                return ResponseModel({},"Company deleted successfully",200)
+                messages.success(request,"Company deleted successfully")
+                return redirect('list_companies')
+                # return ResponseModel({},"Company deleted successfully",200)
         
         except Exception as e:
-            return ResponseModel({},str(e),500)
+            messages.error(request,str(e))
+            return redirect('list_companies')
+            # return ResponseModel({},str(e),500)
 
+    messages.error(request,"Invalid request method")
+    return redirect('list_companies')
+    # return render(request,'list_companies.html')
+    # return ResponseModel({},"Invalid request method",400)
 
-    return ResponseModel({},"Invalid request method",400)
-
-def get_industries(request):
-    industries = list(Industry.objects.values("id", "name").order_by("name"))
-    return ResponseModel(industries,"Industries Fetch Succesfully",200)
+# def get_industries(request):
+#     industries = list(Industry.objects.values("id", "name").order_by("name"))
+#     return ResponseModel(industries,"Industries Fetch Succesfully",200)
     

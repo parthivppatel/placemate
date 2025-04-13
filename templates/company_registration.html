@@ -113,7 +113,32 @@
     .mandatory{
         color:red;
     }
-
+    .loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7); /* transparent white */
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .spinner {
+        border: 8px solid #f3f3f3; /* Light grey */
+        border-top: 8px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
 </style>
             
@@ -129,8 +154,15 @@
     {% endfor %}
 {% endif %}
 
+<!-- Loader (initially hidden) -->
+<div id="loader" style="display: none;">
+    <div class="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+</div>
+
 <!-- Registration Form -->
-<form  id="CompanyRegistrationForm" method="post" enctype="multipart/form-data" action="{% url 'register_company' %}">
+<form  id="CompanyRegistrationForm" class="needs-validation" novalidate method="post" enctype="multipart/form-data" action="{% url 'register_company' %}">
     <!-- Company Information Section -->
      {% csrf_token %}
     <div class="form-container">
@@ -338,45 +370,79 @@
 <script>
 
     $(document).ready(function() { 
+        
+        $('.needs-validation').each(function () {
+            $(this).on('submit', function (event) {
+                if (!this.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).addClass('was-validated');
+                }
+                else{
+                    $('#loader').show();
+                }
+            });
+        });
+        setTimeout(function () {
+            $('.alert-success, .alert-danger').each(function () {
+                $(this).fadeTo(500, 0, function () {
+                    $(this).remove();
+                });
+            });
+        }, 6000); // Wait 6 seconds before fading out
+
+        // Logo preview functionality
+        $('#companyLogo').on('change', function (event) {
+            const file = event.target.files[0];
+            const preview = $('#logoPreview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.html(`<img src="${e.target.result}" alt="Company Logo">`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        $.ajax({
+            type: "GET",
+            url: "/get-countries/",
+            success: function (response) {
+                console.log(response);
+                response.data.forEach(item => {
+                    $('#country').append("<option value=" + item.id + ">" + item.name + "</option >");
+                });
+            }
+        });
+        
+        $('#country').change(function () {
+            $('#state').html("<option selected value=''>Select State</option >");
+            $('#city').html("<option selected value=''>Select City</option >");
+            let country_id = $(this).val();
             $.ajax({
                 type: "GET",
-                url: "/get-countries/",
+                url: "/get-states/" + country_id,
                 success: function (response) {
-                    console.log(response);
                     response.data.forEach(item => {
-                        $('#country').append("<option value=" + item.id + ">" + item.name + "</option >");
+                        $('#state').append("<option value=" + item.id + ">" + item.statename + "</option >");
                     });
                 }
             });
-           
-            $('#country').change(function () {
-                $('#state').html("<option selected value=''>Select State</option >");
-                $('#city').html("<option selected value=''>Select City</option >");
-                let country_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "/get-states/" + country_id,
-                    success: function (response) {
-                        response.data.forEach(item => {
-                            $('#state').append("<option value=" + item.id + ">" + item.statename + "</option >");
-                        });
-                    }
-                });
+        });
+        
+        $('#state').change(function () {
+            $('#city').html("<option selected value=''>Select City</option >");
+            let state_id = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "/get-cities/" + state_id,
+                success: function (response) {
+                    response.data.forEach(item => {
+                        $('#city').append("<option value=" + item.id + ">" + item.cityname + "</option >");
+                    });
+                }
             });
-           
-            $('#state').change(function () {
-                $('#city').html("<option selected value=''>Select City</option >");
-                let state_id = $(this).val();
-                $.ajax({
-                    type: "GET",
-                    url: "/get-cities/" + state_id,
-                    success: function (response) {
-                        response.data.forEach(item => {
-                            $('#city').append("<option value=" + item.id + ">" + item.cityname + "</option >");
-                        });
-                    }
-                });
-            });
+        });
     });
 </script>
 {% endblock %}

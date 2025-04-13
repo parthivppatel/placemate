@@ -1,0 +1,263 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block header_title %}
+    View Company
+{% endblock %}
+
+{% block header_subtitle %}
+    Details of {{name}}
+{% endblock %}
+{% block content %}
+<style>
+    /* Company view page specific styles */
+    .company-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .company-logo {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-right: 1.5rem;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem;
+        background-color: #fff;
+        border-radius: 8px;
+    }
+    
+    .company-name {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    
+    .section-card {
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .section-header {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .section-content {
+        padding: 1.5rem;
+    }
+    
+    .detail-row {
+        margin-bottom: 1rem;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .job-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .job-card:hover {
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .job-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .badge {
+        margin-right: 0.5rem;
+    }
+    
+    .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+    
+    .subsection {
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+    }
+    
+    .subsection:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .subsection-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #495057;
+    }
+</style>
+<body>
+<!-- Main Content -->
+<div class="col main-content" style="margin-left: 0px !important;">
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <div>
+            <a href="{% url 'list_companies'%}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Companies
+            </a>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary me-2">
+                <i class="bi bi-pencil"></i> Edit Company
+            </button>
+        </div>
+    </div>
+    
+    <!-- Company Header -->
+    <div class="company-header">
+        {% if logo %}
+        <img src="/media/{{logo}}" alt="Company Logo" class="company-logo">
+        {% else %}
+        <!-- {{ student.photo_url|default:'/static/images/default-profile.png' }} -->
+        <img src="{% static 'images/default-company.png' %}" alt="Default Logo"  class="company-logo" />
+        {% endif %}
+        <div>
+            <h1 class="company-name" id="companyName">{{name}}</h1>
+            <div>
+                 <span class="text-muted" id="companyJoined">Joined: {{ created_at|date:"F Y" }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Basic Information Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-info-circle me-2"></i>Basic Information
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Industry</div>
+                        <div id="industry">{{industry.display|default:"-"}}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Category</div>
+                        <div id="category">{{category.display}}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Company Type</div>
+                        <div id="companyType">{{company_type.display}}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Founded</div>
+                        <div id="founded">{{founded_year|default:"-"}}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Company Size</div>
+                        <div id="companySize">{{company_size.display}}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Website</div>
+                        <div id="website"><a href="{{website|default:"#"}}" target="_blank">{{website|default:"-"}}</a></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="detail-label">About</div>
+                    <div id="about">
+                        {{description|default:"-"}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Information Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-telephone me-2"></i>Contact Information
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="subsection">
+                <h3 class="subsection-title">Company Contact</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="detail-row">
+                            <div class="detail-label">Email</div>
+                            <div id="email">{{email}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-row">
+                            <div class="detail-label">Phone</div>
+                            <div id="phone">{{phone}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="detail-row">
+                            <div class="detail-label">Address</div>
+                            <div id="address">{{address|default:"-"}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Primary Contact Person</h3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="detail-row">
+                            <div class="detail-label">Name</div>
+                            <div id="contactPerson">{{contact_person_name|default:"-"}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-row">
+                            <div class="detail-label">Position</div>
+                            <div id="contactPosition">{{contact_person_position.display|default:"-"}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-row">
+                            <div class="detail-label">Email</div>
+                            <div id="contactEmail">{{contact_person_email|default:"-"}}</div>
+                        </div>
+                    </div>
+                </div>
+            </di
+            <div class="subsection">
+                <h3 class="subsection-title">Location</h3>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="detail-row">
+                            <div class="detail-label">Headquarters</div>
+                            <div id="location">{{headquater.display| default:"-"}}, {{headquater.country}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+{% endblock %}
