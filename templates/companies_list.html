@@ -55,6 +55,16 @@
     }
 </style>
 <script src="{% static 'js/jquery.min.js' %}"></script>
+<!-- Display Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == "success" %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% else %}
+           <div class="alert alert-danger">{{ message }}</div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="container-fluid p-0">
     <div class="row g-0">
@@ -63,7 +73,7 @@
             <!-- Actions Row -->
             <div class="row mb-4 mt-3">
                 <div class="col-12 text-end">
-                    <a href="{% url 'student_registrations' %}" class="btn btn-outline-primary rounded-pill">
+                    <a href="{% url 'company_registration_page' %}" class="btn btn-outline-primary rounded-pill">
                         Add New Companies <i class="bi bi-plus"></i>
                     </a>
                 </div>

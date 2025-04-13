@@ -7,7 +7,7 @@ from .view.verify_otp import verify_otp, resend_otp
 from .view.dashboard import dashboard
 from .view.logout import logout
 from .view.reset_password import reset_password
-from .view.companies import register_company,view_company,list_companies,edit_company,delete_company,get_industries
+from .view.companies import register_company,view_company,list_companies,edit_company,delete_company,get_industries,company_registration_page
 from .view.countries_states_cities import get_countries,get_states,get_cities
 # from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
 from .view.companydrives import list_drives,add_drive,edit_drive,delete_drive,view_drive,drive_dropdowns
@@ -28,11 +28,12 @@ urlpatterns = [
     
     path('get-industries/',get_industries,name="get_industries"),
 
-    path('register_company/',register_company,name="register_company"),
-    path('view-company/<int:id>/',view_company,name="view_company"),
-    path('list-companies/',list_companies,name="list_companies"),
-    path('edit-company/<int:id>/',edit_company,name="edit_company"),
-    path('delete-company/<int:id>/',delete_company,name="delete_company"),
+    path('companies/register_company/',register_company,name="register_company"),
+    path('companies/register/',company_registration_page,name="company_registration_page"),
+    path('companies/view-company/<int:id>/',view_company,name="view_company"),
+    path('companies/list-companies/',list_companies,name="list_companies"),
+    path('companies/edit-company/<int:id>/',edit_company,name="edit_company"),
+    path('companies/delete-company/<int:id>/',delete_company,name="delete_company"),
     # path('company-dropdowns/',company_dropdowns,name="company_dropdowns"),
 
     # path('post-job/',post_job,name="post_job"),

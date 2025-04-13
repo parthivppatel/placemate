@@ -20,18 +20,99 @@ from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+def get_company_registration_context():
+    return {
+        "industries": list(Industry.objects.values("id", "name")),
+        "positions": list(JobPosition.objects.values("id", "name")),
+        "company_sizes": [
+            {"value": size.value, "label": size.label} for size in CompanySize
+        ],
+        "company_types": [
+            {"value": ctype.value, "label": ctype.label} for ctype in CompanyType
+        ],
+        "categories": [
+            {"value": cat.value, "label": cat.label} for cat in Category
+        ],
+    }
+
+@permission_required('register_company')
+def company_registration_page(request):
+    context = get_company_registration_context()
+    return render(request,'company_registration.html',context)
+
+
+def validate_company_data(request,data):
+    # Validate required fields
+    required_fields = ['email', 'phone', 'name','category','headquater']
+    missing_fields = [field for field in required_fields if not data.get(field)]
+    if missing_fields:
+        messages.error(request, f"Missing required fields: {', '.join(missing_fields)}")
+        context = get_company_registration_context()
+        return render(request,'company_registration.html',context)
+    # Integer Checking
+    fields=["founded_year", "company_size", "company_type", "industry", "contact_person_position"]
+    for field in fields:
+        value = data.get(field)
+        if value in [None, '', 'null']:
+            continue  # Skip if field is optional and empty
+        
+        try:
+            if int(value) <= 0:
+                raise ValueError
+        except (ValueError, TypeError):
+            messages.error(request, f"{field.replace('_', ' ').capitalize()} must be a positive integer.")
+            context = get_company_registration_context()  # Assuming you have this function
+            return render(request, "company_registration.html", context)
+    
+    #unique validation
+    user_fields = {
+        "phone": data.get("phone"),
+        "email": data.get("email"), 
+    }
+    for field, value in user_fields.items():
+        if value and User.objects.filter(**{field: value}).exists():
+            context = get_company_registration_context() 
+            messages.error(request, f"User with {field.replace('_', ' ')} '{value}' already exists.")
+            return render(request, "company_registration.html", context)
+        
+    company_fields = {
+        "name":data.get('name')
+    }
+    
+    website = data.get('website')
+    contact_person_email = data.get('contact_person_email')
+    if website:
+        company_fields["website"] = website
+    if contact_person_email:
+        company_fields["contact_person_email"] = contact_person_email
+    for field, value in company_fields.items():
+        if value and Company.objects.filter(**{field: value}).exists():
+            context = get_company_registration_context() 
+            messages.error(request, f"Company with {field.replace('_', ' ')} '{value}' already exists.")
+            return render(request, "company_registration.html", context)
+
+
+
 @permission_required('register_company')
 def register_company(request):
     if request.method == "POST":
         password = None
+        data = {key: value.strip() for key, value in request.POST.items()}
+
+        # Start a transaction block to ensure all operations succeed or fail together
+        # data = request.POST
+
+        validation_response = validate_company_data(request, data)
+        if validation_response:  # If validation returned a response (i.e., an error), stop execution
+            return validation_response  # Directly return from here    
+        
+        logo = request.FILES.get("logo") 
+        password  = generate_random_password()
+        # print(password)
+        #firstly user creation
         try:
-             # Start a transaction block to ensure all operations succeed or fail together
             with transaction.atomic():
-                data = request.POST
-                logo = request.FILES.get("logo") 
-                password  = generate_random_password()
-                # print(password)
-                #firstly user creation
+
                 user = User(
                     email = data.get("email"),
                     password = make_password(password),
@@ -40,45 +121,63 @@ def register_company(request):
                 user.save()
 
                 #after than company creation 
-                industry = Industry.objects.get(id=data.get("industry"))
                 city = City.objects.get(id=data.get("headquater"))
-                position = JobPosition.objects.get(id=data.get("contact_person_position"))
-    
+
+                industry_id = data.get("industry")
+                industry = Industry.objects.get(id=industry_id) if industry_id else None
+
+                position_id = data.get("contact_person_position")
+                position = JobPosition.objects.get(id=position_id) if position_id else None
+
+                if logo and logo.size>0:
+                    print("logo not detected")
                 company = Company(
                     id=user,
-                    name=data.get("name").strip(),
-                    website=data.get("website", "").strip() or None,
-                    founded_year=data.get("founded_year"),
+                    name=data.get("name"),
+                    website=data.get("website", "") or None,
+                    founded_year=data.get("founded_year","") or None,
                     category=data.get("category"),
                     industry=industry,
-                    company_size=data.get("company_size"),
-                    company_type=data.get("company_type"),
                     headquater=city,
-                    contact_person_name=data.get("contact_person_name", "").strip() or None,
-                    contact_person_email=data.get("contact_person_email", "").strip() or None,
+                    contact_person_name=data.get("contact_person_name", "") or None,
+                    contact_person_email=data.get("contact_person_email", "") or None,
                     contact_person_position=position,
-                    address=data.get("address", "").strip() or None,
-                    logo=logo,  # Save uploaded file
+                    address=data.get("address", "") or None,
+                    description= data.get("description","") or None,
+                    logo= logo,  # Save uploaded file
                 )
 
-                company.save()
+                if data.get("company_size"):
+                    company.company_size = data.get("company_size")
 
+                if data.get("company_type"):
+                    company.company_type = data.get("company_type")
+
+                company.save()
                 role = Role.objects.filter(name='Company').first()
                 if not role:
                     raise ValidationError("Role 'Company' does not exist.")
-
+                
                 user_role = UserRole(user = user,role = role)
                 user_role.save()
-
                 send_registration_email(user.email,password)
-
-                return ResponseModel({},"Company added successfully!",201)
-
+                # Success message
+                messages.success(request, f"Company {company.name} registered successfully.")
+                return redirect("list_companies")
+            
         except ValidationError as e:
-            return ResponseModel({},e.message,400)
-        
+            context = get_company_registration_context()
+            for field, error_list in e.message_dict.items():
+                for err in error_list:
+                    messages.error(request, f"{field.replace('_', ' ').capitalize()}: {err}")
+            return render(request, "company_registration.html", context)
+
         except Exception as e:
-            return ResponseModel({},str(e),500)
+            context = get_company_registration_context()
+            messages.error(request, "An unexpected error occurred. Please try again.")
+            # return ResponseModel({},str(e),500)
+            return render(request, "company_registration.html", context)
+
         
     return ResponseModel({},"Invalid request method",405)
 

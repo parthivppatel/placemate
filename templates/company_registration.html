@@ -1,0 +1,382 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block header_title %}
+    Register New Company
+{% endblock %}
+
+{% block header_subtitle %}
+    Add a new company to the placemate
+{% endblock %}
+{% block content %}
+
+<style>
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .form-section-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #6c7ae0;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 8px;
+    }
+    
+    .form-label {
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    .logo-preview {
+        width: 150px;
+        height: 150px;
+        border: 2px dashed #6c7ae0;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; 
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    
+    .logo-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .logo-preview-text {
+        color: #6c7ae0;
+        text-align: center;
+    }
+    
+    .file-input {
+        display: none;
+    }
+    
+    .btn-register-company {
+        background-color: #6c7ae0;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        min-width: 200px;
+    }
+    
+    .btn-register-company:hover {
+        background-color: #5563d0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(108, 122, 224, 0.3);
+    }
+    
+    .btn-cancel {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        min-width: 200px;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #e9ecef;
+    }
+    
+    /* Form validation styles */
+    .form-control.is-invalid,
+    .was-validated .form-control:invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 80%;
+    }
+
+    .mandatory{
+        color:red;
+    }
+
+
+</style>
+            
+
+<!-- Display Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == "success" %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% else %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<!-- Registration Form -->
+<form  id="CompanyRegistrationForm" method="post" enctype="multipart/form-data" action="{% url 'register_company' %}">
+    <!-- Company Information Section -->
+     {% csrf_token %}
+    <div class="form-container">
+        <div class="form-section">
+            
+            <div class="row g-3">
+                <!-- Company Logo -->
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Company Logo</label>
+                    <div class="logo-preview" id="logoPreview" onclick="document.getElementById('companyLogo').click()">
+                        <div class="logo-preview-text">
+                            <i class="bi bi-image fs-1"></i>
+                            <p class="mb-0">Click to upload logo</p>
+                       
+                        </div>
+                    </div>
+                    <input type="file" name="logo" class="file-input" id="companyLogo" accept="image/png, image/jpeg, image/img">
+                    <div class="invalid-feedback">Please upload a company logo.</div>
+                </div>
+                
+                <!-- Company Basic Info -->
+                <div class="col-md-9">
+                    <div class="row g-3">
+                        <!-- Company Name -->
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Company Name <span class="mandatory">*</span></label>
+                            <input type="text" name="name" class="form-control" id="name" required>
+                            <div class="invalid-feedback">Please enter company name.</div>
+                        </div>
+                        
+                        <!-- Company Website -->
+                        <div class="col-md-6">
+                            <label for="companyWebsite" class="form-label">Company Website</label>
+                            <input type="url" name="website" class="form-control" id="companyWebsite" placeholder="https://example.com">
+                            <div class="invalid-feedback">Please enter a valid website URL.</div>
+                        </div>
+                        
+                        <!-- Founded Year -->
+                        <div class="col-md-4">
+                            <label for="foundedYear" class="form-label">Founded Year</label>
+                            <input type="number" class="form-control" name="founded_year" id="foundedYear">
+                            <div class="invalid-feedback">Please select a valid year.</div>
+                        </div>
+                        
+                        <!-- Industry -->
+                        <div class="col-md-4">
+                            <label for="industry" class="form-label">Industry</label>
+                            <select class="form-select" name="industry" id="industry">
+                                <option value="" selected disabled>Select Industry</option>
+                                {% for obj in industries %}
+                                <option value="{{ obj.id }}">{{ obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select an industry.</div>
+                        </div>
+                        
+                        <!-- Company Size -->
+                        <div class="col-md-4">
+                            <label for="companySize" class="form-label">Company Size</label>
+                            <select class="form-select" name="company_size" id="companySize">
+                                <option value="" selected disabled>Select Size</option>
+                                {% for obj in company_sizes %}
+                                <option value="{{ obj.value }}">{{ obj.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select company size.</div>
+                        </div>
+                        
+                        <!-- Company Type -->
+                        <div class="col-md-6">
+                            <label for="companyType" class="form-label">Company Type</label>
+                            <select class="form-select" name="company_type" id="companyType">
+                                <option value="" selected disabled>Select Type</option>
+                                {% for obj in company_types %}
+                                <option value="{{ obj.value }}">{{ obj.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select company type.</div>
+                        </div>
+                        
+                 
+                        <!-- Category -->
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">Company Category <span class="mandatory">*</span></label>
+                            <select class="form-select" name="category" id="category" required>
+                                <option value="" selected disabled>Select Type</option>
+                                {% for obj in categories %}
+                                <option value="{{ obj.value }}">{{ obj.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select company category.</div>
+                        </div>
+                    
+                        <!-- Company Description -->
+                        <div class="col-md-12">
+                            <label for="companyDescription" class="form-label">Company Description</label>
+                            <textarea class="form-control" name="description" id="companyDescription" rows="3" ></textarea>
+                            <div class="invalid-feedback">Please enter company description. </div>
+                        </div
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4 class="form-section-title">Contact Information</h4>
+            <div class="row g-3">
+                <!-- Contact Person Name -->
+                <div class="col-md-4">
+                    <label for="contactName" class="form-label">Contact Person Name</label>
+                    <input type="text" name="contact_person_name" class="form-control" id="contactName">
+                    <div class="invalid-feedback">Please enter contact person name.</div>
+                </div>
+                
+                <!-- Contact Person Email -->
+                <div class="col-md-4">
+                    <label for="contactEmail" class="form-label">Contact Person Email</label>
+                    <input type="email" name="contact_person_email" class="form-control" id="contactEmail">
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+                
+                <!-- Contact Person Position -->
+                <div class="col-md-4">
+                    <label for="contactPosition" class="form-label">Contact Person Position</label>
+                    <select class="form-select" name="contact_person_position" id="contactPosition">
+                        <option value="" selected disabled>Select Position</option>
+                        {% for obj in positions %}
+                        <option value="{{ obj.id }}">{{ obj.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">Please select contact person position.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4 class="form-section-title">Address Information</h4>
+            <div class="row g-3">
+                <!-- Address Line-->
+                <div class="col-md-6">
+                    <label for="addressLine1" class="form-label">Address Line</label>
+                    <input type="text"  name="address" class="form-control" id="addressLine1">
+                    <div class="invalid-feedback">Please enter address line.</div>
+                </div>
+                
+               
+                
+                <!-- Country -->
+                <div class="w-100"></div>
+                <div class="col-md-4">
+                    <label for="country" class="form-label">Country <span class="mandatory">*</span></label>
+                    <select class="form-select" id="country" required>
+                        <option value="" selected disabled>Select Country</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a country.</div>
+                </div
+                <!-- State -->
+                <div class="col-md-4">
+                    <label for="state" class="form-label">State <span class="mandatory">*</span></label>
+                    <select class="form-select" id="state" required>
+                        <option value="" selected disabled>Select State</option>
+                    </select>
+                    <div class="invalid-feedback">Please enter state.</div>
+                </div
+                <!-- City -->
+                <div class="col-md-4">
+                    <label for="city" class="form-label">Headquater City <span class="mandatory">*</span></label>
+                    <select class="form-select" name="headquater" id="city" required>
+                        <option value="" selected disabled>Select City</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a city.</div>
+                </div>
+                
+                <!-- Phone Number -->
+                <div class="col-md-4">
+                    <label for="phoneNumber" class="form-label">Phone Number  <span class="mandatory">*</span></label>
+                    <input type="text" name="phone" class="form-control" id="phoneNumber" placeholder="Enter 10-digit number"
+                     maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
+                     required>
+                    <div class="invalid-feedback">Please enter phone number.</div>
+                </div
+                <!-- email -->
+                <div class="col-md-4">
+                    <label for="email" class="form-label">Email  <span class="mandatory">*</span></label>
+                    <input type="email" name="email" class="form-control" id="email" required>
+                    <div class="invalid-feedback">Please enter email.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form Buttons -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-cancel me-2" onclick="window.location.href='{% url 'list_companies' %}'">Cancel</button>
+                <button type="submit" class="btn btn-register-company">
+                    <i class="bi bi-building-add me-2"></i> Register Company
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>
+
+    $(document).ready(function() { 
+            $.ajax({
+                type: "GET",
+                url: "/get-countries/",
+                success: function (response) {
+                    console.log(response);
+                    response.data.forEach(item => {
+                        $('#country').append("<option value=" + item.id + ">" + item.name + "</option >");
+                    });
+                }
+            });
+           
+            $('#country').change(function () {
+                $('#state').html("<option selected value=''>Select State</option >");
+                $('#city').html("<option selected value=''>Select City</option >");
+                let country_id = $(this).val();
+                $.ajax({
+                    type: "GET",
+                    url: "/get-states/" + country_id,
+                    success: function (response) {
+                        response.data.forEach(item => {
+                            $('#state').append("<option value=" + item.id + ">" + item.statename + "</option >");
+                        });
+                    }
+                });
+            });
+           
+            $('#state').change(function () {
+                $('#city').html("<option selected value=''>Select City</option >");
+                let state_id = $(this).val();
+                $.ajax({
+                    type: "GET",
+                    url: "/get-cities/" + state_id,
+                    success: function (response) {
+                        response.data.forEach(item => {
+                            $('#city').append("<option value=" + item.id + ">" + item.cityname + "</option >");
+                        });
+                    }
+                });
+            });
+    });
+</script>
+{% endblock %}
