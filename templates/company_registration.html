@@ -1,11 +1,11 @@
 {% extends "admin_base.html" %}
 {% load static %}
 {% block header_title %}
-    Register New Company
+    {{header_title}}
 {% endblock %}
 
 {% block header_subtitle %}
-    Add a new company to the placemate
+    {{header_subtitle}}
 {% endblock %}
 {% block content %}
 
@@ -162,7 +162,13 @@
 </div>
 
 <!-- Registration Form -->
-<form  id="CompanyRegistrationForm" class="needs-validation" novalidate method="post" enctype="multipart/form-data" action="{% url 'register_company' %}">
+<form  id="CompanyRegistrationForm" class="needs-validation" novalidate method="post" enctype="multipart/form-data" action="
+{% if id %}
+{% url 'edit_company' id %}
+{% else %}
+{% url 'register_company' %}
+{% endif %}">
+
     <!-- Company Information Section -->
      {% csrf_token %}
     <div class="form-container">
@@ -189,21 +195,21 @@
                         <!-- Company Name -->
                         <div class="col-md-6">
                             <label for="name" class="form-label">Company Name <span class="mandatory">*</span></label>
-                            <input type="text" name="name" class="form-control" id="name" required>
+                            <input type="text" name="name" value="{{name|default:'' }}" class="form-control" id="name" required>
                             <div class="invalid-feedback">Please enter company name.</div>
                         </div>
                         
                         <!-- Company Website -->
                         <div class="col-md-6">
                             <label for="companyWebsite" class="form-label">Company Website</label>
-                            <input type="url" name="website" class="form-control" id="companyWebsite" placeholder="https://example.com">
+                            <input type="url" name="website"  value="{{website|default:'' }}" class="form-control" id="companyWebsite" placeholder="https://example.com">
                             <div class="invalid-feedback">Please enter a valid website URL.</div>
                         </div>
                         
                         <!-- Founded Year -->
                         <div class="col-md-4">
                             <label for="foundedYear" class="form-label">Founded Year</label>
-                            <input type="number" class="form-control" name="founded_year" id="foundedYear">
+                            <input type="number" value="{{founded_year| default:'' }}" class="form-control" name="founded_year" id="foundedYear">
                             <div class="invalid-feedback">Please select a valid year.</div>
                         </div>
                         
@@ -259,7 +265,7 @@
                         <!-- Company Description -->
                         <div class="col-md-12">
                             <label for="companyDescription" class="form-label">Company Description</label>
-                            <textarea class="form-control" name="description" id="companyDescription" rows="3" ></textarea>
+                            <textarea class="form-control" name="description" id="companyDescription" rows="3" > {{description|default:'' }}</textarea>
                             <div class="invalid-feedback">Please enter company description. </div>
                         </div
                     </div>
@@ -273,14 +279,14 @@
                 <!-- Contact Person Name -->
                 <div class="col-md-4">
                     <label for="contactName" class="form-label">Contact Person Name</label>
-                    <input type="text" name="contact_person_name" class="form-control" id="contactName">
+                    <input type="text" value="{{contact_person_name|default:'' }}" name="contact_person_name" class="form-control" id="contactName">
                     <div class="invalid-feedback">Please enter contact person name.</div>
                 </div>
                 
                 <!-- Contact Person Email -->
                 <div class="col-md-4">
                     <label for="contactEmail" class="form-label">Contact Person Email</label>
-                    <input type="email" name="contact_person_email" class="form-control" id="contactEmail">
+                    <input type="email" value="{{contact_person_email|default:'' }}" name="contact_person_email" class="form-control" id="contactEmail">
                     <div class="invalid-feedback">Please enter a valid email address.</div>
                 </div>
                 
@@ -304,7 +310,7 @@
                 <!-- Address Line-->
                 <div class="col-md-6">
                     <label for="addressLine1" class="form-label">Address Line</label>
-                    <input type="text"  name="address" class="form-control" id="addressLine1">
+                    <input type="text" value="{{address|default:'' }}"  name="address" class="form-control" id="addressLine1">
                     <div class="invalid-feedback">Please enter address line.</div>
                 </div>
                 
@@ -340,14 +346,14 @@
                 <div class="col-md-4">
                     <label for="phoneNumber" class="form-label">Phone Number  <span class="mandatory">*</span></label>
                     <input type="text" name="phone" class="form-control" id="phoneNumber" placeholder="Enter 10-digit number"
-                     maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
+                     maxlength="10" value="{{phone|default:'' }}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
                      required>
                     <div class="invalid-feedback">Please enter phone number.</div>
                 </div
                 <!-- email -->
                 <div class="col-md-4">
                     <label for="email" class="form-label">Email  <span class="mandatory">*</span></label>
-                    <input type="email" name="email" class="form-control" id="email" required>
+                    <input type="email" value="{{email|default:'' }}" name="email" class="form-control" id="email" required>
                     <div class="invalid-feedback">Please enter email.</div>
                 </div>
             </div>
@@ -358,7 +364,7 @@
             <div class="col-12 text-center">
                 <button type="button" class="btn btn-cancel me-2" onclick="window.location.href='{% url 'list_companies' %}'">Cancel</button>
                 <button type="submit" class="btn btn-register-company">
-                    <i class="bi bi-building-add me-2"></i> Register Company
+                    <i class="bi bi-building-add me-2"></i> {{button}}
                 </button>
             </div>
         </div>
@@ -383,6 +389,8 @@
                 }
             });
         });
+
+  
         setTimeout(function () {
             $('.alert-success, .alert-danger').each(function () {
                 $(this).fadeTo(500, 0, function () {
@@ -390,6 +398,12 @@
                 });
             });
         }, 6000); // Wait 6 seconds before fading out
+        
+        let logo = "{{logo}}"
+
+        if(logo && logo !== "None" && logo !== ""){
+            $('#logoPreview').html(`<img src="/media/${logo}" alt="Company Logo" style="max-width: 100%; height: auto;" />`);
+        }
 
         // Logo preview functionality
         $('#companyLogo').on('change', function (event) {
@@ -404,44 +418,95 @@
                 reader.readAsDataURL(file);
             }
         });
-        $.ajax({
-            type: "GET",
-            url: "/get-countries/",
-            success: function (response) {
-                console.log(response);
-                response.data.forEach(item => {
-                    $('#country').append("<option value=" + item.id + ">" + item.name + "</option >");
-                });
-            }
-        });
+
+        let selectedIndustryId = "{{ industry.value }}";  
+        let selectedCsizeId = "{{ company_size.value }}";   
+        let selectedCtypeId = "{{ company_type.value }}";   
+        let selectedCategoryId = "{{ category.value }}";   
+        let selectedPositionId = "{{ contact_person_position.value }}";   
+        let selectedCountryId = "{{ headquater.country_id }}";   
+        let selectedStateId = "{{ headquater.state_id }}";   
+        let selectedCityId = "{{ headquater.value }}";   
         
-        $('#country').change(function () {
-            $('#state').html("<option selected value=''>Select State</option >");
-            $('#city').html("<option selected value=''>Select City</option >");
-            let country_id = $(this).val();
+        if (selectedIndustryId && selectedIndustryId !== "None" && selectedIndustryId !== "") {
+            $('#industry').val(selectedIndustryId); 
+        }
+        if (selectedCsizeId && selectedCsizeId !== "None" && selectedCsizeId !== "") {
+            $('#companySize').val(selectedCsizeId);  
+        }
+        if (selectedCtypeId && selectedCtypeId !== "None" && selectedCtypeId !== "") {
+            $('#companyType').val(selectedCtypeId);  
+        }
+        if (selectedCategoryId && selectedCategoryId !== "None" && selectedCategoryId !== "") {
+            $('#category').val(selectedCategoryId);  
+        }
+        if (selectedPositionId && selectedPositionId !== "None" && selectedPositionId !== "") {
+            $('#contactPosition').val(selectedPositionId);  
+        }
+        initialLoad();
+
+        function initialLoad() {
             $.ajax({
                 type: "GET",
-                url: "/get-states/" + country_id,
+                url: "/get-countries/",
                 success: function (response) {
                     response.data.forEach(item => {
-                        $('#state').append("<option value=" + item.id + ">" + item.statename + "</option >");
+                        $('#country').append("<option value=" + item.id + ">" + item.name + "</option >");
                     });
+
+                    if (selectedCountryId && selectedCountryId !== "None" && selectedCountryId !== "") {
+                        $('#country').val(selectedCountryId);  
+                        loadStates(selectedCountryId,true);
+                    }
                 }
             });
+        }  
+        function loadStates(countryId,isInitial = false){
+            //$('#state').html("<option selected value=''>Select State</option>");
+            $.ajax({
+                type: "GET",
+                url: "/get-states/" + countryId,
+                success: function (response) {
+                    response.data.forEach(item => {
+                        //$('#state').append(`<option value="${item.id}" ${item.id == selectedStateId ? 'selected' : ''}>${item.statename}</option>`);
+                        $('#state').append("<option value=" + item.id + ">" + item.statename + "</option >");
+                    });
+                    
+                    if (isInitial) {
+                        $('#state').val(selectedStateId);  
+                        loadCities(selectedStateId, true);
+                    }
+                }
+            });
+        }
+
+        function loadCities(stateId, isInitial = false){
+            //$('#city').html("<option selected value=''>Select City</option>");
+            $.ajax({
+                type: "GET",
+                url: "/get-cities/" + stateId,
+                success: function (response) {
+                    response.data.forEach(item => {
+                        $('#city').append("<option value=" + item.id + ">" + item.cityname + "</option >");                    });
+
+                    if (isInitial) {
+                        $('#city').val(selectedCityId);  
+                    }
+                }
+            });
+        }
+
+        $('#country').change(function () {
+            let country_id = $(this).val();
+            $('#state').html("<option selected value=''>Select State</option >");
+            $('#city').html("<option selected value=''>Select City</option >");
+            loadStates(country_id);
         });
         
         $('#state').change(function () {
-            $('#city').html("<option selected value=''>Select City</option >");
             let state_id = $(this).val();
-            $.ajax({
-                type: "GET",
-                url: "/get-cities/" + state_id,
-                success: function (response) {
-                    response.data.forEach(item => {
-                        $('#city').append("<option value=" + item.id + ">" + item.cityname + "</option >");
-                    });
-                }
-            });
+            $('#city').html("<option selected value=''>Select City</option >");
+            loadCities(state_id);
         });
     });
 </script>

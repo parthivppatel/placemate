@@ -116,9 +116,11 @@
             </a>
         </div>
         <div>
-            <button class="btn btn-outline-primary me-2">
+            {%if permissions.edit_company %}
+            <a  href="{% url 'edit_company_page' id %}" class="btn btn-outline-primary me-2">
                 <i class="bi bi-pencil"></i> Edit Company
-            </button>
+            </a>
+            {% endif %}
         </div>
     </div>
     
