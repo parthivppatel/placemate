@@ -11,6 +11,16 @@ def safe_deep_get(obj, attrs, default=None):
         obj = getattr(obj, attr, None)
     return obj
 
+def validate_pagination(data):
+    try:
+        page = int(data.get("page", 1))
+        perpage = int(data.get("perpage", 10))
+        if page < 1 or perpage < 1:
+            raise ValueError
+        return page, perpage
+    except ValueError:
+        return None
+
 def paginate(queryset, page, perpage):
     total = queryset.count()
     start = (page - 1) * perpage
@@ -20,6 +30,7 @@ def paginate(queryset, page, perpage):
     pagination = {
         "page": page,
         "perpage": perpage,
+        "start_index":start,
         "next": page + 1 if end < total else None,
         "previous": page - 1 if page > 1 else None
     }
@@ -36,10 +47,10 @@ def ResponseModel(data=None, message="Success", status=200):
 
 def update_mapper_by_id(model, main_field_id, related_field_id,main_id, incoming_ids):
     """
-    Update a mapper table (like JobSkill, JobCourse) using only IDs.
+    Update a mapper table (like DriveSkill, JobCourse) using only IDs.
 
     Args:
-        model (models.Model): The mapper model (e.g., JobSkill).
+        model (models.Model): The mapper model (e.g., DriveSkill).
         main_field_name (str): Name of the main object ForeignKey field (e.g., 'job').
         related_field_name (str): Name of the related object ForeignKey field (e.g., 'skill').
         main_id (int): ID of the main object.(job.id)

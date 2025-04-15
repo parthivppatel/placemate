@@ -1,0 +1,342 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block header_title %}
+Student List
+{% endblock %}
+
+{% block header_subtitle %}
+Manage registered students for placement opportunities.
+{% endblock %}
+{% block content %}
+<style>
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 50px;
+        display: inline-block;
+        min-width: 100px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    /* PLACED */
+    .status-placed {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    /* INTERNSHIP */
+    .status-intern {
+        background-color: #cff4fc;
+        color: #055160;
+    }
+
+    /* JOB OFFER RECEIVED */
+    .status-offer {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    /* NOT PLACED */
+    .status-not-placed {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    /* Optional fallback */
+    .status-unknown {
+        background-color: #e2e3e5;
+        color: #41464b;
+    }
+
+
+    select.form-select-sm,
+    .btn-outline-secondary {
+        min-width: 120px;
+    }
+
+    .error-box {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border-left: 4px solid #dc3545;
+        max-width: max-content;
+    }
+
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border-left: 4px solid #8bdc35;
+        display: block !important;
+        max-width: max-content;
+    }
+</style>
+    <script src="{% static 'js/list_students.js' %}"></script>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div>
+
+            <!-- Display messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "success" %}
+                        <div class="success-message">{{ message }}</div>
+                    {% else %}
+                        <div class="error-box">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <!-- Actions Row -->
+            <div class="row mb-4 mt-3">
+                <div class="col-12 text-end">
+                    {% if can_add_student %}
+                    <a href="{% url 'student_registrations' %}" class="btn btn-outline-primary rounded-pill">
+                        Add New Students <i class="bi bi-plus"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Search & Filters -->
+            <form method="get" id="filterForm">
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <div class="position-relative">
+                            <i
+                                class="bi bi-search position-absolute top-50 start-0 translate-middle-y text-muted ms-3"></i>
+                            <input type="text" class="form-control rounded-pill ps-5 py-2 shadow-sm" name="search"
+                                placeholder="Search by Name or Reg. No." value="{{ request.GET.search|default:'' }}"
+                                onkeydown="if(event.key==='Enter'){ this.form.submit(); }">
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex flex-wrap justify-content-md-end gap-2">
+                        <!-- Batch Filter -->
+                        <select name="batch" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
+                            <option value="">All Batch</option>
+                            {% for batch in filter_options.batches %}
+                            <option value="{{ batch }}" {% if request.GET.batch == batch|stringformat:"s" %}selected{% endif %}>{{ batch }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <!-- Course Filter -->
+                        <select name="course" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
+                            <option value="">All Course</option>
+                            {% for course in filter_options.courses %}
+                            <option value="{{ course.value }}" {% if request.GET.course == course.value|stringformat:"s" %}selected{% endif %}>
+                                {{ course.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <!-- Placement Status Filter -->
+                        <select name="placement_status" class="form-select form-select-sm rounded-pill px-3 shadow-sm w-auto" onchange="this.form.submit()">
+                            <option value="">All Status</option>
+                            {% for status in filter_options.placement_statuses %}
+                            <option value="{{ status.value }}" {% if request.GET.placement_status == status.value|stringformat:"s" %}selected{% endif %}>
+                                {{ status.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <!-- Reset Filters Button -->
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm"
+                            id="resetFiltersBtn" onclick="resetFilters()">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Student Table -->
+            <div class="table-responsive rounded">
+                <table class="table table-hover align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>S.No</th>
+                            <th>Name</th>
+                            <th>Registration No.</th>
+                            <th>Batch</th>
+                            <th>Course</th>
+                            <th>Placement Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if students %}
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ forloop.counter|add:start_index }}</td>
+                            <td>{{ student.first_name }} {{ student.last_name }}</td>
+                            <td>{{ student.enrollment }}</td>
+                            <td>{{ student.joining_year }} - {{ student.joining_year|add:"4" }}</td>
+                            <td>{{ student.course }}</td>
+                            <td>
+                                {% with student.placement_status as status_code %}
+                                <span class="status-badge 
+                                    {% if status_code == 1 %}status-placed
+                                    {% elif status_code == 2 %}status-intern
+                                    {% elif status_code == 3 %}status-offer
+                                    {% elif status_code == 0 %}status-not-placed
+                                    {% else %}status-unknown
+                                    {% endif %}">
+                                    {% if status_code == 1 %}
+                                    Placed
+                                    {% elif status_code == 2 %}
+                                    Internship
+                                    {% elif status_code == 3 %}
+                                    Job Offer Received
+                                    {% elif status_code == 0 %}
+                                    Not Placed
+                                    {% else %}
+                                    Unknown
+                                    {% endif %}
+                                </span>
+                                {% endwith %}
+                            </td>
+                            <td>
+                                <a href="{% url 'view_student' student.student_id.id %}" class="btn btn-sm btn-primary" title="View">
+                                    <i class="bi bi-eye-fill"></i>
+                                </a>
+                                {% if can_delete_student %}
+                                <button class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
+                                    data-bs-target="#deleteConfirmModal" data-student-id="{{ student.student_id.id }}">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8">No students found.</td> <!-- Updated colspan from 7 to 8 -->
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            {% if pagination %}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    Showing {{ students|length }} of {{ total }} students
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if pagination.previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="?page={{ pagination.previous }}&perpage={{ pagination.perpage }}">
+                                Previous
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {{ pagination.page }}
+                            </span>
+                        </li>
+
+                        {% if pagination.next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ pagination.next }}&perpage={{ pagination.perpage }}">
+                                Next
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this student?
+            </div>
+            <div class="modal-footer">
+                <form method="POST" id="deleteStudentForm" action="{% url 'delete_student' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="student_id" id="studentIdToDelete" />
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Reset Filters button handler
+        function resetFilters() {
+            const baseUrl = window.location.origin + window.location.pathname;
+            window.location.href = baseUrl;
+        }
+
+
+        // Attach the reset function to the Reset Filters button (fixed ID)
+        const resetButton = document.getElementById('resetFiltersBtn');  // Corrected ID here
+        if (resetButton) {
+            resetButton.addEventListener('click', resetFilters);
+        }
+
+        // Reset search functionality (if required)
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                // Optional: Reset form parameters whenever search input changes
+                const url = new URL(window.location);
+                url.searchParams.set('search', searchInput.value);  // Add search parameter
+                window.history.replaceState({}, '', url);  // Update URL without page reload
+            });
+        }
+
+        // When a delete button is clicked, extract the student ID and set it in the hidden input field
+        document.querySelectorAll('button[data-bs-target="#deleteConfirmModal"]').forEach(button => {
+            button.addEventListener('click', function () {
+                const studentId = this.getAttribute('data-student-id');
+                const input = document.getElementById('studentIdToDelete');
+                if (input) input.value = studentId;
+            });
+        });
+
+        // Automatically hide messages after 6 seconds
+        const messages = document.querySelectorAll('.success-message, .error-box');
+        messages.forEach(message => {
+            setTimeout(() => {
+                message.style.transition = "opacity 0.5s ease";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500); // Remove the element after fading out
+            }, 6000); // 6 seconds
+        });
+    });
+</script>
+
+
+{% endblock %}

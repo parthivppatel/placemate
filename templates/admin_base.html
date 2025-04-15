@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/admin_sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/listing_data.css' %}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            {% include "includes/_admin_sidebar.html" %}
+            
+            <div class="col main-content">
+                <!-- Header -->
+                <div class="header d-flex justify-content-between align-items-center px-4 py-3 bg-white position-sticky top-0 z-1030" style="border-bottom: 1px solid #e0e0e0; z-index: 1050;">
+                    <div>
+                        <h2 class="mb-0">{% block header_title %}Default Title{% endblock %}</h2>
+                        <p class="text-muted">
+                            {% block header_subtitle %}Default subtitle can go here.{% endblock %}
+                        </p>
+                    </div>
+
+                    <!-- Profile and Notification -->
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="notification-icon position-relative" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span class="notification-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+                        </div>
+                        <div class="profile-icon" data-bs-toggle="offcanvas" data-bs-target="#profileOffcanvas">
+                            <i class="bi bi-person fs-5"></i>
+                        </div>
+                    </div>
+                </div>
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/admin_sidebar.js' %}"></script>
+</body>
+</html>

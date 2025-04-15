@@ -1,0 +1,513 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block header_title %}
+    {{header_title}}
+{% endblock %}
+
+{% block header_subtitle %}
+    {{header_subtitle}}
+{% endblock %}
+{% block content %}
+
+<style>
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .form-section-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #6c7ae0;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 8px;
+    }
+    
+    .form-label {
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    .logo-preview {
+        width: 150px;
+        height: 150px;
+        border: 2px dashed #6c7ae0;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; 
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    
+    .logo-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .logo-preview-text {
+        color: #6c7ae0;
+        text-align: center;
+    }
+    
+    .file-input {
+        display: none;
+    }
+    
+    .btn-register-company {
+        background-color: #6c7ae0;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        min-width: 200px;
+    }
+    
+    .btn-register-company:hover {
+        background-color: #5563d0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(108, 122, 224, 0.3);
+    }
+    
+    .btn-cancel {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        min-width: 200px;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #e9ecef;
+    }
+    
+    /* Form validation styles */
+    .form-control.is-invalid,
+    .was-validated .form-control:invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 80%;
+    }
+
+    .mandatory{
+        color:red;
+    }
+    .loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7); /* transparent white */
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .spinner {
+        border: 8px solid #f3f3f3; /* Light grey */
+        border-top: 8px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+</style>
+            
+
+<!-- Display Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == "success" %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% else %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<!-- Loader (initially hidden) -->
+<div id="loader" style="display: none;">
+    <div class="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<!-- Registration Form -->
+<form  id="CompanyRegistrationForm" class="needs-validation" novalidate method="post" enctype="multipart/form-data" action="
+{% if id %}
+{% url 'edit_company' id %}
+{% else %}
+{% url 'register_company' %}
+{% endif %}">
+
+    <!-- Company Information Section -->
+     {% csrf_token %}
+    <div class="form-container">
+        <div class="form-section">
+            
+            <div class="row g-3">
+                <!-- Company Logo -->
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Company Logo</label>
+                    <div class="logo-preview" id="logoPreview" onclick="document.getElementById('companyLogo').click()">
+                        <div class="logo-preview-text">
+                            <i class="bi bi-image fs-1"></i>
+                            <p class="mb-0">Click to upload logo</p>
+                       
+                        </div>
+                    </div>
+                    <input type="file" name="logo" class="file-input" id="companyLogo" accept="image/png, image/jpeg, image/img">
+                    <div class="invalid-feedback">Please upload a company logo.</div>
+                </div>
+                
+                <!-- Company Basic Info -->
+                <div class="col-md-9">
+                    <div class="row g-3">
+                        <!-- Company Name -->
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Company Name <span class="mandatory">*</span></label>
+                            <input type="text" name="name" value="{{name|default:'' }}" class="form-control" id="name" required>
+                            <div class="invalid-feedback">Please enter company name.</div>
+                        </div>
+                        
+                        <!-- Company Website -->
+                        <div class="col-md-6">
+                            <label for="companyWebsite" class="form-label">Company Website</label>
+                            <input type="url" name="website"  value="{{website|default:'' }}" class="form-control" id="companyWebsite" placeholder="https://example.com">
+                            <div class="invalid-feedback">Please enter a valid website URL.</div>
+                        </div>
+                        
+                        <!-- Founded Year -->
+                        <div class="col-md-4">
+                            <label for="foundedYear" class="form-label">Founded Year</label>
+                            <input type="number" value="{{founded_year| default:'' }}" class="form-control" name="founded_year" id="foundedYear">
+                            <div class="invalid-feedback">Please select a valid year.</div>
+                        </div>
+                        
+                        <!-- Industry -->
+                        <div class="col-md-4">
+                            <label for="industry" class="form-label">Industry</label>
+                            <select class="form-select" name="industry" id="industry">
+                                <option value="" selected disabled>Select Industry</option>
+                                {% for obj in industries %}
+                                <option value="{{ obj.id }}">{{ obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select an industry.</div>
+                        </div>
+                        
+                        <!-- Company Size -->
+                        <div class="col-md-4">
+                            <label for="companySize" class="form-label">Company Size</label>
+                            <select class="form-select" name="company_size" id="companySize">
+                                <option value="" selected disabled>Select Size</option>
+                                {% for obj in company_sizes %}
+                                <option value="{{ obj.value }}">{{ obj.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select company size.</div>
+                        </div>
+                        
+                        <!-- Company Type -->
+                        <div class="col-md-6">
+                            <label for="companyType" class="form-label">Company Type</label>
+                            <select class="form-select" name="company_type" id="companyType">
+                                <option value="" selected disabled>Select Type</option>
+                                {% for obj in company_types %}
+                                <option value="{{ obj.value }}">{{ obj.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select company type.</div>
+                        </div>
+                        
+                 
+                        <!-- Category -->
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">Company Category <span class="mandatory">*</span></label>
+                            <select class="form-select" name="category" id="category" required>
+                                <option value="" selected disabled>Select Type</option>
+                                {% for obj in categories %}
+                                <option value="{{ obj.value }}">{{ obj.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select company category.</div>
+                        </div>
+                    
+                        <!-- Company Description -->
+                        <div class="col-md-12">
+                            <label for="companyDescription" class="form-label">Company Description</label>
+                            <textarea class="form-control" name="description" id="companyDescription" rows="3" > {{description|default:'' }}</textarea>
+                            <div class="invalid-feedback">Please enter company description. </div>
+                        </div
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4 class="form-section-title">Contact Information</h4>
+            <div class="row g-3">
+                <!-- Contact Person Name -->
+                <div class="col-md-4">
+                    <label for="contactName" class="form-label">Contact Person Name</label>
+                    <input type="text" value="{{contact_person_name|default:'' }}" name="contact_person_name" class="form-control" id="contactName">
+                    <div class="invalid-feedback">Please enter contact person name.</div>
+                </div>
+                
+                <!-- Contact Person Email -->
+                <div class="col-md-4">
+                    <label for="contactEmail" class="form-label">Contact Person Email</label>
+                    <input type="email" value="{{contact_person_email|default:'' }}" name="contact_person_email" class="form-control" id="contactEmail">
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+                
+                <!-- Contact Person Position -->
+                <div class="col-md-4">
+                    <label for="contactPosition" class="form-label">Contact Person Position</label>
+                    <select class="form-select" name="contact_person_position" id="contactPosition">
+                        <option value="" selected disabled>Select Position</option>
+                        {% for obj in positions %}
+                        <option value="{{ obj.id }}">{{ obj.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">Please select contact person position.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4 class="form-section-title">Address Information</h4>
+            <div class="row g-3">
+                <!-- Address Line-->
+                <div class="col-md-6">
+                    <label for="addressLine1" class="form-label">Address Line</label>
+                    <input type="text" value="{{address|default:'' }}"  name="address" class="form-control" id="addressLine1">
+                    <div class="invalid-feedback">Please enter address line.</div>
+                </div>
+                
+               
+                
+                <!-- Country -->
+                <div class="w-100"></div>
+                <div class="col-md-4">
+                    <label for="country" class="form-label">Country <span class="mandatory">*</span></label>
+                    <select class="form-select" id="country" required>
+                        <option value="" selected disabled>Select Country</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a country.</div>
+                </div
+                <!-- State -->
+                <div class="col-md-4">
+                    <label for="state" class="form-label">State <span class="mandatory">*</span></label>
+                    <select class="form-select" id="state" required>
+                        <option value="" selected disabled>Select State</option>
+                    </select>
+                    <div class="invalid-feedback">Please enter state.</div>
+                </div
+                <!-- City -->
+                <div class="col-md-4">
+                    <label for="city" class="form-label">Headquater City <span class="mandatory">*</span></label>
+                    <select class="form-select" name="headquater" id="city" required>
+                        <option value="" selected disabled>Select City</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a city.</div>
+                </div>
+                
+                <!-- Phone Number -->
+                <div class="col-md-4">
+                    <label for="phoneNumber" class="form-label">Phone Number  <span class="mandatory">*</span></label>
+                    <input type="text" name="phone" class="form-control" id="phoneNumber" placeholder="Enter 10-digit number"
+                     maxlength="10" value="{{phone|default:'' }}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
+                     required>
+                    <div class="invalid-feedback">Please enter phone number.</div>
+                </div
+                <!-- email -->
+                <div class="col-md-4">
+                    <label for="email" class="form-label">Email  <span class="mandatory">*</span></label>
+                    <input type="email" value="{{email|default:'' }}" name="email" class="form-control" id="email" required>
+                    <div class="invalid-feedback">Please enter email.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form Buttons -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-cancel me-2" onclick="window.location.href='{% url 'list_companies' %}'">Cancel</button>
+                <button type="submit" class="btn btn-register-company">
+                    <i class="bi bi-building-add me-2"></i> {{button}}
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>
+
+    $(document).ready(function() { 
+        
+        $('.needs-validation').each(function () {
+            $(this).on('submit', function (event) {
+                if (!this.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).addClass('was-validated');
+                }
+                else{
+                    $('#loader').show();
+                }
+            });
+        });
+
+  
+        setTimeout(function () {
+            $('.alert-success, .alert-danger').each(function () {
+                $(this).fadeTo(500, 0, function () {
+                    $(this).remove();
+                });
+            });
+        }, 6000); // Wait 6 seconds before fading out
+        
+        let logo = "{{logo}}"
+
+        if(logo && logo !== "None" && logo !== ""){
+            $('#logoPreview').html(`<img src="/media/${logo}" alt="Company Logo" style="max-width: 100%; height: auto;" />`);
+        }
+
+        // Logo preview functionality
+        $('#companyLogo').on('change', function (event) {
+            const file = event.target.files[0];
+            const preview = $('#logoPreview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.html(`<img src="${e.target.result}" alt="Company Logo">`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        let selectedIndustryId = "{{ industry.value }}";  
+        let selectedCsizeId = "{{ company_size.value }}";   
+        let selectedCtypeId = "{{ company_type.value }}";   
+        let selectedCategoryId = "{{ category.value }}";   
+        let selectedPositionId = "{{ contact_person_position.value }}";   
+        let selectedCountryId = "{{ headquater.country_id }}";   
+        let selectedStateId = "{{ headquater.state_id }}";   
+        let selectedCityId = "{{ headquater.value }}";   
+        
+        if (selectedIndustryId && selectedIndustryId !== "None" && selectedIndustryId !== "") {
+            $('#industry').val(selectedIndustryId); 
+        }
+        if (selectedCsizeId && selectedCsizeId !== "None" && selectedCsizeId !== "") {
+            $('#companySize').val(selectedCsizeId);  
+        }
+        if (selectedCtypeId && selectedCtypeId !== "None" && selectedCtypeId !== "") {
+            $('#companyType').val(selectedCtypeId);  
+        }
+        if (selectedCategoryId && selectedCategoryId !== "None" && selectedCategoryId !== "") {
+            $('#category').val(selectedCategoryId);  
+        }
+        if (selectedPositionId && selectedPositionId !== "None" && selectedPositionId !== "") {
+            $('#contactPosition').val(selectedPositionId);  
+        }
+        initialLoad();
+
+        function initialLoad() {
+            $.ajax({
+                type: "GET",
+                url: "/get-countries/",
+                success: function (response) {
+                    response.data.forEach(item => {
+                        $('#country').append("<option value=" + item.id + ">" + item.name + "</option >");
+                    });
+
+                    if (selectedCountryId && selectedCountryId !== "None" && selectedCountryId !== "") {
+                        $('#country').val(selectedCountryId);  
+                        loadStates(selectedCountryId,true);
+                    }
+                }
+            });
+        }  
+        function loadStates(countryId,isInitial = false){
+            //$('#state').html("<option selected value=''>Select State</option>");
+            $.ajax({
+                type: "GET",
+                url: "/get-states/" + countryId,
+                success: function (response) {
+                    response.data.forEach(item => {
+                        //$('#state').append(`<option value="${item.id}" ${item.id == selectedStateId ? 'selected' : ''}>${item.statename}</option>`);
+                        $('#state').append("<option value=" + item.id + ">" + item.statename + "</option >");
+                    });
+                    
+                    if (isInitial) {
+                        $('#state').val(selectedStateId);  
+                        loadCities(selectedStateId, true);
+                    }
+                }
+            });
+        }
+
+        function loadCities(stateId, isInitial = false){
+            //$('#city').html("<option selected value=''>Select City</option>");
+            $.ajax({
+                type: "GET",
+                url: "/get-cities/" + stateId,
+                success: function (response) {
+                    response.data.forEach(item => {
+                        $('#city').append("<option value=" + item.id + ">" + item.cityname + "</option >");                    });
+
+                    if (isInitial) {
+                        $('#city').val(selectedCityId);  
+                    }
+                }
+            });
+        }
+
+        $('#country').change(function () {
+            let country_id = $(this).val();
+            $('#state').html("<option selected value=''>Select State</option >");
+            $('#city').html("<option selected value=''>Select City</option >");
+            loadStates(country_id);
+        });
+        
+        $('#state').change(function () {
+            let state_id = $(this).val();
+            $('#city').html("<option selected value=''>Select City</option >");
+            loadCities(state_id);
+        });
+    });
+</script>
+{% endblock %}

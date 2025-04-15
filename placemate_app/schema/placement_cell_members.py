@@ -18,6 +18,8 @@ class PlacementCellMember(models.Model):
     join_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True, blank=True)
     active_status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'placement_cell_members'  

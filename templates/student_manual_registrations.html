@@ -1,0 +1,371 @@
+{% extends "admin_base.html" %}
+{% load static %}
+
+{% block header_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block header_subtitle %}
+{{ page_subtitle }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #5E50F9;
+        --secondary-color: #4a3ec9;
+        --success-color: #27ae60;
+        --danger-color: #e74c3c;
+        --border-color: #ddd;
+        --light-bg: #f9f9f9;
+        --font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+        font-family: var(--font-family);
+    }
+
+    .student-registration__heading {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+        font-weight: 700;
+        font-size: 32px;
+        letter-spacing: 0.5px;
+        border-bottom: 3px solid var(--primary-color);
+        display: inline-block;
+        padding-bottom: 10px;
+    }
+
+    .student-registration__form-group {
+        margin-bottom: 20px;
+    }
+
+    .student-registration__label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .student-registration__input,
+    .student-registration__select,
+    .student-registration__textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border 0.3s, box-shadow 0.3s;
+        background: white;
+    }
+
+    .student-registration__input:focus,
+    .student-registration__select:focus,
+    .student-registration__textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 8px rgba(94, 80, 249, 0.3);
+    }
+
+    .student-registration__row {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .student-registration__col {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .student-registration__profile-upload {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .student-registration__profile-preview {
+        width: 150px; /* Increased size for better visibility */
+        height: 150px;
+        border-radius: 50%;
+        background-color: var(--light-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        overflow: hidden;
+        border: 2px solid var(--border-color);
+    }
+
+    .student-registration__profile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures the image fits well */
+    }
+
+    .student-registration__upload-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .student-registration__upload-btn:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+
+    .student-registration__submit-btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .student-registration__submit-btn:hover {
+        background-color: #1e8449;
+        transform: translateY(-2px);
+    }
+
+    .student-registration__error {
+        color: var(--danger-color);
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    @media screen and (max-width: 768px) {
+        .student-registration__row {
+            flex-direction: column;
+        }
+    }
+    .error-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #8bdc35;
+            display: block !important;
+        }
+
+    #studentRegistrationPreviewText {
+        font-size: 14px;
+        color: #888;
+    }
+</style>
+
+<h1 class="student-registration__heading">Student Registration Form</h1>
+
+<!-- Display Messages -->
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == "success" %}
+            <div class="success-message">{{ message }}</div>
+        {% else %}
+            <div class="error-box">{{ message }}</div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<form id="studentRegistrationForm" method="post" action="{% url 'student_manual_registrations' %}">
+    {% csrf_token %}
+
+    <!-- Personal Details -->
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationFirstName" class="student-registration__label">First Name *</label>
+                <input type="text" id="studentRegistrationFirstName" name="first_name" class="student-registration__input" required>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationMiddleName" class="student-registration__label">Middle Name</label>
+                <input type="text" id="studentRegistrationMiddleName" name="middle_name" class="student-registration__input">
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationLastName" class="student-registration__label">Last Name *</label>
+                <input type="text" id="studentRegistrationLastName" name="last_name" class="student-registration__input" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationEmail" class="student-registration__label">Email *</label>
+                <input type="email" id="studentRegistrationEmail" name="email" class="student-registration__input" required>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationPhone" class="student-registration__label">Phone Number *</label>
+                <input type="tel" id="studentRegistrationPhone" name="phone" class="student-registration__input" required>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationDob" class="student-registration__label">Date of Birth *</label>
+                <input type="date" id="studentRegistrationDob" name="dob" class="student-registration__input" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationGender" class="student-registration__label">Gender</label>
+                <select id="studentRegistrationGender" name="gender" class="student-registration__select">
+                    <option value="">Select Gender</option>
+                    {% for key, value in gender_choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationEnrollmentNo" class="student-registration__label">Enrollment No. *</label>
+                <input type="number" id="studentRegistrationEnrollmentNo" name="enrollment" class="student-registration__input" required>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationAddress" class="student-registration__label">Address</label>
+                <textarea id="studentRegistrationAddress" name="address" rows="3" class="student-registration__textarea"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Details -->
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationJoiningYear" class="student-registration__label">Joining Year *</label>
+                <input type="number" id="studentRegistrationJoiningYear" name="joining_year" min="2000" max="{{ current_year }}" class="student-registration__input" required>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationCgpa" class="student-registration__label">Current CGPA</label>
+                <input type="number" id="studentRegistrationCgpa" name="cgpa" min="0" max="10" step="0.01" class="student-registration__input">
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationCourse" class="student-registration__label">Course *</label>
+                <select id="studentRegistrationCourse" name="course" class="student-registration__select" required>
+                    <option value="">Select Course</option>
+                    {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationPlacementStatus" class="student-registration__label">Placement Status *</label>
+                <select id="studentRegistrationPlacementStatus" name="placement_status" class="student-registration__select" required>
+                    <option value="">Select Placement Status</option>
+                    {% for key, value in placement_status_choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationGraduationStatus" class="student-registration__label">Graduation Status *</label>
+                <select id="studentRegistrationGraduationStatus" name="graduation_status" class="student-registration__select" required>
+                    <option value="">Select Graduation Status</option>
+                    {% for key, value in graduation_status_choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Placement Details -->
+    <div class="student-registration__row">
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationCompany" class="student-registration__label">Company Placed In</label>
+                <input type="text" id="studentRegistrationCompany" name="company_placed_in" class="student-registration__input">
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationJobRole" class="student-registration__label">Job Role</label>
+                <input type="text" id="studentRegistrationJobRole" name="job_role" class="student-registration__input">
+            </div>
+        </div>
+        <div class="student-registration__col">
+            <div class="student-registration__form-group">
+                <label for="studentRegistrationPackage" class="student-registration__label">Package (LPA)</label>
+                <input type="number" id="studentRegistrationPackage" name="package" min="0" step="0.01" class="student-registration__input">
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="student-registration__submit-btn" id="studentRegistrationSubmitBtn">Register Student</button>
+</form>
+
+<script>
+    // Handle profile picture upload
+    document.getElementById('studentRegistrationUploadBtn').addEventListener('click', function () {
+        document.getElementById('studentRegistrationProfilePicture').click();
+    });
+
+    document.getElementById('studentRegistrationProfilePicture').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = document.getElementById('studentRegistrationPreviewImage');
+                img.src = event.target.result;
+                img.style.display = 'block'; // Show the image
+                document.getElementById('studentRegistrationPreviewText').style.display = 'none'; // Hide the placeholder text
+            }
+            reader.readAsDataURL(file);
+        } else {
+            // Reset to placeholder if no file is selected
+            const img = document.getElementById('studentRegistrationPreviewImage');
+            img.src = "/static/images/placeholder.png";
+            img.style.display = 'none';
+            document.getElementById('studentRegistrationPreviewText').style.display = 'block';
+        }
+    });
+</script>
+
+{% endblock %}

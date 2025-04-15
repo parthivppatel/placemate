@@ -1,6 +1,8 @@
 from django.utils.html import escape
 from django.core.mail import send_mail
 from placemate import settings
+from ..schema.company_drive_jobs import CompanyDriveJobs
+import logging
 
 def send_custom_email(email, subject, message, html_message=None):
     """
@@ -106,3 +108,102 @@ def send_registration_email(email, password):
     """
 
     send_custom_email(email,subject,message,html_message)
+
+
+def send_drive_emails(drive, students,jobs,skills,courses,locations,edit=False):
+    logger = logging.getLogger(__name__)
+
+    try:
+        company = drive.company
+        # drive_jobs = Job.objects.filter(company=company)
+        # jobs = [cdj for cdj in companydrivejobs]
+        # jobs = CompanyDriveJobs.objects.filter(id__in=job_ids)
+
+        job_lines = ""
+        for i, job in enumerate(jobs, start=1):
+            job_lines += f"{i}. <strong>{job['job_title']}</strong>: {job['job_description']}<br>"
+
+        update_msg = ""
+        if edit:
+            update_msg =f"""
+            <div style="padding: 12px 16px; background-color: #fff8e1; border-left: 5px solid #fbc02d; margin-bottom: 20px;">
+              <p style="margin: 0; font-size: 15px; color: #333;">
+                <strong>Note:</strong> There has been an update to this drive.<br>
+                Please review the latest details below. 
+              </p>
+            </div>""" 
+
+
+        subject = f"Placement Drive - {company.name} - {drive.drive_name}"
+ 
+        message_html = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+            <p>Dear Students,</p>
+            {update_msg}
+            <p>
+              Upcoming placement drive of the company <strong>{company.name}</strong>
+              is scheduled on <strong>{f"{drive.start_date.strftime('%Y')}-00-00:00:00"}</strong>.
+            </p>
+
+            <h3>Details of the drive and eligibility criteria:</h3>
+            <ul style="list-style-type: none; padding: 0; margin: 0; font-family: Arial, sans-serif; color: #333;">
+            <li><strong>Registration Starts on:</strong> {f"{drive.start_date.strftime('%Y-%m-%d %H:%M')}:00"}</li>
+            <li><strong>Registration Ends on:</strong> {f"{drive.end_date.strftime('%Y-%m-%d %H:%M')}:00"}</li>
+            <li><strong>Offer Type:</strong> {drive.job_type}</li>
+            <li><strong>Category:</strong> {company.category}</li>
+            <li><strong>Mode:</strong> {drive.job_mode}</li>
+            <li><strong>Bond details:</strong> {drive.bond or '-'}</li>
+            <li><strong>Skills Required:</strong> {', '.join(skills) if skills else "-" }</li>
+            <li><strong>Open for:</strong> {', '.join(courses) if courses else "-"}</li>
+            <li><strong>Posting Location(s) :</strong> {', '.join(locations) if locations else "-"}</li>
+            </ul>
+
+            <h3>Company Profile Details:</h3>
+            <p><strong>Name:</strong> {company.name}</p>
+            <p><strong>Description:</strong><br />{company.description or '-'}</p>
+
+            <h3>Job Roles:</h3>
+            <p>{job_lines}</p>
+
+            <ul style="list-style-type: none; padding: 0; margin: 0; font-family: Arial, sans-serif; color: #333;">            
+            <li><strong>UG Package(LPA):</strong> {
+                f"{drive.ug_package_min} - {drive.ug_package_max}"
+                if drive.ug_package_min and drive.ug_package_max
+                else "-"}</li>
+            <li><strong>PG Package(LPA):</strong>{ 
+                  f"{drive.pg_package_min} - {drive.pg_package_max}"
+                if drive.pg_package_min and drive.pg_package_max
+                else "-"}
+            </li>
+            <li><strong>Stipend:</strong> ₹{drive.stipend or '-'}</li>
+            </ul>
+
+            <p>
+              <strong>Note:</strong> All the students who are registering for a company are required
+              to attend the company process and cannot back out from the same, for any reason.
+              Anyone violating this norm will be strictly banned from the next eligible company.
+            </p>
+
+            <p>
+              <strong>Strict notice to all the students:</strong> No late registrations will be entertained
+              (no matter the reason). So, do keep in mind the registration deadline.
+              Research about the company and the job profile before registering.
+            </p>
+
+            <p>Wish you luck!</p>
+
+            <p><strong>Regards,<br />Student Placement Cell</strong></p>
+          </body>
+        </html>
+        """
+
+        message = "Hello There is companyDrive Details"
+        email_list = [s.student_id.email for s in students]
+
+        # print(email_list)
+        for email in email_list:
+            send_custom_email(email,subject,message,message_html)
+
+    except Exception as e:
+        logger.error(f"Error : {str(e)}", exc_info=True)

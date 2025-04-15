@@ -42,5 +42,36 @@ INSERT INTO "Permissions" (id,name, description) VALUES (11,'delete_job','Permis
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(21,2,11);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(22,3,11);
 
+INSERT INTO "Permissions" (id, name, description)  VALUES (12, 'view_students', 'Permission to view students details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(23,2,12);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(24,3,12);
 
+INSERT INTO "Permissions" (id, name, description) VALUES (13, 'delete_students', 'Permission to delete students');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(25,2,13);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(26,3,13);
 
+INSERT INTO "Permissions" (id, name, description) VALUES (14, 'add_students', 'Permission to add/create students');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES (28, 3, 14);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (15,'add_drive', 'Permission to add the new drive');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(29,2,15);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(30,3,15);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (16,'edit_drive', 'Permission to edit the drive details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(31,3,16);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (17,'view_drives','Permission to view the drives list');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(32,1,17);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(33,3,17);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (18,'view_drive','Permission to view the specific drive details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(34,1,18);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(35,2,18);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(36,3,18);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (19,'delete_drive','Permission to delete the drive details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(37,3,19);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (20,'edit_students','Permission to edit student details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(38,1,20);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(39,3,20);
