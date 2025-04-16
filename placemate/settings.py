@@ -76,6 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'placemate.wsgi.application'
 
+USE_TZ = True
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

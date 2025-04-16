@@ -6,5 +6,6 @@ from .companies import *
 from .countries_states_cities import *
 from .jobs import *
 from .students import *
+from .student import *
 from .verify_otp import *
 from .reset_password import *

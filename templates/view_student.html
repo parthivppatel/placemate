@@ -8,64 +8,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- <style>
-    .student-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .student-avatar {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        margin-right: 1.5rem;
-        border: 1px solid #dee2e6;
-        padding: 0.25rem;
-        background-color: #fff;
-        border-radius: 50%;
-    }
-
-    .student-name {
-        font-size: 2rem;
-        font-weight: 600;
-        margin-bottom: 0;
-    }
-
-    .section-card {
-        margin-bottom: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-
-    .section-header {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-bottom: 1px solid #dee2e6;
-        border-radius: 8px 8px 0 0;
-    }
-
-    .section-content {
-        padding: 1.5rem;
-    }
-
-    .detail-row {
-        margin-bottom: 1rem;
-    }
-
-    .detail-label {
-        font-weight: 600;
-        color: #6c757d;
-    }
-
-    .actions-bar {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
-    }
-
-</style> -->
-
 <style>
     .student-header {
         display: flex;
@@ -209,13 +151,15 @@
     <!-- Student Header -->
     <div class="student-header">
         <div id="studentPhotoWrapper" class="student-avatar-wrapper">
-            <img 
-                src="{{ student.photo_url|default:'/static/images/default-profile.png' }}" 
-                alt="Student Photo" 
-                class="student-avatar" 
-                id="studentPhoto"
-                onerror="handlePhotoError(this)"
-            >
+            <div id="studentPhotoWrapper" class="student-avatar-wrapper">
+                <img 
+                    src="{{ student.profile|default:'/static/images/default-profile.png' }}" 
+                    alt="Student Photo" 
+                    class="student-avatar" 
+                    id="studentPhoto"
+                    onerror="handlePhotoError(this)"
+                >
+            </div>
             <div class="student-avatar-placeholder" id="studentPhotoPlaceholder" style="display: none;">
                 N/A
             </div>
