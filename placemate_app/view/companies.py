@@ -369,6 +369,7 @@ def list_companies(request):
         #     "total":total,
         #     "pagination":pagination
         # } 
+        
         return render(request, "companies_list.html", {
             "data": result,
             "total": total,
