@@ -1,6 +1,8 @@
 import json
 from django.contrib.auth.hashers import make_password
 
+from django.utils import timezone 
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db.models import Q
@@ -19,6 +21,8 @@ from ..utils.jwt_utils import has_permission, get_user_from_jwt
 
 from django.contrib import messages
 from django.db import IntegrityError
+from datetime import datetime
+from ..schema.company_drives import CompanyDrive  # Import the CompanyDrive model
 
 
 def parse_json_data(request):
@@ -436,3 +440,68 @@ def edit_student(request, student_id):
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return redirect("list_students")
 
+
+def list_student_drives(request):
+    try:
+        # Extract and verify the token
+        user_payload = get_user_from_jwt(request)
+        if not user_payload:
+            return JsonResponse({"message": "Invalid or missing token"}, status=401)
+
+        # Extract email from the token payload
+        user_email = user_payload.get("email")
+        if not user_email:
+            return JsonResponse({"message": "Email not found in token"}, status=400)
+
+        # Get the user and student based on the email
+        try:
+            user = User.objects.get(email=user_email)
+            student = Student.objects.get(student_id=user)  # Match the OneToOneField
+        except User.DoesNotExist:
+            return JsonResponse({"message": "User not found"}, status=404)
+        except Student.DoesNotExist:
+            return JsonResponse({"message": "Student not found"}, status=404)
+
+        # Get the current date
+        current_date = timezone.now()
+
+        # Retrieve only active drives (status: SCHEDULED or ONGOING)
+        active_drives = CompanyDrive.objects.filter(
+            status__in=["scheduled", "ongoing"],  # Filter by active statuses
+            start_date__lte=current_date,  # Ensure the drive has started
+            end_date__gte=current_date  # Ensure the drive has not ended
+        ).select_related('company')  # Optimize queries by selecting related company data
+
+        # Format the drives for the template
+        drives_data = [
+            {
+                "id": drive.id,
+                "drive_name": drive.drive_name,
+                "company_name": drive.company.name,
+                "job_type": drive.job_type,
+                "job_mode": drive.job_mode,
+                "ug_package_min": drive.ug_package_min,
+                "ug_package_max": drive.ug_package_max,
+                "pg_package_min": drive.pg_package_min,
+                "pg_package_max": drive.pg_package_max,
+                "start_date": drive.start_date.strftime('%Y-%m-%d'),
+                "end_date": drive.end_date.strftime('%Y-%m-%d'),
+                "status": drive.status,
+            }
+            for drive in active_drives
+        ]
+
+        # Render the student drives page with dynamic content
+        return render(request, "student_drives.html", {
+            "page_title": "Student Drives",
+            "page_subtitle": "Your insight hub to track progress of your placement drives.",
+            "student_id": student.student_id.id,  # Pass student_id to the template
+            "student": student,
+            "student_name": f"{student.first_name} {student.last_name}",  # Pass student name
+            "profile_name": f"{student.first_name} {student.last_name}",  # Dynamic profile name
+            "drives": drives_data,  # Pass the active drives data to the template
+        })
+
+    except Exception as e:
+        # Handle unexpected errors
+        return JsonResponse({"message": f"An unexpected error occurred: {str(e)}"}, status=500)

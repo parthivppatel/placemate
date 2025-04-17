@@ -47,11 +47,14 @@ class Student(models.Model):
         choices=GraduationStatus.choices,
         default=GraduationStatus.PURSUING
     )
-    company_placedIn = models.ForeignKey(Company,on_delete=models.SET_NULL,null=True,blank=True,related_name="placed_students")
+    company_placedIn = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name="placed_students")
     package = models.FloatField(null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
-    course = models.ForeignKey(Course, on_delete=models.SET_NULL,null=True,blank=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.TextField(blank=True, null=True)
+    tenth_percentage = models.FloatField(null=True, blank=True)  # New field for 10th percentage
+    twelfth_percentage = models.FloatField(null=True, blank=True)  # New field for 12th percentage
+    backlog = models.PositiveIntegerField(default=0)  # New field for backlog count
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -1,5 +1,8 @@
 from django.urls import path
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 from .view.login import login
 from .view.forgot_password import forgot_password
 from .view.verify_otp import verify_otp, resend_otp
@@ -12,7 +15,8 @@ from .view.countries_states_cities import get_countries,get_states,get_cities,ge
 # from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
 from .view.companydrives import list_drives,add_drive,edit_drive,delete_drive,view_drive,drive_dropdowns,add_drive_page
 
-from .view.students import student_registrations, student_manual_registrations, list_students, view_student, edit_student, delete_student
+from .view.students import student_registrations, student_manual_registrations, list_students, view_student, edit_student, delete_student, list_student_drives
+from .view.student import student_profile, student_edit_student
 
 urlpatterns = [
     path('', dashboard, name="dashboard"),
@@ -66,5 +70,11 @@ urlpatterns = [
     path('students/edit_student/<int:student_id>/', edit_student, name='edit_student'),
     path('students/delete/', delete_student, name='delete_student'),
 
-
+    # Students
+    path('student/drives/', list_student_drives, name='list_student_drives'),
+    path('student/profile/<int:student_id>/', student_profile, name='student_profile'),
+    path('student/edit/<int:student_id>/', student_edit_student, name='student_edit_student'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

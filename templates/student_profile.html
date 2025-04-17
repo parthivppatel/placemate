@@ -1,258 +1,406 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StepAhead - Complete Your Profile</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #6249c9;
-            --light-purple: #f2f0fa;
-            --white: #ffffff;
-        }
-        
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .header {
-            background-color: var(--light-purple);
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .logo {
-            width: 140px;
-            margin-right: 1rem;
-        }
-        
-        .profile-header h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #212529;
-            margin-bottom: 0.5rem;
-        }
-        
-        .profile-header p {
-            color: #444;
-            margin-bottom: 0;
-        }
-        
-        .info-card {
-            background-color: var(--white);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            margin-bottom: 1.5rem;
-        }
-        
-        .info-title {
-            font-size: 1.5rem;
-            color: #444;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .avatar-placeholder {
-            width: 150px;
-            height: 150px;
-            background-color: #e9ecef;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem;
-        }
-        
-        .avatar-icon {
-            font-size: 5rem;
-            color: #adb5bd;
-        }
-        
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-control, .form-select {
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-        }
-        
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .nav-tabs {
-            border-bottom: none;
-            margin-bottom: 1rem;
-        }
-        
-        .nav-tabs .nav-link {
-            border: none;
-            color: #6c757d;
-            font-weight: 500;
-        }
-        
-        .nav-tabs .nav-link.active {
-            background-color: var(--light-purple);
-            color: var(--primary-color);
-            border-radius: 0.375rem;
-            border: none;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .btn-primary:hover {
-            background-color: #5438b8;
-            border-color: #5438b8;
-        }
-    </style>
-</head>
-<body>
-    <div class="container py-4">
-        <div class="header d-flex align-items-center">
-            <!-- <img src="/api/placeholder/140/80" alt="StepAhead Logo" class="logo"> -->
-            <div class="profile-header">
-                <h1>Complete Your Profile</h1>
-                <p>Kindly fill in your personal and academic details to complete your profile and get the most out of our platform.</p>
+{% extends 'student_base.html' %}
+
+{% block title %}Student - Profile{% endblock %}
+
+{% block content %}
+<style>
+    .student-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #fefefe;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .student-avatar-wrapper {
+        position: relative;
+        width: 110px;
+        height: 110px;
+        margin-right: 1.5rem; /* Added gap between avatar and info */
+    }
+
+    .student-avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e0e0e0;
+        background-color: #f8f9fa;
+    }
+
+    .student-avatar-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 2px solid #e0e0e0;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #6c757d;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .student-info h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #212529;
+    }
+
+    .badges .badge {
+        margin-right: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .section-card {
+        margin-bottom: 2rem;
+        border-radius: 0.75rem;
+        border: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-header {
+        background-color: #f1f3f5;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 0.75rem 0.75rem 0 0;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .section-content {
+        padding: 1.5rem;
+    }
+
+    .detail-row {
+        margin-bottom: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        font-size: 1rem;
+        color: #212529;
+        text-align: right;
+    }
+
+    .detail-row .detail-value {
+        flex: 1;
+        text-align: right;
+    }
+
+    .detail-row .detail-label {
+        flex: 1;
+    }
+
+    .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .btn i {
+        margin-right: 0.5rem;
+    }
+
+    .back-to-students-btn:hover {
+        background-color: #6a5acd;
+        color: white; /* Optional: Change text color to white for better contrast */
+        border-color: #6a5acd; /* Optional: Match border color with background */
+    }
+</style>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary back-to-students-btn">
+            <i class="bi bi-arrow-left"></i> Back to Students
+        </a>
+
+        <button class="btn btn-outline-primary me-2" id="toggleEditBtn">
+            <i class="bi bi-pencil"></i> Edit Student
+        </button>
+    </div>
+
+    <!-- Success Message -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Student Header -->
+    <div class="student-header">
+        <div id="studentPhotoWrapper" class="student-avatar-wrapper">
+            <div id="studentPhotoWrapper" class="student-avatar-wrapper">
+                <img 
+                    src="{{ student_details.profile|default:'/static/images/default-profile.png' }}" 
+                    alt="Student Photo" 
+                    class="student-avatar" 
+                    id="studentPhoto"
+                    onerror="handlePhotoError(this)"
+                >
+            </div>
+            <div class="student-avatar-placeholder" id="studentPhotoPlaceholder" style="display: none;">
+                N/A
             </div>
         </div>
-        
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="info-card">
-                    <h2 class="info-title">Personal Information</h2>
-                    
-                    <div class="avatar-placeholder">
-                        <div class="avatar-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    
-                    <form>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="firstName" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="firstName" placeholder="Enter your First Name">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="lastName" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="lastName" placeholder="Enter your Last Name">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Gender</label>
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="male" value="male">
-                                    <label class="form-check-label" for="male">Male</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="female" value="female">
-                                    <label class="form-check-label" for="female">Female</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="dob" class="form-label">Date of Birth</label>
-                            <input type="text" class="form-control" id="dob" placeholder="DD/MM/YYY">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="mobile" class="form-label">Mobile Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text">+91</span>
-                                <input type="text" class="form-control" id="mobile" placeholder="Enter your Mobile Number">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Personal Email ID</label>
-                            <input type="email" class="form-control" id="email" placeholder="Enter your Email ID">
-                        </div>
-                    </form>
-                </div>
+        <div class="student-info">
+            <h1 class="student-name" id="studentName">{{ student_details.name }}</h1>
+            <div class="badges">
+                <span class="badge text-primary bg-primary-subtle" id="studentDepartment">{{ student_details.course }}</span>
+                <span class="badge text-info bg-info-subtle" id="studentBatch">{{ student_details.batch }}</span>
+                <span class="badge text-success bg-success-subtle" id="placementStatus">{{ student_details.placement_status }}</span>
             </div>
-            
-            <div class="col-md-6 mb-4">
-                <div class="info-card">
-                    <h2 class="info-title">Academic Information</h2>
-                    
-                    <form>
-                        <div class="mb-3">
-                            <label for="highestEducation" class="form-label">Education</label>
-                            <select class="form-select" id="highestEducation">
-                                <option selected disabled>Select your education</option>
-                                <option>High School</option>
-                                <option>Bachelor's Degree</option>
-                                <option>Master's Degree</option>
-                                <option>Ph.D.</option>
-                                <option>Other</option>  
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="university" class="form-label">University/College</label>
-                            <input type="text" class="form-control" id="university" placeholder="Enter your university/college name">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="specialization" class="form-label">Specialization/Major</label>
-                            <input type="text" class="form-control" id="specialization" placeholder="Enter your specialization">
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="yearOfPassing" class="form-label">Year of Passing</label>
-                                <select class="form-select" id="yearOfPassing">
-                                    <option selected disabled>Select year</option>
-                                    <option>2025</option>
-                                    <option>2024</option>
-                                    <option>2023</option>
-                                    <option>2022</option>
-                                    <option>2021</option>
-                                    <option>2020</option>
-                                    <option>Older</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="cgpa" class="form-label">CGPA/Percentage</label>
-                                <input type="text" class="form-control" id="cgpa" placeholder="Enter your CGPA/Percentage">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="skills" class="form-label">Key Skills</label>
-                            <textarea class="form-control" id="skills" rows="3" placeholder="Enter your key skills (separated by commas)"></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="certification" class="form-label">Certifications</label>
-                            <textarea class="form-control" id="certification" rows="3" placeholder="Enter your certifications (if any)"></textarea>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary px-4 py-2">Save Profile</button>
         </div>
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Personal Details Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-person me-2"></i>Personal Details
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Enrollment Number</div>
+                        <div class="detail-value">{{ student_details.enrollment|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Date of Birth</div>
+                        <div class="detail-value">{{ student_details.dob }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Gender</div>
+                        <div class="detail-value">{{ student_details.gender }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">{{ student_details.email|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Phone</div>
+                        <div class="detail-value">{{ student_details.phone|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Address</div>
+                        <div class="detail-value">{{ student_details.address|default:"N/A" }}</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Details Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-book me-2"></i>Academic Details
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Joining Year</div>
+                        <div class="detail-value">{{ student_details.joining_year|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Course</div>
+                        <div class="detail-value">{{ student_details.course }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Current CGPA</div>
+                        <div class="detail-value">{{ student_details.cgpa|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Graduation Status</div>
+                        <div class="detail-value">{{ student_details.graduation_status|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">10th Percentage</div>
+                        <div class="detail-value">{{ student_details.tenth_percentage|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">12th Percentage</div>
+                        <div class="detail-value">{{ student_details.twelfth_percentage|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Backlogs</div>
+                        <div class="detail-value">{{ student_details.backlogs|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Placement Details Section -->
+    <div class="card section-card">
+        <div class="section-header">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-briefcase me-2"></i>Placement Details
+            </h2>
+        </div>
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Placement Status</div>
+                        <div class="detail-value">{{ student_details.placement_status|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Company Placed In</div>
+                        <div class="detail-value">{{ student_details.company_placed_in|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Job Role</div>
+                        <div class="detail-value">{{ student_details.job_role|default:"N/A" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Package (LPA)</div>
+                        <div class="detail-value">{{ student_details.package|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Offer Date</div>
+                        <div class="detail-value">{{ student_details.offer_date|default:"N/A" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Joining Date</div>
+                        <div class="detail-value">{{ student_details.joining_date|default:"N/A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Edit Student Modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStudentModalLabel">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'student_edit_student' student.student_id.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Allowed Fields Message as Heading -->
+                    <h6 class="mb-4 text-muted"><b>{{ allowed_fields_message|default:"Message not passed from view"  }}</b></h6>
+
+                    <!-- Editable Fields -->
+                    <h5 class="mb-3">Editable Fields</h5>
+                    <div class="row">
+                        <!-- Phone Number -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentPhoneInput" class="form-label">Phone Number *</label>
+                                <input type="text" class="form-control" id="studentPhoneInput" name="phone" value="{{ student.phone }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentAddressInput" class="form-label">Address *</label>
+                                <textarea class="form-control" id="studentAddressInput" name="address" rows="3" required>{{ student.address }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Profile Picture -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentProfilePicInput" class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" id="studentProfilePicInput" name="profile_pic">
+                            </div>
+                        </div>
+
+                        <!-- 10th Percentage -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentTenthPercentageInput" class="form-label">10th Percentage *</label>
+                                <input type="number" step="0.01" class="form-control" id="studentTenthPercentageInput" name="tenth_percentage" value="{{ student.tenth_percentage }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- 12th Percentage -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="studentTwelfthPercentageInput" class="form-label">12th Percentage *</label>
+                                <input type="number" step="0.01" class="form-control" id="studentTwelfthPercentageInput" name="twelfth_percentage" value="{{ student.twelfth_percentage }}" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+  
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editStudentModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+
+        document.getElementById('toggleEditBtn').addEventListener('click', function () {
+            editStudentModal.show();
+        });
+
+        function handlePhotoError(imgElement) {
+            const wrapper = document.getElementById('studentPhotoWrapper');
+            wrapper.classList.add('show-na');
+        }
+    });
+
+    function handlePhotoError(imgElement) {
+        // Hide the broken image
+        imgElement.style.display = "none";
+
+        // Show the placeholder with "N/A"
+        const placeholder = document.getElementById("studentPhotoPlaceholder");
+        placeholder.style.display = "flex";
+    }
 </script>
-</body>
-</html>
+{% endblock %}

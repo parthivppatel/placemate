@@ -75,3 +75,5 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(37,3,19);
 INSERT INTO "Permissions" (id,name, description) VALUES (20,'edit_students','Permission to edit student details');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(38,1,20);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(39,3,20);
+
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(40, 1, 12);

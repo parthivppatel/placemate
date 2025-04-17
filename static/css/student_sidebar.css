@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    height: 100dvh;
+    /* background-color: #e8e7ff; */
+    background-color: #D1CFFB !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    margin-bottom: 32px;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #1e3a8a;
+    /* Exact blue from image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-inner {
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.logo-circle-outer {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    border: 2px solid #22c55e;
+    /* green color */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-circle-inner {
+    width: 80%;
+    height: 80%;
+    border: 2px solid #22c55e;
+    /* green color */
+    border-radius: 50%;
+}
+
+.logo-text {
+    position: absolute;
+    font-weight: bold;
+    font-size: 12px;
+    color: #1e3a8a;
+    z-index: 2;
+}
+
+.nav-items {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    color: #000;
+}
+
+.nav-item:hover {
+    background-color: #6366f1;
+    /* indigo-500 */
+    color: white;
+}
+
+.nav-item.active {
+    background-color: #6366f1;
+    /* indigo-500 */
+    color: white;
+}
+
+.nav-item-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.nav-item-text {
+    font-size: 14px; /* Adjust the font size */
+    font-weight: 500;
+    color: #333; /* Example text color */
+}
+
+.nav-item-content {
+    display: flex;
+    align-items: center; /* Vertically center the items */
+    gap: 10px; /* Add spacing between the icon and text */
+}
+
+.sidebar-bottom {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Create a 2x2 grid */
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2px; /* Add spacing between grid items */
+    width: 24px; /* Set a fixed width for the grid */
+    height: 24px; /* Set a fixed height for the grid */
+}
+
+.dashboard-grid-item {
+    width: 10px; /* Adjust the size of individual grid items */
+    height: 10px;
+    background-color: #000; /* Example color for the grid items */
+    border-radius: 2px; /* Optional: Add rounded corners */
+}
