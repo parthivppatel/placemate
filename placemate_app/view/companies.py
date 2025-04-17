@@ -265,7 +265,7 @@ def view_company(request,id=0):
         
         return render(request,'company_registration.html',data)
     
-    print('here',data['id'])
+    # print('here',data['id'])
     return render(request,'view_company.html',data)
 
 
@@ -444,7 +444,7 @@ def edit_company(request,id=0):
             return redirect("edit_company_page",id=id)
 
         except Exception as e:
-            print("ste",str(e))
+            # print("ste",str(e))
             messages.error(request,"An Unexpected Error Ocuured, Please try again")
             return redirect("edit_company_page",id=id)
         

@@ -14,6 +14,7 @@ from ..schema.cities import City
 from ..schema.company_drive_jobs import CompanyDriveJobs
 from ..schema.placement_offers import PlacementOffer 
 from ..utils.random_password_utils import generate_random_password
+from django.urls import reverse
 from ..decorators import permission_required
 from ..utils.email_utils import send_registration_email,send_drive_emails
 from django.db.models import Q,Count, F, ExpressionWrapper, IntegerField
@@ -29,11 +30,11 @@ from datetime import datetime
 def get_drives_context():
     return {
         "companies": list(Company.objects.values("id", "name")),
-        "courses": list(Course.objects.values("id", "name")),
-        "skills": list(Skill.objects.values("id", "name")),
-        "job_types": [type for type in JobType],
-        "job_modes": [mode for mode in JobMode],
-        "status_dropdown" : [mode for mode in DriveStatus]
+        "courses_dropdown": list(Course.objects.values("id", "name")),
+        "skills_dropdown": list(Skill.objects.values("id", "name")),
+        "job_types": [type.value for type in JobType],
+        "job_modes": [mode.value for mode in JobMode],
+        "status_dropdown" : [mode.value for mode in DriveStatus]
     }
 
 
@@ -133,27 +134,34 @@ def list_drives(request):
     messages.error(request,"Invalid request method")
     return redirect("dashboard")
 
-@permission_required('add_drive','edit_drive')
-def drive_dropdowns(request):    
-    data = {
-        "status": [st for st in DriveStatus]
-    }
+@permission_required('edit_drive')   
+def edit_drive_page(request,id=0):
+    url = reverse('view_drive', kwargs={'id': id}) + "?mode=edit"
+    return redirect(url)
 
-    return ResponseModel(data,"Drive Dropdowns get successfully",200)
-
-@permission_required('view_drive')
+@permission_required('view_drive','edit_drive')
 def view_drive(request,id=0):
     drive = get_object_or_404(CompanyDrive,id=id)
-    
+    mode = request.GET.get('mode', 'view')
+
     job_skills = DriveSkill.objects.filter(drive=drive).select_related("skill")
     job_courses = DriveCourses.objects.filter(drive=drive).select_related("course")
     job_locations = DriveLocation.objects.filter(drive=drive).select_related("city")
     jobs = CompanyDriveJobs.objects.filter(company_drive=drive)
+
+    s_ids = [js.skill.id for js in job_skills]
+    s_names = [js.skill.name for js in job_skills]
+
+    c_ids = [jc.course.id for jc in job_courses]
+    c_names = [jc.course.name for jc in job_courses]
+
     # Check if the user has the 'add_students' and 'delete_students' permissions
     user_payload = get_user_from_jwt(request)
     user_role = user_payload.get("role") if user_payload else None
     edit_drive = has_permission(user_role, 'edit_drive')
+
     data={
+        "id":drive.id,
         "drive_name" : drive.drive_name,
         "ug_package_min" : drive.ug_package_min,
         "ug_package_max" : drive.ug_package_max,
@@ -162,8 +170,8 @@ def view_drive(request,id=0):
         "stipend":drive.stipend,
         "bond" : drive.bond,
         "minimum_cgpa" : drive.minimum_cgpa,
-        "start_date" : drive.start_date.date(),
-        "end_date" : drive.end_date.date(),
+        "start_date" : drive.start_date,
+        "end_date" : drive.end_date,
         "tenth" : drive.tenth,
         "twelth" : drive.twelth,
         "diploma" : drive.diploma,
@@ -173,28 +181,31 @@ def view_drive(request,id=0):
             "display": drive.company.id.id
         },
         "logo" : drive.company.logo if drive.company.logo else None,
-        "status" : {
-            "value": [st.value for st in DriveStatus], 
-            "display": drive.status
-        },
-        "job_type" : {
-            "value": [type.value for type in JobType], 
-            "display": drive.job_type
-        },
+        "status" : drive.status,
+        "job_type" :drive.job_type,        
         "created_at":drive.created_at,
-        "job_mode" : {
-            "value": [mode.value for mode in JobMode], 
-            "display": drive.job_mode
-        },
+        "job_mode" : drive.job_mode,
         "jobs": [
             {"id": j.id,"job_title": j.job_title, "job_description": j.job_description}
             for j in jobs
         ],
-        "skills": list({"id":js.skill.id,"name":js.skill.name} for js in job_skills),
-        "courses": list({"id":jc.course.id,"name":jc.course.name,"active":jc.course.is_active} for jc in job_courses),  
+        "skills": {
+            'ids':s_ids,
+            'names':s_names
+        },
+        "courses": {
+            'ids' : c_ids,
+            'names' : c_names
+        },  
         "locations": list({"id":jl.city.id,"cityname":jl.city.cityname} for jl in job_locations),
         "edit_drive":edit_drive
     } 
+
+    if(mode == 'edit'):
+        context = get_drives_context()
+        data.update(context)
+
+        return render(request,'edit_drive.html',data)
     
     return render(request,'view_drive.html',data)
     # return ResponseModel(data,"Drive Fetched Successfully",200)
@@ -232,7 +243,7 @@ def sanitize_data(data):
     # Apply sanitization to all keys/values in the dictionary
     return {key: sanitize_value(value) for key, value in data.items()}
 
-def validate_drive_data(data):
+def validate_drive_data(data,is_edit=False):
     def is_invalid_int(value):
         try:
             return int(value) < 0
@@ -240,7 +251,9 @@ def validate_drive_data(data):
             return True
     
     # Validate required fields
-    required_fields = ['drive_name','company', 'job_type', 'job_mode','start_date','end_date']
+    required_fields = ['drive_name', 'job_type', 'job_mode','start_date','end_date']
+    if not is_edit:
+        required_fields.append('company')
     missing_fields = [field for field in required_fields if not data.get(field)]
     if missing_fields:
         return False, f"Missing required fields: {', '.join(missing_fields)}"
@@ -465,7 +478,7 @@ def edit_drive(request,id=0):
     if request.method == "POST":
         data = json.loads(request.body)
         data = sanitize_data(data)
-        is_valid, message = validate_drive_data(data)
+        is_valid, message = validate_drive_data(data,True)
         if not is_valid:
             return ResponseModel({}, message, 400)
 
@@ -493,7 +506,7 @@ def edit_drive(request,id=0):
             drive.undergraduate = data.get("undergraduate") or None
             drive.status = data.get("status")
             drive.save()
-            
+
             update_mapper_by_id(DriveSkill,'drive_id','skill_id',drive.id,data.get('skills',[]))
             update_mapper_by_id(DriveCourses,'drive_id','course_id',drive.id,data.get('courses',[]))
             update_mapper_by_id(DriveLocation,'drive_id','city_id',drive.id,data.get('locations',[]))

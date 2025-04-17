@@ -194,10 +194,11 @@
                         </a>
                     </div>
                     <div>
-                       
-                        <button class="btn btn-outline-primary me-2">
+                        {%if edit_drive %}
+                        <a  href="{% url 'edit_drive_page' id %}" class="btn btn-outline-primary me-2">
                             <i class="bi bi-pencil"></i> Edit Drive
-                        </button>
+                        </a>
+                        {% endif %}  
                        
                     </div>
                 </div>
@@ -214,12 +215,12 @@
                         <h1 class="drive-name" id="driveName">{{drive_name}}</h1>
                         <div>
                             <span class="badge
-                                    {% if status.display == 'scheduled' %}bg-info text-dark
-                                    {% elif status.display == 'ongoing' %}bg-warning text-dark
-                                    {% elif status.display == 'completed' %}bg-success
-                                    {% elif status.display == 'cancelled' %}bg-danger
+                                    {% if status == 'scheduled' %}bg-info text-dark
+                                    {% elif status == 'ongoing' %}bg-warning text-dark
+                                    {% elif status == 'completed' %}bg-success
+                                    {% elif status == 'cancelled' %}bg-danger
                                     {% else %}bg-secondary
-                                    {% endif %}" id="driveStatus">{{status.display}}</span>
+                                    {% endif %}" id="driveStatus">{{status}}</span>
                              <span class="text-muted" id="driveCreated">Created: {{ created_at|date:"M d, Y" }}</span>
                         </div>
                     </div>
@@ -237,11 +238,11 @@
                             <div class="col-md-6">
                                 <div class="detail-row">
                                     <div class="detail-label">Job Type</div>
-                                    <div id="jobType">{{job_type.display}}</div>
+                                    <div id="jobType">{{job_type}}</div>
                                 </div>
                                 <div class="detail-row">
                                     <div class="detail-label">Job Mode</div>
-                                    <div id="jobMode">{{job_mode.display}}</div>
+                                    <div id="jobMode">{{job_mode}}</div>
                                 </div>
                                 <div class="detail-row">
                                     <div class="detail-label">Minimum CGPA</div>
@@ -266,8 +267,8 @@
                                     <div class="detail-label">Eligible Batches</div>
                                     <div class="eligibility-tags">
                                         {% if courses %}
-                                            {% for course in courses %}
-                                                <span class="eligibility-tag">{{ course.name }}</span>
+                                            {% for course in courses.names %}
+                                                <span class="eligibility-tag">{{ course }}</span>
                                             {% endfor %}
                                         {% else %}
                                         -
@@ -278,8 +279,8 @@
                                     <div class="detail-label">Required Skills</div>
                                     <div class="skills-container">
                                         {% if skills %}
-                                        {% for skill in skills %}
-                                        <span class="badge bg-light text-dark">{{skill.name}}</span>
+                                        {% for skill in skills.names %}
+                                        <span class="badge bg-light text-dark">{{skill}}</span>
                                         {% endfor %}
                                         {% else %}
                                         -
