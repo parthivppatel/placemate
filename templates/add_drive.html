@@ -1,0 +1,600 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block header_title %}
+Add Drive
+{% endblock %}
+
+{% block header_subtitle %}
+Add company drive in placemate.
+{% endblock %}
+{% block content %}
+     <style>
+    
+        .container{
+            margin-top: 30px;
+        }
+        .card {
+            border-radius: 5px;
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #eaeaea;
+            padding: 15px 25px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+        }
+        
+        .job-card {
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fcfcfc;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .job-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .header-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        /* Form validation styles */
+        .form-control.is-invalid,
+        .was-validated .form-control:invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 80%;
+        }
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* transparent white */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+
+    <!-- Loader (initially hidden) -->
+    <div id="loader" style="display: none;">
+        <div class="loader-overlay">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Display Messages -->
+    <div class="alert alert-danger mx-5 d-none" id="alertBox" >this is messafe</div>
+
+    <!-- Main Content -->
+    <main class="container">
+  
+        <form id="createDriveForm" class="needs-validation" novalidate>
+            <!-- Basic Details Card -->
+            <input type="hidden" name="csrfmiddlewaretoken" id="csrfToken" value="{{ csrf_token }}">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Basic Drive Details</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="company" class="form-label">Company <span class="text-danger">*</span></label>
+                            <select class="form-select" id="company" name="company" required>
+                                <option value="">Select Company</option>
+                                {% for obj in companies %}
+                                <option value="{{ obj.id }}">{{ obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text invalid-feedback">You can only create drives for registered companies.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="driveName" class="form-label">Drive Name</label>
+                            <input type="text" class="form-control" name="drive_name" id="driveName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="jobType" class="form-label">Job Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="jobType" name="job_type" required>
+                                <option value="">Select Job Type</option>
+                                {% for obj in job_types %}
+                                <option value="{{ obj }}">{{ obj }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select job type.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="jobMode" class="form-label">Job Mode <span class="text-danger">*</span></label>
+                            <select class="form-select" id="jobMode" name="job_mode" required>
+                                <option value="">Select Job Mode</option>
+                                {% for obj in job_modes %}
+                                <option value="{{ obj }}">{{ obj }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select job mode.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="minimumCGPA" class="form-label">Minimum CGPA</label>
+                            <input type="number" class="form-control" name="minimum_cgpa" id="minimumCGPA" step="0.01" min="0" max="10">
+                            <div class="invalid-feedback">Enter between 1 to 10.</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="eligibleBatches" class="form-label">Eligible Courses  </label>
+                            <select class="form-select dropdown" name="courses[]" id="eligibleBatches" multiple>
+                                {% for obj in courses %}
+                                <option value="{{ obj.id }}">{{ obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Type to filter courses and select eligeble courses</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="requiredSkills" class="form-label">Required Skills</label>
+                            <select class="form-select dropdown" id="requiredSkills" name="skills[]" multiple="multiple">
+                                {% for obj in skills %}
+                                <option value="{{ obj.id }}">{{ obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Type to filter skills and select required skills</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="postingLocations" class="form-label">Posting locations  </label>
+                            <select class="form-select dropdown" name="locations[]" id="postingLocations" multiple>
+                            </select>
+                            <div class="form-text">Type to filter cities and select posting locations</div>
+                        </div>
+
+                   </div>
+                </div>
+            </div>
+
+            <!-- Academic Eligibility Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span>Academic Eligibility Criteria</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tenthPercentage" class="form-label">Minimum 10th Percentage</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="tenthPercentage" name="tenth_percentage" placeholder="e.g. 60" step="0.01" min="0" max="100">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="invalid-feedback">Enter between 1 to 100</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="twelfthPercentage" class="form-label">Minimum 12th Percentage</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="twelthPercentage" name="twelfth_percentage" placeholder="e.g. 60" step="0.01" min="0" max="100">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="invalid-feedback">Enter between 1 to 100</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="diplomaPercentage" class="form-label">Minimum Diploma Percentage</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="diplomaPercentage" name="diploma_percentage" placeholder="e.g. 60" step="0.01" min="0" max="100">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="invalid-feedback">Enter between 1 to 100</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="ugPercentage" class="form-label">Minimum UG CGPA</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="ugPercentage" name="ug_percentage" placeholder="e.g. 7.5 or 75" step="0.01" min="0" max="10">
+                                <span class="input-group-text" id="ugUnit">/ 10</span>
+                            </div>
+                            <div class="invalid-feedback">Enter between 1 to 10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package Details Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span>Package Details</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">UG Package (LPA)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="ugPackageMin" name="ug_package_min" placeholder="Minimum" step="0.1" min="0">
+                                <span class="input-group-text">to</span>
+                                <input type="number" class="form-control" id="ugPackageMax" name="ug_package_max" placeholder="Maximum" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">PG Package (LPA)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="pgPackageMin" name="pg_package_min" placeholder="Minimum" step="0.1" min="0">
+                                <span class="input-group-text">to</span>
+                                <input type="number" class="form-control" id="pgPackageMax" name="pg_package_max" placeholder="Maximum" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="bond" class="form-label">Bond (if any)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="bond" name="bond" placeholder="Any Bond Condition">
+                             </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="stipend" class="form-label">Stipend (if any)</label>
+                            <div class="input-group">
+                                 <input type="number" class="form-control" name="stipend" id="stipend" placeholder="Monthly amount" min="0">
+                                <span class="input-group-text">/month</span>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drive Timeline Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <span>Drive Timeline</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="startDate" class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" name="start_date" id="startDate" required>
+                            <div class="invalid-feedback">Please enter start date.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="endDate" class="form-label">End Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" name="end_date" id="endDate" required>
+                            <div class="invalid-feedback">Please enter end date.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">Select Status</option>
+                                {% for obj in status_dropdown %}
+                                <option value="{{ obj }}">{{ obj }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Details Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Job Details</span>
+                    <small class="text-muted">At least one job is required</small>
+                </div>
+                <div class="card-body">
+                    <div id="jobsContainer">
+                        <!-- Initial job card -->
+                        <div class="job-card" data-job-id="1">
+                            <div class="job-header">
+                                <h5 class="job-title">Job #1</h5>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-job-btn" style="display: none;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="jobTitle1" class="form-label">Job Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="jobTitle1" required>
+                                    <div class="invalid-feedback">Please enter the job title.</div>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="jobDescription1" class="form-label">Job Description <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="jobDescription1" rows="3" required></textarea>
+                                    <div class="invalid-feedback">Please select job description.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center mt-3">
+                        <button type="button" id="addJobBtn" class="btn btn-outline-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Add Another Job
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'list_drives' %}'">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Create Drive
+                </button>
+            </div>
+        </form>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            function invokeAlert(textValue){
+                $('#alertBox').removeClass('d-none')
+                     .text(textValue).get(0)
+                    .scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    setTimeout(function () {
+                        $('.alert-success, .alert-danger').each(function () {
+                            $(this).fadeOut(500, function () {
+                                $(this).removeAttr('style').addClass('d-none');
+                            });
+                        });
+                    }, 6000); // Wait 6 seconds before fading out
+            }
+
+            let jobCounter = 1;
+            $('.dropdown').select2();
+
+ 
+                
+            const $jobsContainer = $('#jobsContainer');
+            const $addJobBtn = $('#addJobBtn');
+            const $createDriveForm = $('#createDriveForm');
+            
+            $('#postingLocations').select2({
+                allowClear: true,
+                minimumInputLength: 1, // Only trigger after 1+ characters
+                ajax: {
+                    url: '/get-cities-by-name/',
+                    method : 'GET',
+                    dataType: 'json',
+                    data: function (params) {
+                        return {
+                            search: params.term // Query param ?search=YourText
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.data.map(city => ({
+                                id: city.id,
+                                text: city.cityname
+                            }))
+                        };
+                    },
+                    cache: true
+                }
+            });
+            function updateRemoveButtonVisibility() {
+                const $removeBtns = $('.remove-job-btn');
+                $removeBtns.toggle($removeBtns.length > 1);
+            }
+        
+            function renumberJobs() {
+                $('.job-card').each(function (index) {
+                    const jobNumber = index + 1;
+                    $(this).attr('data-job-id', jobNumber);
+                    $(this).find('.job-title').text(`Job #${jobNumber}`);
+        
+                    const $titleInput = $(this).find('[id^="jobTitle"]');
+                    const $descInput = $(this).find('[id^="jobDescription"]');
+        
+                    $titleInput.attr('id', `jobTitle${jobNumber}`);
+                    $descInput.attr('id', `jobDescription${jobNumber}`);
+        
+                    $titleInput.prev('label').attr('for', `jobTitle${jobNumber}`);
+                    $descInput.prev('label').attr('for', `jobDescription${jobNumber}`);
+                });
+        
+                jobCounter = $('.job-card').length;
+                updateRemoveButtonVisibility();
+            }
+        
+            function removeJob($jobCard) {
+                $jobCard.remove();
+                renumberJobs();
+            }
+        
+            $addJobBtn.on('click', function () {
+                jobCounter++;
+        
+                const jobHTML = `
+                    <div class="job-card" data-job-id="${jobCounter}">
+                        <div class="job-header">
+                            <h5 class="job-title">Job #${jobCounter}</h5>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-job-btn" style="display: none;">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="jobTitle${jobCounter}" class="form-label">Job Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="jobTitle${jobCounter}" required>
+                                <div class="invalid-feedback">Please enter the job title.</div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="jobDescription${jobCounter}" class="form-label">Job Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="jobDescription${jobCounter}" rows="3" required></textarea>
+                                <div class="invalid-feedback">Please enter the job description.</div>
+
+                            </div>
+                        </div>
+                    </div>`;
+        
+                const $newJob = $(jobHTML);
+                $jobsContainer.append($newJob);
+        
+                $newJob.find('.remove-job-btn').on('click', function () {
+                    removeJob($newJob);
+                });
+        
+                updateRemoveButtonVisibility();
+            });
+        
+            $createDriveForm.on('submit', function (e) {
+                e.preventDefault();
+                const form = this;
+
+                // Bootstrap validation
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;  // Stop if invalid
+                }
+
+                $('#loader').show();
+
+                // Check HTML5 validation
+                //if (!this.checkValidity()) {
+                //    this.reportValidity();  // Show validation messages
+                //   return;
+                //}
+        
+                const formData = {
+                    company: parseInt($('#company').val()),
+                    drive_name : $('#driveName').val(),
+                    job_type: $('#jobType').val(),
+                    job_mode: $('#jobMode').val(),
+                    minimum_cgpa: parseFloat($('#minimumCGPA').val()),
+                    ug_package_min: parseFloat($('#ugPackageMin').val()),
+                    ug_package_max: parseFloat($('#ugPackageMax').val()),
+                    pg_package_min: parseFloat($('#pgPackageMin').val()),
+                    pg_package_max: parseFloat($('#pgPackageMax').val()),
+                    tenth : parseFloat($('#tenthPercentage').val()),
+                    twelth : parseFloat($('#twelthPercentage').val()),
+                    diploma : parseFloat($('#diplomaPercentage').val()),
+                    undergraduate : parseFloat($('#ugPercentage').val()),
+                    courses:$('#eligibleBatches').val(),
+                    skills:$('#requiredSkills').val(),
+                    locations:$('#postingLocations').val(),
+                    bond: $('#bond').val(),
+                    stipend: parseFloat($('#stipend').val()),
+                    start_date: $('#startDate').val(),
+                    end_date: $('#endDate').val(),
+                    status: $('#status').val(),
+                    jobs: []
+                };
+        
+                $('.job-card').each(function () {
+                    const jobId = $(this).data('job-id');
+                    formData.jobs.push({
+                        job_title: $(`#jobTitle${jobId}`).val(),
+                        job_description: $(`#jobDescription${jobId}`).val()
+                    });
+                });
+
+                $.ajax({
+                    url: '/drives/add-drive/',
+                    method: 'POST',
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    headers: {
+                        'X-CSRFToken': $('#csrfToken').val()
+                    },
+                    success: function (response) {
+                        window.location.href = "/drives/list-drives/";
+                    },
+                    error: function (xhr) {
+                        $('#loader').hide();
+                        let errorMessage = 'Something went wrong.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        invokeAlert(errorMessage)
+                    }
+                });
+                
+            });
+        
+            $('#endDate,#startDate').on('change', function () {
+                console.log("hello");
+                const startDate = new Date($('#startDate').val());
+                const endDate = new Date($('#endDate').val());
+        
+                if (startDate && endDate && endDate <= startDate) {
+                    //alert('End date must be grater than start date');
+                    invokeAlert('End date must be grater than equal to start date')
+                    $(this).val('');
+                }
+            });
+        
+            $('#ugPackageMax,#ugPackageMin').on('change', function () {
+                const min = parseFloat($('#ugPackageMin').val());
+                const max = parseFloat($('#ugPackageMax').val());
+                if (!isNaN(min) && !isNaN(max) && max < min) {
+                    invokeAlert('Maximum UG package must be greater than minimum');
+                    $(this).val('');
+                }
+            });
+        
+            $('#pgPackageMax,#pgPackageMin').on('change', function () {
+                const min = parseFloat($('#pgPackageMin').val());
+                const max = parseFloat($('#pgPackageMax').val());
+        
+                if (!isNaN(min) && !isNaN(max) && max < min) {
+                    invokeAlert('Maximum PG package must be greater than minimum');
+                    $(this).val('');
+                }
+            });
+        
+        });
+        
+        
+        
+    </script>
+ 
+
+{% endblock %}

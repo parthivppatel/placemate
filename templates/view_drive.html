@@ -1,0 +1,431 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block header_title %}
+    View Company Drive
+{% endblock %}
+
+{% block header_subtitle %}
+    Details of Company Drive
+{% endblock %}
+{% block content %}
+<style>
+    /* Main content styles */
+    .main-content {
+        padding: 20px;
+    }
+
+    .div-view{
+        margin-left: 0px !important;
+    }
+    
+    
+    /* Drive view page specific styles */
+    .drive-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .company-logo {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-right: 1.5rem;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem;
+        background-color: #fff;
+        border-radius: 8px;
+    }
+    
+    .company-name {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        color: #6c757d;
+    }
+    
+    .drive-name {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-card {
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .section-header {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .section-content {
+        padding: 1.5rem;
+    }
+    
+    .detail-row {
+        margin-bottom: 1rem;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .job-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s;
+    }
+     
+    .job-title {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 1.25rem;
+    }
+    
+    .badge {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-dates {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .date-box {
+        flex: 1;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .date-divider {
+        margin: 0 1rem;
+        color: #6c757d;
+    }
+    
+    .date-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .date-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    .package-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    
+    .package-card {
+        flex: 1;
+        min-width: 200px;
+        padding: 1.25rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+    
+    .package-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+    
+    .package-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0d6efd;
+    }
+    
+    .eligibility-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .eligibility-tag {
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+    
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+</style>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Main Content -->
+            <div class="col main-content div-view">
+                <!-- Actions Bar -->
+                <div class="actions-bar">
+                    <div>
+                        <a href="{% url 'list_drives'%}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Drives
+                        </a>
+                    </div>
+                    <div>
+                       
+                        <button class="btn btn-outline-primary me-2">
+                            <i class="bi bi-pencil"></i> Edit Drive
+                        </button>
+                       
+                    </div>
+                </div>
+                
+                <!-- Drive Header -->
+                <div class="drive-header">
+                    {% if logo %}
+                    <img src="/media/{{logo}}" alt="Company Logo" class="company-logo">
+                    {% else %}
+                    <img src="{% static 'images/default-company.png' %}" alt="Company Logo" class="company-logo">
+                    {% endif %}
+                    <div>
+                        <h2 class="company-name" id="companyName">{{company.value}}</h2>
+                        <h1 class="drive-name" id="driveName">{{drive_name}}</h1>
+                        <div>
+                            <span class="badge
+                                    {% if status.display == 'scheduled' %}bg-info text-dark
+                                    {% elif status.display == 'ongoing' %}bg-warning text-dark
+                                    {% elif status.display == 'completed' %}bg-success
+                                    {% elif status.display == 'cancelled' %}bg-danger
+                                    {% else %}bg-secondary
+                                    {% endif %}" id="driveStatus">{{status.display}}</span>
+                             <span class="text-muted" id="driveCreated">Created: {{ created_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Basic Drive Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-info-circle me-2"></i>Basic Drive Details
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Job Type</div>
+                                    <div id="jobType">{{job_type.display}}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Job Mode</div>
+                                    <div id="jobMode">{{job_mode.display}}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Minimum CGPA</div>
+                                    <div id="minCGPA">{{ minimum_cgpa|default:"-" }}{% if minimum_cgpa %} / 10{% endif %}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Job Locations</div>
+                                    <div id="jobLocations">
+                                        {% if locations %}
+                                            {% for city in locations %}
+                                                {{ city.cityname }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Eligible Batches</div>
+                                    <div class="eligibility-tags">
+                                        {% if courses %}
+                                            {% for course in courses %}
+                                                <span class="eligibility-tag">{{ course.name }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Required Skills</div>
+                                    <div class="skills-container">
+                                        {% if skills %}
+                                        {% for skill in skills %}
+                                        <span class="badge bg-light text-dark">{{skill.name}}</span>
+                                        {% endfor %}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Academic Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-mortarboard-fill me-2"></i>Academic Eligibility Criteria
+                        
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">10th Percentage</div>
+                                    <div id="tenthPercentage">{{ tenth|default:"-" }}{% if tenth %} % {% endif %}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">12th Percentage</div>
+                                    <div id="twelfthPercentage">{{ twelth|default:"-" }}{% if twelth %} % {% endif %}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-row">
+                                    <div class="detail-label">Diploma Percentage</div>
+                                    <div id="diplomaPercentage">{{ diploma|default:"-" }}{% if diploma %} % {% endif %}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">UG Current CGPA</div>
+                                    <div id="ugCGPA">{{ undergraduate|default:"-" }}{% if undergraduate %} / 10{% endif %}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Drive Timeline Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-calendar-event me-2"></i>Drive Timeline
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="timeline-dates">
+                            <div class="date-box">
+                                <div class="date-label">Start Date</div>
+                                <div class="date-value">{{ start_date|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="date-divider">
+                                <i class="bi bi-arrow-right"></i>
+                            </div>
+                            <div class="date-box">
+                                <div class="date-label">End Date</div>
+                                <div class="date-value">{{ end_date|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                      
+                    </div>
+                </div>
+                
+                <!-- Package Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-currency-dollar me-2"></i>Package Details & Bond
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="package-details">
+                            <div class="package-card">
+                                <div class="package-title">UG Package Range</div>
+                                <div class="package-value">
+                                    {% if ug_package_min or ug_package_max %}
+                                    {{ug_package_min}}{% if ug_package_min and ug_package_max %} - {% endif %}{{ug_package_max}} LPA
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="package-card">
+                                <div class="package-title">PG Package Range</div>
+                                <div class="package-value">
+                                    {% if pg_package_min or pg_package_max %} 
+                                    {{pg_package_min}}{% if pg_package_min and pg_package_max %} - {% endif %}{{pg_package_max}} LPA
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="package-card">
+                                <div class="package-title">Internship Stipend</div>
+                                <div class="package-value">{{stipend| default:'-'}} {% if stipend %}  / month{% endif %}</div>
+                            </div>
+                            <div class="package-card">
+                                <div class="package-title">Bond</div>
+                                <div class="package-value">{{bond| default:'-'}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Job Details Section -->
+                <div class="card section-card">
+                    <div class="section-header">
+                        <h2 class="h5 mb-0">
+                            <i class="bi bi-briefcase me-2"></i>Job Details
+                        </h2>
+                    </div>
+                    <div class="section-content">
+                        <!-- Job Card 1 -->
+                         {% if jobs %}
+                         {% for job in jobs %}
+                        <div class="job-card">
+                            <h3 class="job-title">{{job.job_title}}</h3>
+                            {{job.job_description }}
+                        </div>
+                        
+                        {% endfor %}
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // This script would handle dynamic data population in production
+        document.addEventListener('DOMContentLoaded', function() {
+            // In a real implementation, you would fetch drive data from your backend API
+            // and populate the elements dynamically
+        });
+    </script>  
+</html>
+
+
+
+{% endblock %}

@@ -25,3 +25,14 @@ def get_cities(request,state_id):
     
     cities = list(City.objects.filter(state=state_id).values("id","cityname"))
     return ResponseModel(cities,"Cities Fetch Successfully",200)
+
+def get_city_with_name(request):
+    search = request.GET.get('search', '').strip()
+
+    if not search:
+        return ResponseModel({}, "No search query provided", 400)
+
+    cities = list(
+        City.objects.filter(cityname__istartswith=search).values("id", "cityname")
+    )
+    return ResponseModel(cities, f"Countries starting with '{search}' fetched successfully", 200)

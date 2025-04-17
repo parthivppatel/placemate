@@ -83,10 +83,10 @@
             <form method="get" id="filterForm">
                 <div class="row mb-3 align-items-center" >
                         <!-- Hidden inputs for pagination -->
-                    <input type="hidden" name="page" value="1" id="filterPage">
-                    <input type="hidden" name="perpage" value="{{ request.GET.perpage|default:'10' }}" id="filterPerPage">
+                    <!-- <input type="hidden" name="page" value="1" id="filterPage">
+                    <input type="hidden" name="perpage" value="{{ request.GET.perpage|default:'10' }}" id="filterPerPage"> -->
                     <div class="col-md-3 mb-2 mb-md-0">
-                        <div class="d-flex align-items-center rounded-pill px-3 py-1 shadow-sm border border-1" style="min-height: 42px;">
+                        <div class="d-flex align-items-center rounded-pill px-3 shadow-sm border border-1">
                             <i class="bi bi-search text-muted me-2 fs-6"></i>
                             <input type="text"
                                    class="form-control border-0 shadow-none bg-transparent"
@@ -99,7 +99,7 @@
                     <div class="col-md-9 d-flex flex-wrap justify-content-md-end gap-2">
                     
                         <!-- Comapny Size Filter -->
-                        <select name="company_size" class="form-select form-select-sm rounded-pill px-3 pe-5 shadow-sm w-auto" onchange="this.form.submit()">
+                        <select name="company_size" class="form-select form-select-sm rounded-pill px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">select company size</option>
                             {% for size in filter_options.company_sizes %}
                             <option value="{{ size.value }}" {% if request.GET.company_size == size.value|stringformat:"s" %}selected{% endif %}>
@@ -109,7 +109,7 @@
                         </select>
                     
                         <!-- Industry Filter -->
-                        <select name="industry" class="form-select form-select-sm rounded-pill px-3 pe-5 shadow-sm w-auto" onchange="this.form.submit()">
+                        <select name="industry" class="form-select form-select-sm rounded-pill px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">select industry</option>
                             {% for industry in filter_options.industries %}
                             <option value="{{ industry.id }}" {% if request.GET.industry == industry.id|stringformat:"s" %}selected{% endif %}>
@@ -166,7 +166,7 @@
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="6">No Companies found.</td>
+                            <td colspan="6" align="center">No Companies found.</td>
                         </tr>
                         {% endif %}
                     </tbody>
@@ -188,7 +188,7 @@
                                 {% if pagination.previous %}
                                 <li class="page-item">
                                     <a class="page-link"
-                                        href="?page={{ pagination.previous }}&perpage={{ pagination.perpage }}&company_size={{ request.GET.company_size|default:''}}&industry={{ request.GET.industry|default:'' }}&search=&company_size={{ request.GET.company_size|default:''}}&search={{ request.GET.search|default:'' }}">
+                                        href="?page={{ pagination.previous }}&perpage={{ pagination.perpage }}&company_size={{ request.GET.company_size|default:''}}&industry={{ request.GET.industry|default:'' }}&search={{ request.GET.search|default:'' }}">
                                         Previous
                                     </a>
                                     
@@ -242,7 +242,7 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body text-center">
-          <p class="mb-3 fs-5">Are you sure you want to delete this item?</p>
+          <p class="mb-3 fs-5">Are you sure you want to delete this company?</p>
           <p class="text-muted small mb-0">This action cannot be undone.</p>
         </div>
         <div class="modal-footer justify-content-center">

@@ -169,8 +169,9 @@ def register_company(request):
                 company.save()
                 role = Role.objects.filter(name='Company').first()
                 if not role:
-                    raise ValidationError("Role 'Company' does not exist.")
-                
+                    messages.error(request,"Role 'Company' does not exist.")
+                    return redirect("list_companies")
+                                
                 user_role = UserRole(user = user,role = role)
                 user_role.save()
                 send_registration_email(user.email,password)
@@ -380,6 +381,7 @@ def list_companies(request):
             }
         })
     
+    messages.error(request,"Invalid request method")
     return redirect("dashboard")
 
 
@@ -458,7 +460,8 @@ def delete_company(request):
             return redirect("list_companies")
         try:
             with transaction.atomic():
-                company = get_object_or_404(Company, id=company_id)
+                company = Company.objects.get(id=company_id)
+                # company = get_object_or_404(Company, id=company_id)
                 user = company.id
 
                 # Check for assigned jobs
@@ -478,7 +481,9 @@ def delete_company(request):
                 messages.success(request,"Company deleted successfully")
                 return redirect('list_companies')
                 # return ResponseModel({},"Company deleted successfully",200)
-        
+        except Company.DoesNotExist:
+                messages.error(request,"Company not found")
+                return redirect("list_companies")
         except Exception as e:
             messages.error(request,str(e))
             return redirect('list_companies')

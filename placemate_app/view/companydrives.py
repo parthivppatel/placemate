@@ -17,7 +17,8 @@ from ..utils.random_password_utils import generate_random_password
 from ..decorators import permission_required
 from ..utils.email_utils import send_registration_email,send_drive_emails
 from django.db.models import Q,Count, F, ExpressionWrapper, IntegerField
-from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,update_mapper_by_id
+from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,update_mapper_by_id,validate_pagination
+from ..utils.jwt_utils import has_permission,get_user_from_jwt
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction,IntegrityError
 import json
@@ -25,22 +26,33 @@ import threading
 import re
 from datetime import datetime
 
+def get_drives_context():
+    return {
+        "companies": list(Company.objects.values("id", "name")),
+        "courses": list(Course.objects.values("id", "name")),
+        "skills": list(Skill.objects.values("id", "name")),
+        "job_types": [type for type in JobType],
+        "job_modes": [mode for mode in JobMode],
+        "status_dropdown" : [mode for mode in DriveStatus]
+    }
+
+
+@permission_required('add_drive')
+def add_drive_page(request):
+    context = get_drives_context()
+    return render(request,'add_drive.html',context)
 
 @permission_required('view_drives')   
 def list_drives(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        filters = data.get("filters", {})
+    page,perpage = 1,10
+    if request.method == "GET":
+        data = request.GET
+        # filters = data.get("filters", {})
         sort = data.get("sort", {})
-        try:
-            page = int(data.get("page", 1))
-            perpage = int(data.get("perpage", 10))
-
-            if page < 1 or perpage < 1:
-                return ResponseModel({},"Page and per page must be positive integers",400)
-        except:
-            return ResponseModel({},"Page and per page must be valid integers.",400)
-
+        validate_pg = validate_pagination(data)
+        if validate_pg is None:
+            return ResponseModel({},"Page and perpage must be valid positive integers", 400)
+        page, perpage = validate_pg
 
         # data gathering
         drives = CompanyDrive.objects.select_related("company").annotate(
@@ -48,11 +60,11 @@ def list_drives(request):
         )
 
         # filtering
-        if search := filters.get("search","").strip():
+        if search := data.get("search","").strip():
             drives = drives.filter(Q(drive_name__icontains=search) | Q(company__name__icontains=search))
 
-        if "status" in filters:
-            drives = drives.filter(status__iexact=filters['status'])    
+        if status := data.get("status","").strip():
+            drives = drives.filter(status__iexact=status)    
 
         #sorting
         sort_field = sort.get("field", "").strip()  # Clean up any accidental whitespace
@@ -86,20 +98,40 @@ def list_drives(request):
                 "id": drive.id,
                 "company": drive.company.name,
                 "drive_name" : drive.drive_name,
+                "job_type" : drive.job_type,
+                "job_mode" : drive.job_mode,
+                "start_date" : drive.start_date,
                 "status": drive.status,
                 "applicants":drive.applicants,
-                "created_date": drive.created_at.date()
             })
         
-        response = {
-            "total" : total,
-            "pagination" : pagination,
-            "data" : result
+        filter_options={      
+            "status_dropdown": [
+                {"value": status.value} for status in DriveStatus
+            ],
         }
 
-        return ResponseModel(response,"Success",200)
+        # Check if the user has the 'add_students' and 'delete_students' permissions
+        user_payload = get_user_from_jwt(request)
+        user_role = user_payload.get("role") if user_payload else None
+        add_drive = has_permission(user_role, 'add_drive')
+        view_drive = has_permission(user_role, 'view_drive')
+        delete_drive = has_permission(user_role, 'delete_drive')
+
+        return render(request, "drives_list.html", {
+            "data": result,
+            "total": total,
+            "pagination": pagination,
+            "filter_options": filter_options,
+            "permissions":{
+                "add_drive" : add_drive,
+                "view_drive" : view_drive,
+                "delete_drive" : delete_drive
+            }
+        })
     
-    return ResponseModel(None,"Invalid request method",405)
+    messages.error(request,"Invalid request method")
+    return redirect("dashboard")
 
 @permission_required('add_drive','edit_drive')
 def drive_dropdowns(request):    
@@ -117,7 +149,10 @@ def view_drive(request,id=0):
     job_courses = DriveCourses.objects.filter(drive=drive).select_related("course")
     job_locations = DriveLocation.objects.filter(drive=drive).select_related("city")
     jobs = CompanyDriveJobs.objects.filter(company_drive=drive)
-
+    # Check if the user has the 'add_students' and 'delete_students' permissions
+    user_payload = get_user_from_jwt(request)
+    user_role = user_payload.get("role") if user_payload else None
+    edit_drive = has_permission(user_role, 'edit_drive')
     data={
         "drive_name" : drive.drive_name,
         "ug_package_min" : drive.ug_package_min,
@@ -139,15 +174,16 @@ def view_drive(request,id=0):
         },
         "logo" : drive.company.logo if drive.company.logo else None,
         "status" : {
-            "value": [st for st in DriveStatus], 
+            "value": [st.value for st in DriveStatus], 
             "display": drive.status
         },
         "job_type" : {
-            "value": [type for type in JobType], 
+            "value": [type.value for type in JobType], 
             "display": drive.job_type
         },
+        "created_at":drive.created_at,
         "job_mode" : {
-            "value": [mode for mode in JobMode], 
+            "value": [mode.value for mode in JobMode], 
             "display": drive.job_mode
         },
         "jobs": [
@@ -156,10 +192,12 @@ def view_drive(request,id=0):
         ],
         "skills": list({"id":js.skill.id,"name":js.skill.name} for js in job_skills),
         "courses": list({"id":jc.course.id,"name":jc.course.name,"active":jc.course.is_active} for jc in job_courses),  
-        "locations": list({"id":jl.city.id,"cityname":jl.city.cityname} for jl in job_locations)   
+        "locations": list({"id":jl.city.id,"cityname":jl.city.cityname} for jl in job_locations),
+        "edit_drive":edit_drive
     } 
- 
-    return ResponseModel(data,"Drive Fetched Successfully",200)
+    
+    return render(request,'view_drive.html',data)
+    # return ResponseModel(data,"Drive Fetched Successfully",200)
 
 
 #jobs frontend structure
@@ -173,56 +211,129 @@ def view_drive(request,id=0):
 #     "job_descriprtion" : "yes valid json"
 #     }
 # ]
+def sanitize_data(data):
+    def sanitize_value(value):
+        # Strip strings, return None if empty
+        if isinstance(value, str):
+            return value.strip() if value.strip() != '' else None
+        
+        # If it's a list, handle items recursively
+        elif isinstance(value, list):
+            return [sanitize_value(item) for item in value]
+        
+        # If it's a dictionary (object), recurse
+        elif isinstance(value, dict):
+            return {key: sanitize_value(val) for key, val in value.items()}
+        
+        # For other data types (numbers, booleans, etc.), return the value unchanged
+        else:
+            return value
+
+    # Apply sanitization to all keys/values in the dictionary
+    return {key: sanitize_value(value) for key, value in data.items()}
+
+def validate_drive_data(data):
+    def is_invalid_int(value):
+        try:
+            return int(value) < 0
+        except (ValueError, TypeError):
+            return True
+    
+    # Validate required fields
+    required_fields = ['drive_name','company', 'job_type', 'job_mode','start_date','end_date']
+    missing_fields = [field for field in required_fields if not data.get(field)]
+    if missing_fields:
+        return False, f"Missing required fields: {', '.join(missing_fields)}"
+    
+    jobs = data.get('jobs', [])
+    for i,job in enumerate(jobs):
+        job_title = job.get("job_title")
+        job_description = job.get("job_description")
+        if not job_title or not job_description:
+            return False, f"Missing job_title or job_description in job {i + 1}"
+
+    # Integer Checking
+    int_fields=["minimum_cgpa", "ug_package_min", "ug_package_max", "pg_package_min", "pg_package_max","stipend","tenth","twelth","diploma","undergraduate"]
+    for field in int_fields:
+        value = data.get(field)
+        if value not in [None, '', 'null'] and is_invalid_int(value):
+            return False, f"{field.replace('_', ' ').capitalize()} must be a positive integer."
+    
+    job_type = data.get("job_type")
+    job_mode = data.get("job_mode")
+    status = data.get("status")
+
+    try:
+        start_date = datetime.fromisoformat(data.get("start_date"))
+        end_date = datetime.fromisoformat(data.get("end_date"))
+
+        if start_date >= end_date:
+            return False, "Start date cannot be greater than equal to end date."
+                        
+    except ValueError:
+        return False, "Invalid datetime format. Use ISO format: YYYY-MM-DDTHH:MM:SS."
+
+    if (data.get("ug_package_min") and data.get("ug_package_max")) and data["ug_package_min"]> data["ug_package_max"]:
+        return False, "UG package min must not be greater than UG package max."
+
+    if (data.get("pg_package_min") and data.get("pg_package_max")) and data["pg_package_min"]> data["pg_package_max"]:
+        return False, "PG package min must not be greater than PG package max."
+
+    if job_type not in JobType.values:
+        return False, f"Invalid job_type: '{job_type}'. Must be one of {JobType.values}"
+
+    if job_mode not in JobMode.values:
+        return False, f"Invalid job_mode: '{job_mode}'. Must be one of {JobMode.values}"
+                
+    if status not in DriveStatus.values:
+        return False, f"Invalid status: '{status}'. Must be one of {DriveStatus.values}"
+    return True, "Validated successfully"
+
+
 
 @permission_required('add_drive')
 def add_drive(request):
     if request.method == "POST":
+        data = json.loads(request.body)
+    
+        # for key,value in request.POST:
+        #     print("hwllo")
+        #     print("key",key)
+        #     print("value",value)
+        data = sanitize_data(data)
+        is_valid, message = validate_drive_data(data)
+        if not is_valid:
+            return ResponseModel({}, message, 400)
+        
         try:
              # Start a transaction block to ensure all operations succeed or fail together
             with transaction.atomic():
-                data = json.loads(request.body)
-
                 company = Company.objects.get(id = data.get("company"))
-                job_type_input = data.get("job_type").strip()
-                job_mode_input = data.get("job_mode").strip()
-
-                if job_type_input not in JobType.values:
-                    raise ValidationError(f"Invalid job_type: '{job_type_input}'. Must be one of {JobType.values}")
-
-                if job_mode_input not in JobMode.values:
-                    raise ValidationError(f"Invalid job_mode: '{job_mode_input}'. Must be one of {JobMode.values}")
                 
                 # print(data.get("company")) 
-                try:
-                    start_date = datetime.fromisoformat(data.get("start_date").strip())
-                    end_date = datetime.fromisoformat(data.get("end_date").strip())
-                    start_year = start_date.year
-
-                    if start_date > end_date:
-                        return ResponseModel({}, "start date cannot be greater than end date.", 400)
-                        
-                except ValueError:
-                    return ResponseModel({}, "Invalid date format. Use YYYY-MM-DD.", 400)
+                start_date = datetime.fromisoformat(data.get("start_date"))
+                end_date = datetime.fromisoformat(data.get("end_date"))
+                start_year = start_date.year                        
                 
                 drive = CompanyDrive(
-                    drive_name = data.get("drive_name").strip(),
+                    drive_name = data.get("drive_name"),
                     company=company,
-                    job_type = data.get("job_type").strip(),
-                    job_mode = data.get("job_mode").strip(),
+                    job_type = data.get("job_type"),
+                    job_mode = data.get("job_mode"),
                     ug_package_min = data.get("ug_package_min") or None,
                     ug_package_max = data.get("ug_package_max") or None,
                     pg_package_min = data.get("pg_package_min") or None,
                     pg_package_max = data.get("pg_package_max") or None,
-                    stipend = data.get("stipend") or None,
-                    bond = data.get("bond","").strip() or None,
-                    minimum_cgpa = data.get("minimum_cgpa") or None,
-                    start_date = start_date,
-                    end_date = end_date,
                     tenth = data.get("tenth") or None,
                     twelth = data.get("twelth") or None,
                     diploma = data.get("diploma") or None,
                     undergraduate = data.get("undergraduate") or None,
-                    status = data.get("status").strip()
+                    stipend = data.get("stipend") or None,
+                    bond = data.get("bond") or None,
+                    minimum_cgpa = data.get("minimum_cgpa") or None,
+                    start_date = start_date,
+                    end_date = end_date,
+                    status = data.get("status")
                 )
 
                 drive.full_clean()
@@ -282,27 +393,33 @@ def add_drive(request):
                 #     print(student.student_id.email)
                 # Launch email sending in a background thread
                 threading.Thread(target=send_drive_emails, args=(drive, students, jobs,skills,courses,locations)).start()
-                return ResponseModel({},"Drive added successfully!",201)
+                messages.success(request,"Drive added successfully")
+                return ResponseModel({},"Drive added successfully!!",201)
 
+        except CompanyDrive.DoesNotExist:
+            return ResponseModel({},"Company Not found!",400)
         except ValidationError as e:
+            for field, error_list in e.message_dict.items():
+                for err in error_list:
+                    return ResponseModel({},f"{field.replace('_', ' ').capitalize()}: {err}",400)
             return ResponseModel({},e.messages,400)
 
-        # except IntegrityError as e:
-        #     error_msg = str(e)
+        except IntegrityError as e:
+            error_msg = str(e)
 
-        #     # Extract table and key from the message if possible
-        #     match = re.search(r'table "(?P<table>[^"]+)" violates foreign key constraint "(?P<constraint>[^"]+)"', error_msg)
-        #     detail = re.search(r'DETAIL:  Key \((?P<column>[^)]+)\)=\((?P<value>[^\)]+)\) is not present in table "(?P<ref_table>[^"]+)"', error_msg)
+            # Extract table and key from the message if possible
+            match = re.search(r'table "(?P<table>[^"]+)" violates foreign key constraint "(?P<constraint>[^"]+)"', error_msg)
+            detail = re.search(r'DETAIL:  Key \((?P<column>[^)]+)\)=\((?P<value>[^\)]+)\) is not present in table "(?P<ref_table>[^"]+)"', error_msg)
 
-        #     if match and detail:
-        #         column = detail.group("column")
-        #         value = detail.group("value")
-        #         ref_table = detail.group("ref_table")
+            if match and detail:
+                column = detail.group("column")
+                value = detail.group("value")
+                ref_table = detail.group("ref_table")
 
-        #         return ResponseModel(
-        #             [],f"Invalid reference: `{column}` with value `{value}` not found in `{ref_table}`.",400)
+                return ResponseModel(
+                    [],f"Invalid reference: `{column}` with value `{value}` not found in `{ref_table}`.",400)
 
-        #     return ResponseModel([], "A database error occurred.", 500)
+            return ResponseModel([], "A database error occurred.", 500)
 
         except Exception as e:
             return ResponseModel({},str(e),500)
@@ -346,42 +463,27 @@ def update_drive_jobs(drive_id, updated_jobs_data):
 @permission_required('edit_drive')
 def edit_drive(request,id=0):
     if request.method == "POST":
+        data = json.loads(request.body)
+        data = sanitize_data(data)
+        is_valid, message = validate_drive_data(data)
+        if not is_valid:
+            return ResponseModel({}, message, 400)
+
         try: 
-            data = json.loads(request.body)
-            job_type_input = data.get("job_type").strip()
-            job_mode_input = data.get("job_mode").strip()
-            if job_type_input not in JobType.values:
-                raise ValidationError(f"Invalid job_type: '{job_type_input}'. Must be one of {JobType.values}")
-            if job_mode_input not in JobMode.values:
-                raise ValidationError(f"Invalid job_mode: '{job_mode_input}'. Must be one of {JobMode.values}")
-            
-            jobs = data.get("jobs", []) 
-            if not jobs or not isinstance(jobs, list):
-               return ResponseModel({}, "At least one job_id must be provided.", 400)
-            
-            # print(data.get("company")) 
-            try:
-                start_date = datetime.fromisoformat(data.get("start_date").strip())
-                end_date = datetime.fromisoformat(data.get("end_date").strip())
-                start_year = start_date.year
-                if start_date > end_date:
-                    return ResponseModel({}, "start date cannot be greater than end date.", 400)
-                    
-            except ValueError:
-                return ResponseModel({}, "Invalid date format. Use YYYY-MM-DD.", 400)
+            drive = CompanyDrive.objects.get(id=id)
+            start_date = datetime.fromisoformat(data.get("start_date"))
+            end_date = datetime.fromisoformat(data.get("end_date"))
+            start_year = start_date.year    
 
-            data = json.loads(request.body)
-            drive = get_object_or_404(CompanyDrive,id=id)
-
-            drive.drive_name = data.get("drive_name").strip()
-            drive.job_type = data.get("job_type").strip()
-            drive.job_mode = data.get("job_mode").strip()
+            drive.drive_name = data.get("drive_name")
+            drive.job_type = data.get("job_type")
+            drive.job_mode = data.get("job_mode")
             drive.ug_package_min = data.get("ug_package_min") or None
             drive.ug_package_max = data.get("ug_package_max") or None
             drive.pg_package_min = data.get("pg_package_min") or None
             drive.pg_package_max = data.get("pg_package_max") or None
             drive.stipend = data.get("stipend") or None
-            drive.bond = data.get("bond","").strip() or None
+            drive.bond = data.get("bond") or None
             drive.minimum_cgpa = data.get("minimum_cgpa") or None
             drive.start_date = start_date
             drive.end_date = end_date
@@ -389,16 +491,18 @@ def edit_drive(request,id=0):
             drive.twelth = data.get("twelth") or None
             drive.diploma = data.get("diploma") or None
             drive.undergraduate = data.get("undergraduate") or None
-            drive.status = data.get("status").strip()
+            drive.status = data.get("status")
             drive.save()
             
             update_mapper_by_id(DriveSkill,'drive_id','skill_id',drive.id,data.get('skills',[]))
             update_mapper_by_id(DriveCourses,'drive_id','course_id',drive.id,data.get('courses',[]))
             update_mapper_by_id(DriveLocation,'drive_id','city_id',drive.id,data.get('locations',[]))
 
-            print(drive.id)
+            jobs = data.get("jobs", []) 
+            if not jobs or not isinstance(jobs, list):
+                return ResponseModel({}, "At least one job_id must be provided.", 400)
+            # print(drive.id)
             update_drive_jobs(drive.id,jobs)
-            print("hjer")
                
             skills = Skill.objects.filter(id__in=data.get("skills", [])).values_list('name', flat=True)
             courses = Course.objects.filter(id__in=data.get("courses", [])).values_list('name', flat=True)
@@ -417,11 +521,35 @@ def edit_drive(request,id=0):
             )
 
             threading.Thread(target=send_drive_emails, args=(drive, students, jobs,skills,courses,locations,True)).start()
-
+            
+            messages.success(request,"Drive updated successfully")
             return ResponseModel({},"Drive updated successfully",200)
         
-        except Company.DoesNotExist:
+        except CompanyDrive.DoesNotExist:
             return ResponseModel({},"Drive not found",404)
+        except ValidationError as e:
+            for field, error_list in e.message_dict.items():
+                for err in error_list:
+                    return ResponseModel({},f"{field.replace('_', ' ').capitalize()}: {err}",400)
+            return ResponseModel({},e.messages,400)
+
+        except IntegrityError as e:
+            error_msg = str(e)
+
+            # Extract table and key from the message if possible
+            match = re.search(r'table "(?P<table>[^"]+)" violates foreign key constraint "(?P<constraint>[^"]+)"', error_msg)
+            detail = re.search(r'DETAIL:  Key \((?P<column>[^)]+)\)=\((?P<value>[^\)]+)\) is not present in table "(?P<ref_table>[^"]+)"', error_msg)
+
+            if match and detail:
+                column = detail.group("column")
+                value = detail.group("value")
+                ref_table = detail.group("ref_table")
+
+                return ResponseModel(
+                    [],f"Invalid reference: `{column}` with value `{value}` not found in `{ref_table}`.",400)
+
+            return ResponseModel([], "A database error occurred.", 500)
+
         except Exception as e:
             return ResponseModel({},str(e),500)
         
@@ -429,27 +557,37 @@ def edit_drive(request,id=0):
 
 
 @permission_required('delete_drive')
-def delete_drive(request,id=0):
-    if request.method == "DELETE":
+def delete_drive(request):
+    if request.method == "POST":
+        drive_id = request.POST.get("drive_id")
+        if not drive_id:
+            messages.error(request, "drive id is required to delete.")
+            return redirect("list_drives")
         try:
             with transaction.atomic():
-                drive = get_object_or_404(CompanyDrive, id=id)
+                drive = CompanyDrive.objects.get(id=drive_id)
 
                 # Check for drive mapping
                 if DriveApplication.objects.filter(drive=drive).exists():
-                    return ResponseModel({},"You can't delete the drive because it has applicants",400)
-                
+                    messages.error(request,"You can't delete the drive because it has applicants")
+                    return redirect("list_drives")                
                 # Check for PlacementOffer mapping
                 if PlacementOffer.objects.filter(job__company_drive=drive).exists():
-                        return ResponseModel({},"You can't delete drive which have associated placement data",400)
-                
+                    messages.error(request,"You can't delete drive which have associated placement data")
+                    return redirect("list_drives")
+
                 # Delete company 
                 drive.delete()
 
-                return ResponseModel({},"Drive deleted successfully",200)
-        
+                messages.success(request,"Drive deleted successfully")
+                return redirect("list_drives")
+            
+        except CompanyDrive.DoesNotExist:
+            messages.error(request,"Company Drive not found")
+            return redirect("list_drives")
         except Exception as e:
-            return ResponseModel({},str(e),500)
-
-
-    return ResponseModel({},"Invalid request method",400)
+            messages.error(request,str(e))
+            return redirect('list_drives')
+        
+    messages.error(request,"Invalid request method")
+    return redirect('list_drives')

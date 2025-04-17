@@ -8,9 +8,9 @@ from .view.dashboard import dashboard
 from .view.logout import logout
 from .view.reset_password import reset_password
 from .view.companies import register_company,view_company,list_companies,edit_company,delete_company,company_registration_page,edit_company_page
-from .view.countries_states_cities import get_countries,get_states,get_cities
+from .view.countries_states_cities import get_countries,get_states,get_cities,get_city_with_name
 # from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
-from .view.companydrives import list_drives,add_drive,edit_drive,delete_drive,view_drive,drive_dropdowns
+from .view.companydrives import list_drives,add_drive,edit_drive,delete_drive,view_drive,drive_dropdowns,add_drive_page
 
 from .view.students import student_registrations, student_manual_registrations, list_students, view_student, edit_student, delete_student
 
@@ -44,16 +44,19 @@ urlpatterns = [
     # path('view-job/<int:id>/',view_job,name="view_job"),
     # path('delete-job/<int:id>/',delete_job,name="delete_job"),
 
-    path('list-drives/',list_drives,name="list_drives"),
-    path('add-drive/',add_drive,name="add_drive"),
-    path('edit-drive/<int:id>/',edit_drive,name="edit_drive"),
-    path('delete-drive/<int:id>/',delete_drive,name="delete_drive"),
-    path('view-drive/<int:id>/',view_drive,name="view_drive"),
-    path('drive-dropdowns/',drive_dropdowns,name="drive_dropdowns"),
+    path('drives/list-drives/',list_drives,name="list_drives"),
+    path('drives/add-drive/',add_drive,name="add_drive"),
+    path('drives/add-drive-page/',add_drive_page,name="add_drive_page"),
+    path('drives/edit-drive/<int:id>/',edit_drive,name="edit_drive"),
+    path('drives/delete-drive/',delete_drive,name="delete_drive"),
+    path('drives/view-drive/<int:id>/',view_drive,name="view_drive"),
+    path('drives/drive-dropdowns/',drive_dropdowns,name="drive_dropdowns"),
 
     path('get-countries/',get_countries,name="get_countries"),
     path('get-states/<int:country_id>/',get_states,name="get_states"),
     path('get-cities/<int:state_id>/',get_cities,name="get_cities"),
+    path('get-cities-by-name/',get_city_with_name,name="get_city_with_name"),
+    
 
     # Manage Students
     path('students/manual_registrations/', student_manual_registrations, name='student_manual_registrations'),
