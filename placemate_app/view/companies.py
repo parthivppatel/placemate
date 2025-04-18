@@ -282,14 +282,15 @@ def view_company(request,id=0):
 
 @permission_required('view_companies')  
 def list_companies(request):
-    page,perpage = 1,10
+    # page,perpage = 1,10
     if request.method == "GET":
         data = request.GET
         # filters = data.get("filters", {})
         sort = data.get("sort", {})
         validate_pg = validate_pagination(data)
         if validate_pg is None:
-            return ResponseModel({},"Page and perpage must be valid positive integers", 400)
+            messages.error(request,"page and perpage must be valid positive integers")
+            return redirect('dashboard')
         page, perpage = validate_pg
 
         # data gathering

@@ -13,7 +13,7 @@ from .view.reset_password import reset_password
 from .view.companies import register_company,view_company,list_companies,edit_company,delete_company,company_registration_page,edit_company_page
 from .view.countries_states_cities import get_countries,get_states,get_cities,get_city_with_name
 # from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
-from .view.companydrives import list_drives,add_drive,edit_drive,edit_drive_page,delete_drive,view_drive,add_drive_page
+from .view.companydrives import list_drives,add_drive,edit_drive,edit_drive_page,delete_drive,view_drive,add_drive_page,drive_applicants
 
 from .view.students import student_registrations, student_manual_registrations, list_students, view_student, edit_student, delete_student, list_student_drives
 from .view.student import student_profile, student_edit_student
@@ -55,6 +55,7 @@ urlpatterns = [
     path('drives/edit-drive/<int:id>/',edit_drive,name="edit_drive"),
     path('drives/delete-drive/',delete_drive,name="delete_drive"),
     path('drives/view-drive/<int:id>/',view_drive,name="view_drive"), 
+    path('drives/drive-applicants/<int:id>/',drive_applicants,name="drive_applicants"), 
 
     path('get-countries/',get_countries,name="get_countries"),
     path('get-states/<int:country_id>/',get_states,name="get_states"),

@@ -23,6 +23,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 from datetime import datetime
 from ..schema.company_drives import CompanyDrive  # Import the CompanyDrive model
+from ..schema.drive_applications import DriveApplication
 
 
 def parse_json_data(request):
@@ -352,13 +353,27 @@ def view_student(request, student_id):
             "gender": student.gender if student.gender else "",  
         }
 
-        # Render the student details page
-        return render(request, "view_student.html", {
+        user_payload = get_user_from_jwt(request)
+        user_role = user_payload.get("role") if user_payload else None
+        can_view_applicants = has_permission(user_role, 'view_applicants')
+
+        context = {
             "student": student_details,
             "page_title": "View Student",
             "page_subtitle": f"Details of {student.first_name} {student.last_name}",
             "courses": courses,  # Pass courses to the template
-        })
+            "permissions":{
+                "view_applicants":can_view_applicants
+            }
+        }
+
+        drive_id = request.GET.get("drive_id")
+        if can_view_applicants and drive_id:
+            resume_link = DriveApplication.objects.filter(drive_id = drive_id,student_id = student_id).values("resume_link").first()
+            context.update({'resume':resume_link,'drive_id':drive_id})
+
+        # Render the student details page
+        return render(request, "view_student.html",context)
 
     except Student.DoesNotExist:
         # Handle case where student does not exist

@@ -147,7 +147,7 @@ Manage company drives for placement opportunities.
                                     {% elif drive.status == 'cancelled' %}status-cancelled
                                     {% else %}status-unknown
                                     {% endif %}" id="driveStatus">{{drive.status}}</span></td>
-                                <td>{{ drive.applicants }}</td>
+                                <td><a href="{% url 'drive_applicants' drive.id %}">{{ drive.applicants }}</a></td>
                                 <td>
                                     {% if permissions.view_drive %}
                                     <a href="{% url 'view_drive' drive.id %}" class="btn btn-sm btn-primary" title="View">

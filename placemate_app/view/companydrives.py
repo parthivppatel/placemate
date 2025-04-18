@@ -22,6 +22,7 @@ from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel
 from ..utils.jwt_utils import has_permission,get_user_from_jwt
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction,IntegrityError
+from .students import format_student_data
 import json
 import threading
 import re
@@ -302,7 +303,38 @@ def validate_drive_data(data,is_edit=False):
         return False, f"Invalid status: '{status}'. Must be one of {DriveStatus.values}"
     return True, "Validated successfully"
 
+permission_required('view_applicants')
+def drive_applicants(request,id=0):
+    # page,perpage = 1,10
+    if request.method == 'GET':
+        data = request.GET
+        pagination = validate_pagination(data)
+        if pagination is None:
+            messages.error(request,"Page and perpage must be valid positive integers.")
+            return redirect("dashboard")
+        
+        page, perpage = pagination
 
+        drive = CompanyDrive.objects.get(id=id)
+        if not drive:
+            messages.error(request,"Drive Not Found")
+
+        students = Student.objects.filter(
+            student_id__in = DriveApplication.objects.filter(drive_id = drive.id).values("student_id")
+        ).select_related("company_placedIn", "student_id", "course").distinct().order_by("enrollment")
+
+        paginated_students, total, pagination_data = paginate(students, page, perpage)
+        
+        return render(request, "drive_applications.html", {
+            "students": paginated_students,
+            "pagination": pagination_data,
+            "total": total,
+            "drive":drive
+        })
+
+    
+    messages.error(request,"Invalid request method")
+    return redirect('dashboard')
 
 @permission_required('add_drive')
 def add_drive(request):
