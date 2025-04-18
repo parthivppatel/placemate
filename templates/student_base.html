@@ -20,7 +20,7 @@
 
             <div class="col main-content">
                 <!-- Header -->
-                <div class="header">
+                <div class="header" style="border-bottom: 1px solid #e0e0e0; z-index: 1050;">
                     <div class="title-container">
                         <h1 class="dashboard-title">{{ page_title }}</h1>
                         <p class="dashboard-subtitle">{{ page_subtitle }}</p>
@@ -37,6 +37,7 @@
                             </div>
                         </a>
                     </div>
+                    <hr style="border: 1px solid #ddd; margin: 10px 0;">
                 </div>
             
                 {% block content %}{% endblock %}

@@ -23,7 +23,11 @@ def dashboard(request):
         except Student.DoesNotExist:
             return render(request, "403.html", {"error": "Student not found"})
 
+        page_title = "Welcome, John Doe 👋"
+        page_subtitle = "Here's a quick overview of your placement progress"
         return render(request, "student_dashboard.html", {
+            "page_title": page_title,
+            "page_subtitle": page_subtitle,
             "user_email": user_email,
             "student": student,  
             "profile_name": f"{student.first_name} {student.last_name}",

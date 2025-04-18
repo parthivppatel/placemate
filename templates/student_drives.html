@@ -87,8 +87,8 @@
         }
 
         .company-logo {
-            width: 50px;
-            height: 50px;
+            width: 100px;
+            height: 100px;
             margin-right: 12px;
             object-fit: contain;
         }
@@ -186,37 +186,73 @@
     </style>
 
     <div class="search-container">
-        <div class="search-bar">
-            <input type="text" class="search-input" placeholder="Search Company">
-            <i class="fas fa-search search-icon"></i>
-        </div>
+        <form method="get" id="filterForm">
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <div class="d-flex align-items-center rounded-pill px-3 shadow-sm border border-1">
+                        <i class="bi bi-search text-muted me-2 fs-6"></i>
+                        <input type="text"
+                               class="form-control border-0 shadow-none bg-transparent"
+                               name="search"
+                               placeholder="Search by Company or Drive Name or Job Type"
+                               value="{{ request.GET.search|default:'' }}"
+                               onkeydown="if(event.key==='Enter'){ this.form.submit(); }">
+                    </div>
+                </div>
+        
+                <div class="col-md-9 d-flex flex-wrap justify-content-md-end gap-2">
+                    <!-- Status Filter -->
+                    <select name="status" class="form-select form-select-sm rounded-pill px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
+                        <option value="">Select Status</option>
+                        <option value="scheduled" {% if request.GET.status == 'scheduled' or not request.GET.status %}selected{% endif %}>Scheduled</option>
+                        <option value="ongoing" {% if request.GET.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+                        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                    
+                    <!-- Reset Filters Button -->
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm" id="resetFiltersBtn"
+                            onclick="resetFilters()">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 
-    <div class="job-listings">
+    <div class="job-listings" style="padding: 20px;">
         {% for drive in drives %}
             <div class="job-card">
                 <div class="company-info">
-                    <img src="/api/placeholder/50/50" alt="{{ drive.company_name }}" class="company-logo">
+                    <a href="{% url 'view_company' drive.company_id %}" style="text-decoration: none;">
+                    <img 
+                        src="{{ drive.company_logo }}" 
+                        alt="{{ drive.company_name }}" 
+                        class="company-logo" 
+                        onerror="this.onerror=null;this.src='/static/images/default-company-logo.png';"
+                    />
                     <div>
-                        <div class="company-name">{{ drive.company_name }}</div>
+                        <div class="company-name">{{ drive.company_name }}</div></a>
                         <div class="company-location">
                             <i class="fas fa-map-marker-alt location-icon"></i>
-                            {{ drive.location|default:"Location not specified" }}
+                            {{ drive.location.city }}, {{ drive.location.state }}, {{ drive.location.country }}
                         </div>
+                        
                     </div>
                 </div>
-                <h2 class="job-title">{{ drive.drive_name }}</h2>
-                <div class="job-type">{{ drive.job_type }}</div>
-                <p class="job-description">
-                    {{ drive.description|default:"No description available." }}
-                </p>
-                <div class="job-footer">
-                    <div class="lpa-info">
-                        <i class="fas fa-rupee-sign lpa-icon"></i>
-                        {{ drive.ug_package_min|default:"-" }} - {{ drive.ug_package_max|default:"-" }} LPA
+                <a href="{% url 'student_drive_details' drive.id %}" style="text-decoration: none;">
+                    <h2 class="job-title">{{ drive.drive_name }}</h2>
+                    <div class="job-type">{{ drive.job_type }}</div>
+                    <p class="job-description">
+                        {{ drive.company_description|default:"No description available." }}
+                    </p>
+                    <div class="job-footer">
+                        <div class="lpa-info">
+                            <i class="fas fa-rupee-sign lpa-icon"></i>
+                            {{ drive.ug_package_min|default:"-" }} - {{ drive.ug_package_max|default:"-" }} LPA
+                        </div>
+                        <button class="action-button apply-button">View</button>
                     </div>
-                    <button class="action-button apply-button">Apply Now</button>
-                </div>
+                </a>
             </div>
         {% empty %}
             <p>No active drives available at the moment.</p>
@@ -254,6 +290,17 @@
                 }
             });
         });
+
+        function resetFilters() {
+            // Clear the search input
+            document.querySelector("input[name='search']").value = '';
+            
+            // Reset the status filter to the default option (empty value)
+            document.querySelector("select[name='status']").value = '';
+            
+            // Submit the form to reload the page with no filters
+            document.getElementById('filterForm').submit();
+        }
     </script>
 
 {% endblock %}

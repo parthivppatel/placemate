@@ -15,13 +15,12 @@ from ..schema.course import Course
 from ..schema.roles import Role
 from ..schema.user_roles import UserRole
 from ..schema.cities import City
-from ..utils.helper_utils import paginate, safe_value,validate_pagination
+from ..utils.helper_utils import paginate, safe_value,validate_pagination, ResponseModel
 
 from ..utils.jwt_utils import has_permission, get_user_from_jwt
 
 from django.contrib import messages
 from django.db import IntegrityError
-from datetime import datetime
 from ..schema.company_drives import CompanyDrive  # Import the CompanyDrive model
 from ..schema.drive_applications import DriveApplication
 
@@ -211,85 +210,6 @@ def student_manual_registrations(request):
         "graduation_status_choices": GraduationStatus.choices
     })
 
-@permission_required('view_students')
-@csrf_exempt
-def list_students(request):
-    if request.method == "POST":
-        data = parse_json_data(request)
-        if data is None:
-            return JsonResponse({"message": "Invalid JSON data"}, status=400)
-
-        filters = data.get("filters", {})
-        pagination = validate_pagination(data)
-        if pagination is None:
-            return JsonResponse({"message": "Page and perpage must be valid positive integers."}, status=400)
-
-        page, perpage = pagination
-        students = Student.objects.select_related("company_placedIn", "student_id", "course")
-        students = apply_filters(students, filters).order_by("enrollment")
-
-        paginated_students, total, pagination_data = paginate(students, page, perpage)
-        result = format_student_data(paginated_students, page, perpage)
-
-        # Check if the user has the 'add_students' and 'delete_students' permissions
-        user_payload = get_user_from_jwt(request)
-        user_role = user_payload.get("role") if user_payload else None
-        can_add_student = has_permission(user_role, 'add_students')
-        can_delete_student = has_permission(user_role, 'delete_students')
-
-        return JsonResponse({
-            "data": result,
-            "total": total,
-            "pagination": pagination_data,
-            "permissions": {
-                "can_add_students": can_add_student,
-                "can_delete_students": can_delete_student
-            }
-        }, status=200)
-
-    # Handle GET request
-    try:
-        page = int(request.GET.get("page", 1))
-        perpage = int(request.GET.get("perpage", 10))
-    except ValueError:
-        page, perpage = 1, 10
-
-    students = Student.objects.select_related("company_placedIn", "student_id", "course").order_by("enrollment")
-    students = apply_filters(students, request.GET)
-
-    paginated_students, total, pagination_data = paginate(students, page, perpage)
-    start_index = (page - 1) * perpage
-
-    # Filter dropdown options
-    batches = Student.objects.values_list("joining_year", flat=True).distinct().order_by("joining_year")
-    course_ids = Student.objects.values_list("course", flat=True).distinct()
-    courses = Course.objects.filter(id__in=course_ids, is_active=True).order_by("name")
-    course_options = [{"value": c.id, "label": c.name} for c in courses]
-
-    placement_status_options = [{"value": val, "label": label} for val, label in PlacementStatus.choices]
-    graduation_status_options = [{"value": val, "label": label} for val, label in GraduationStatus.choices]
-
-    # Check if the user has the 'add_students' and 'delete_students' permissions
-    user_payload = get_user_from_jwt(request)
-    user_role = user_payload.get("role") if user_payload else None
-    can_add_student = has_permission(user_role, 'add_students')
-    can_delete_student = has_permission(user_role, 'delete_students')
-
-    return render(request, "list_students.html", {
-        "students": paginated_students,
-        "pagination": pagination_data,
-        "total": total,
-        "start_index": start_index,
-        "filter_options": {
-            "batches": list(batches),
-            "courses": course_options,
-            "placement_statuses": placement_status_options,
-            "graduation_statuses": graduation_status_options
-        },
-        "can_add_student": can_add_student,
-        "can_delete_student": can_delete_student
-    })
-
 @permission_required('delete_students')
 @csrf_exempt
 def delete_student(request):
@@ -351,6 +271,9 @@ def view_student(request, student_id):
             "profile": student.profile or "N/A",
             "dob": student.dob.strftime('%Y-%m-%d') if student.dob else "N/A",
             "gender": student.gender if student.gender else "",  
+             "tenth_percentage": student.tenth_percentage or "N/A",  # Added 10th percentage
+            "twelfth_percentage": student.twelfth_percentage or "N/A",  # Added 12th percentage
+            "backlog": student.backlog or 0,  # Added backlog count
         }
 
         user_payload = get_user_from_jwt(request)
@@ -455,68 +378,118 @@ def edit_student(request, student_id):
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return redirect("list_students")
 
+@permission_required('view_students')
+def list_students(request):
+    page, perpage = 1, 10
 
-def list_student_drives(request):
-    try:
-        # Extract and verify the token
+    if request.method == "GET":
+        data = request.GET
+
+        # Validate pagination
+        validate_pg = validate_pagination(data)
+        if validate_pg is None:
+            return ResponseModel({},"Page and perpage must be valid positive integers", 400)
+        page, perpage = validate_pg
+
+        # Apply filters
+        students = Student.objects.select_related("company_placedIn", "student_id", "course")
+
+        if search := data.get("search", "").strip():
+            students = students.filter(
+                Q(student_id__email__icontains=search) |
+                Q(enrollment__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)
+            )
+
+        if batch := data.get("joining_year", "").strip():
+            students = students.filter(joining_year=batch)
+
+        if course := data.get("course", "").strip():
+            students = students.filter(course=course)
+
+        if placement_status := data.get("placement_status", "").strip():
+            students = students.filter(placement_status=placement_status)
+
+        if graduation_status := data.get("graduation_status", "").strip():
+            students = students.filter(graduation_status=graduation_status)
+
+        # Sorting
+        sort = data.get("sort", {})
+        sort_field = sort.get("field", "").strip()
+        sort_type = sort.get("type", "asc").lower()
+
+        ordering = "enrollment"
+        if sort_field:
+            if sort_field == "name":
+                ordering = "first_name"
+            elif sort_field == "email":
+                ordering = "student_id__email"
+            elif sort_field == "phone":
+                ordering = "student_id__phone"
+            elif sort_field == "cgpa":
+                ordering = "cgpa"
+            elif sort_field == "joining_year":
+                ordering = "joining_year"
+
+            if sort_type == "desc":
+                ordering = f"-{ordering}"
+
+        students = students.order_by(ordering)
+
+        # Pagination
+        students, total, pagination = paginate(students, page, perpage)
+
+        # Format results
+        result = []
+        for student in students:
+            result.append({
+                "id": student.student_id.id,
+                "email": student.student_id.email,
+                "name": f"{student.first_name} {student.last_name}",
+                "enrollment": student.enrollment,
+                "cgpa": student.cgpa,
+                "phone": student.student_id.phone,
+                "batch": f"{student.joining_year} - {student.joining_year + 4}" if student.joining_year else "N/A",  # Added Batch
+                "course": safe_value(student.course, "name"),
+                "placement_status": student.get_placement_status_display(),  # Added Placement Status
+                "graduation_status": student.get_graduation_status_display(),
+                "company_placedIn": safe_value(student.company_placedIn, "name")
+            })
+
+        # Filter options
+        batches = list(Student.objects.values_list("joining_year", flat=True).distinct().order_by("joining_year"))
+        course_ids = Student.objects.values_list("course", flat=True).distinct()
+        courses = Course.objects.filter(id__in=course_ids, is_active=True).order_by("name")
+        course_options = [{"value": c.id, "label": c.name} for c in courses]
+
+        placement_status_options = [{"value": val, "label": label} for val, label in PlacementStatus.choices]
+        graduation_status_options = [{"value": val, "label": label} for val, label in GraduationStatus.choices]
+
+        filter_options = {
+            "batches": batches,
+            "courses": course_options,
+            "placement_statuses": placement_status_options,
+            "graduation_statuses": graduation_status_options
+        }
+
+        # Permissions
         user_payload = get_user_from_jwt(request)
-        if not user_payload:
-            return JsonResponse({"message": "Invalid or missing token"}, status=401)
+        user_role = user_payload.get("role") if user_payload else None
+        can_add_student = has_permission(user_role, 'add_students')
+        can_delete_student = has_permission(user_role, 'delete_students')
+        can_view_student = has_permission(user_role, 'view_students')
 
-        # Extract email from the token payload
-        user_email = user_payload.get("email")
-        if not user_email:
-            return JsonResponse({"message": "Email not found in token"}, status=400)
-
-        # Get the user and student based on the email
-        try:
-            user = User.objects.get(email=user_email)
-            student = Student.objects.get(student_id=user)  # Match the OneToOneField
-        except User.DoesNotExist:
-            return JsonResponse({"message": "User not found"}, status=404)
-        except Student.DoesNotExist:
-            return JsonResponse({"message": "Student not found"}, status=404)
-
-        # Get the current date
-        current_date = timezone.now()
-
-        # Retrieve only active drives (status: SCHEDULED or ONGOING)
-        active_drives = CompanyDrive.objects.filter(
-            status__in=["scheduled", "ongoing"],  # Filter by active statuses
-            start_date__lte=current_date,  # Ensure the drive has started
-            end_date__gte=current_date  # Ensure the drive has not ended
-        ).select_related('company')  # Optimize queries by selecting related company data
-
-        # Format the drives for the template
-        drives_data = [
-            {
-                "id": drive.id,
-                "drive_name": drive.drive_name,
-                "company_name": drive.company.name,
-                "job_type": drive.job_type,
-                "job_mode": drive.job_mode,
-                "ug_package_min": drive.ug_package_min,
-                "ug_package_max": drive.ug_package_max,
-                "pg_package_min": drive.pg_package_min,
-                "pg_package_max": drive.pg_package_max,
-                "start_date": drive.start_date.strftime('%Y-%m-%d'),
-                "end_date": drive.end_date.strftime('%Y-%m-%d'),
-                "status": drive.status,
+        return render(request, "list_students.html", {
+            "students": result,
+            "total": total,
+            "pagination": pagination,
+            "filter_options": filter_options,
+            "permissions": {
+                "can_add_student": can_add_student,
+                "can_delete_student": can_delete_student,
+                "can_view_student": can_view_student
             }
-            for drive in active_drives
-        ]
-
-        # Render the student drives page with dynamic content
-        return render(request, "student_drives.html", {
-            "page_title": "Student Drives",
-            "page_subtitle": "Your insight hub to track progress of your placement drives.",
-            "student_id": student.student_id.id,  # Pass student_id to the template
-            "student": student,
-            "student_name": f"{student.first_name} {student.last_name}",  # Pass student name
-            "profile_name": f"{student.first_name} {student.last_name}",  # Dynamic profile name
-            "drives": drives_data,  # Pass the active drives data to the template
         })
 
-    except Exception as e:
-        # Handle unexpected errors
-        return JsonResponse({"message": f"An unexpected error occurred: {str(e)}"}, status=500)
+    return redirect("dashboard")
