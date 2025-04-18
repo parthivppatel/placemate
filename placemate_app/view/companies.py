@@ -291,12 +291,9 @@ def view_company(request,id=0):
         
         return render(request,'company_registration.html',data)
     
-<<<<<<< HEAD
     # print('here',data['id'])
-    return render(request,'view_company.html',data)
-=======
+    # return render(request,'view_company.html',data)
     return render(request, template_to_render, data)
->>>>>>> 0d65524 (Updated students drives_list)
 
 
 # Frontend Structure
