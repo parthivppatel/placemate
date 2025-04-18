@@ -17,7 +17,7 @@ Drive Applications for {{drive.company.name}}
             position: relative;
         }
         
-        .logo-container {
+        .application-logo-container {
             width: 100px;
             height: 100px;
             border-radius: 50%;
@@ -26,11 +26,12 @@ Drive Applications for {{drive.company.name}}
             padding: 5px;
         }
         
-        .logo-container img {
+        .application-logo-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+        
         .status-badge {
             font-size: 0.8rem;
             padding: 0.25rem 0.6rem;
@@ -107,7 +108,7 @@ Drive Applications for {{drive.company.name}}
                 <!-- Left Section -->
                 <div class="col-md-8 col-12 mb-4 mb-md-0">
                     <div class="d-flex align-items-center mb-4 flex-column flex-md-row text-center text-md-start">
-                        <div class="logo-container me-md-4 mb-3 mb-md-0">
+                        <div class="application-logo-container me-md-4 mb-3 mb-md-0">
                             {% if drive.company.logo %}
                             <img src="/media/{{drive.company.logo}}" alt="Company Logo" class="company-logo">
                             {% else %}
