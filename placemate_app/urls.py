@@ -15,8 +15,8 @@ from .view.countries_states_cities import get_countries,get_states,get_cities,ge
 # from .view.jobs import list_jobs,job_dropdowns,view_job,post_job,edit_job,delete_job
 from .view.companydrives import list_drives,add_drive,edit_drive,edit_drive_page,delete_drive,view_drive,add_drive_page
 
-from .view.students import student_registrations, student_manual_registrations, view_student, edit_student, delete_student, list_student_drives, list_students
-from .view.student import student_profile, student_edit_student
+from .view.students import student_registrations, student_manual_registrations, view_student, edit_student, delete_student, list_students
+from .view.student import student_profile, student_edit_student, list_student_drives
 
 urlpatterns = [
     path('', dashboard, name="dashboard"),

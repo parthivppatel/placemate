@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from ..schema.companies import  Company,CompanySize,CompanyType,Category
 from ..schema.users import User
+from ..schema.students import Student  
+
 from ..schema.industry import Industry
 from ..schema.cities import City
 from ..schema.job_positions import JobPosition
@@ -208,10 +210,27 @@ def view_company(request,id=0):
     user = company.id
     user_payload = get_user_from_jwt(request)
     user_role = user_payload.get("role") if user_payload else None
+    user_email = user_payload.get("email") if user_payload else None
     edit_company = has_permission(user_role, 'edit_company')
     mode = request.GET.get('mode', 'view')
+
+    student = None
     
-    data={
+    if user_role == "Admin":
+        template_to_render = "view_company.html"
+    elif user_role == "Student":
+        template_to_render = "student_view_company.html"
+        try:
+            user = User.objects.get(email=user_email)
+            student = Student.objects.get(student_id=user)
+        except User.DoesNotExist:
+            return render(request, "403.html", {"error": "User not found"})
+        except Student.DoesNotExist:
+            return render(request, "403.html", {"error": "Student not found"})
+    else:
+        template_to_render = "student_view_company.html" 
+
+    data = {
         "id" : user.id,
         "name" : company.name,
         "email" : company.id.email,
@@ -256,6 +275,13 @@ def view_company(request,id=0):
         "logo" : company.logo if company.logo else None
     } 
     
+    if student:
+        data["student"] = student
+        data["profile_name"] = student.first_name + " " + student.last_name
+
+    data["page_title"] = "View Company"
+    data["page_subtitle"] = f"Details of {company.name}"
+
     if(mode == 'edit'):
         context = get_company_registration_context()
         data.update(context)
@@ -265,8 +291,12 @@ def view_company(request,id=0):
         
         return render(request,'company_registration.html',data)
     
+<<<<<<< HEAD
     # print('here',data['id'])
     return render(request,'view_company.html',data)
+=======
+    return render(request, template_to_render, data)
+>>>>>>> 0d65524 (Updated students drives_list)
 
 
 # Frontend Structure
