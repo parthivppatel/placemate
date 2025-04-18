@@ -1,0 +1,332 @@
+{% extends 'student_base.html' %}
+
+{% block title %}Student - Drives{% endblock %}
+
+{% block content %}
+<style>
+    .back-to-students-btn:hover {
+        background-color: #6a5acd;
+        color: white; /* Optional: Change text color to white for better contrast */
+        border-color: #6a5acd; /* Optional: Match border color with background */
+    }
+
+    .company-card-detail {
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .company-logo-container {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        padding: 5px;
+    }
+
+    .company-logo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .eligibility-badge {
+        background-color: #f8f9fa;
+        color: #28a745;
+        border: 1px solid #28a745;
+        border-radius: 5px;
+        padding: 5px 15px;
+        font-weight: bold;
+    }
+
+    .opt-in-section {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    @media (max-width: 767.98px) {
+        .opt-in-section {
+            position: static;
+            margin-top: 20px;
+        }
+
+        .eligibility-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+    }
+
+    .job-card-detail,
+    .resume-card-detail {
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .job-title-section {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    .btn-opt-in-action {
+        background-color: white;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px 30px;
+        font-weight: 500;
+    }
+
+    .btn-opt-out-action {
+        background-color: white;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px 30px;
+        font-weight: 500;
+    }
+
+    .resume-upload-section {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        padding: 25px;
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .requirement-list-item {
+        margin-bottom: 10px;
+    }
+
+    .custom-btn {
+        background-color: #4CAF50; /* Example: Your theme primary color */
+        color: white;
+        border-radius: 5px; /* Custom border radius */
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .custom-btn:hover {
+        background-color: #45a049; /* Slightly darker shade on hover */
+    }
+
+    .custom-btn:disabled {
+        background-color: #cccccc; /* Disabled button style */
+        color: #666666;
+    }
+</style>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <a href="{% url 'list_student_drives' %}" class="btn btn-outline-secondary back-to-students-btn">
+            <i class="bi bi-arrow-left"></i> Back to Students
+        </a>
+    </div>
+
+    <!-- Success Message -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="container mt-4">
+        <div class="company-card-detail bg-white">
+        <div class="row">
+            <!-- Left Section -->
+            <div class="col-md-8 col-12 mb-4 mb-md-0">
+            <div class="d-flex align-items-center mb-4 flex-column flex-md-row text-center text-md-start">
+                <div class="company-logo-container me-md-4 mb-3 mb-md-0">
+                    <a href="{% url 'view_company' drive.company_id %}" style="text-decoration: none !important;">
+                    <img 
+                        src="{{ logo_url }}" 
+                        alt="{{ company.name }} Logo" 
+                        class="img-fluid" 
+                    />
+                </div>
+                <div>
+                <h2 class="mb-0 fw-bold">{{ company.name }}</h2></a>
+                </div>
+            </div>
+            <div class="company-details text-center text-md-start">
+                    <p class="mb-2">
+                        <i class="fas fa-building me-2"></i>
+                        <strong>Drive Name:</strong> {{ job_details.drive_name }}
+                    </p>
+                
+                    <p class="mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        <strong>Location:</strong> {% for loc in location %} {{ loc.city }}, {% endfor %}
+                    </p>
+                    
+                
+                    {% if job_details.ctc.min or job_details.ctc.max %}
+                    <p class="mb-2">
+                        <i class="fas fa-rupee-sign me-2"></i>
+                        <strong>CTC:</strong>
+                        {% if job_details.ctc.min %}{{ job_details.ctc.min }}{% endif %}
+                        {% if job_details.ctc.min and job_details.ctc.max %} - {% endif %}
+                        {% if job_details.ctc.max %}{{ job_details.ctc.max }}{% endif %}
+                        LPA
+                    </p>
+                    {% endif %}
+                
+                    <p class="mb-2">
+                        <i class="fas fa-briefcase me-2"></i>
+                        <strong>Job Type:</strong> {{ job_details.job_type }}
+                    </p>
+                
+                    <p class="mb-2">
+                        <i class="fas fa-laptop-house me-2"></i>
+                        <strong>Job Mode:</strong> {{ job_details.job_mode }}
+                    </p>
+                
+                    <p class="mb-2">
+                        <i class="fas fa-wallet me-2"></i>
+                        <strong>Stipend:</strong> {{ job_details.stipend }}
+                    </p>
+                </div>
+            
+            </div>
+    
+            <!-- Right Section -->
+            <div class="col-md-4 position-relative text-md-end text-center">
+                <div class="eligibility-wrapper mb-3">
+                    {% if eligible %}
+                    <span class="eligibility-badge">Eligible</span>
+                    {% else %}
+                    <span class="eligibility-badge text-danger">Not Eligible</span>
+                    {% endif %}
+                </div>
+    
+                <div class="opt-in-section">
+                    <p class="text-muted small mb-2">
+                        Last date to opt-in: <strong>{{ deadline }}</strong>
+                    </p>
+                    <div class="d-flex justify-content-md-end justify-content-center gap-2 flex-wrap">
+                        {% if not is_drive_completed_or_ongoing %}
+                            {% if eligible %}
+                                {% if applied %}
+                                    <p class="text-success">You have already applied for this drive.</p>
+                                    {% if resume_url %}
+                                        <p class="mb-1">
+                                            <strong>Submitted Resume:</strong> 
+                                            <a href="{{ resume_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-underline">
+                                                View Resume
+                                            </a>
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <form method="post" class="d-inline" id="optInForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="opt_in">
+                                        <input type="hidden" name="resume_link" id="hiddenResumeLink">
+                                        <button 
+                                            type="submit" 
+                                            class="btn btn-primary custom-btn">
+                                            Apply
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <p class="text-danger">You are not eligible to apply for this drive due to academic criteria.</p>
+                            {% endif %}
+                        {% else %}
+                            <p>This drive has either ended or is no longer accepting new applications.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        </div>
+
+        {% for job in job_details.jobs %}
+            <div class="job-card-detail bg-white">
+                <h3 class="job-title-section">{{ job.job_title }}</h3>
+                <div class="job-content">
+                    <p>{{ job.job_description }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if not is_drive_completed_or_ongoing %}
+            <div class="resume-card-detail bg-white">
+                <h3 class="job-title-section">Update Resume</h3>
+                <div class="resume-content">
+                    <p>Please provide a link to your updated resume that matches the job role before opting in.</p>
+                    <p>To ensure the best fit for your application, kindly update your resume according to the specific
+                        requirements of the job role. This will help in aligning your skills with the position and increase
+                        your chances of success.</p>
+
+                    <div class="resume-upload-section mt-4">
+                        <h5>Submit your resume link as per Job Description!</h5>
+                        <p class="text-muted">Please ensure your resume is accessible through the link (Google Drive,
+                            Dropbox, etc.)</p>
+                        <div class="mt-3">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                <input type="url" class="form-control" id="resumeLinkInput"
+                                    placeholder="Enter your resume link (Google Drive, Dropbox, etc.)">
+                            </div>
+                            <div id="resumeLinkFeedback" class="form-text text-muted">
+                                Make sure the link has proper sharing permissions.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <script>
+        let resumeLinkValidated = '';
+
+        document.getElementById('optInForm').addEventListener('submit', function (event) {
+            const link = document.getElementById('resumeLinkInput').value.trim();
+            const feedback = document.getElementById('resumeLinkFeedback');
+            const hiddenField = document.getElementById('hiddenResumeLink');
+
+            // If resume link is provided, validate it
+            if (link) {
+                try {
+                    new URL(link);
+                    feedback.textContent = 'Link submitted successfully!';
+                    feedback.classList.remove('text-muted', 'text-danger');
+                    feedback.classList.add('text-success');
+                    resumeLinkValidated = link;  // Save for form submission
+                } catch (e) {
+                    feedback.textContent = 'Please enter a valid URL';
+                    feedback.classList.remove('text-muted', 'text-success');
+                    feedback.classList.add('text-danger');
+                    resumeLinkValidated = '';
+                    event.preventDefault();  // Prevent form submission if URL is invalid
+                    return;
+                }
+            } else {
+                feedback.textContent = 'Resume link is required';
+                feedback.classList.remove('text-muted', 'text-success');
+                feedback.classList.add('text-danger');
+                resumeLinkValidated = '';
+                event.preventDefault();  // Prevent form submission if no link is provided
+                return;
+            }
+
+            // If link is valid, set it in the hidden field
+            if (resumeLinkValidated) {
+                hiddenField.value = resumeLinkValidated;
+            }
+        });
+    </script>
+
+{% endblock %}

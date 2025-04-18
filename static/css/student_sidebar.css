@@ -20,6 +20,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border-radius: 0 40px 40px 0 !important;
 }
 
 .sidebar-top {
