@@ -194,7 +194,7 @@ def list_student_drives(request):
                 "company_name": company.name,
                 "company_id": company.id.id, 
                 "company_description": company.description,
-                "company_logo": f"/media/{company.logo}" if company.logo else "/static/images/default-company-logo.png",
+                "company_logo": f"/media/{company.logo}" if company.logo else "/static/images/default-company.png",
                 "job_type": drive.job_type,
                 "job_mode": drive.job_mode,
                 "ug_package_min": drive.ug_package_min,
@@ -263,7 +263,7 @@ def student_drive_details(request, drive_id):
 
         # ─── 3) COMPANY & LOCATION CONTEXT ─────────────────────────────────────────
         company = drive.company
-        logo_url = company.logo.url if company.logo else "/static/images/default-company-logo.png"
+        logo_url = company.logo.url if company.logo else "/static/images/default-company.png"
         drive_locations = DriveLocation.objects.filter(drive=drive).select_related("city__state__country")
 
         location_list = []
