@@ -189,14 +189,22 @@
                 <!-- Actions Bar -->
                 <div class="actions-bar">
                     <div>
-                        <a href="{% url 'list_drives'%}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to Drives
+                        <a href="{% url 'list_drives' %}" 
+                        class="btn btn-outline-dark rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2" 
+                        style="gap: 6px;" 
+                        title="Back to Companies">
+                        <i class="bi bi-arrow-left fs-5"></i>
+                        <span class="fw-semibold">Back</span>
                         </a>
                     </div>
                     <div>
                         {%if edit_drive %}
-                        <a  href="{% url 'edit_drive_page' id %}" class="btn btn-outline-primary me-2">
-                            <i class="bi bi-pencil"></i> Edit Drive
+                        <a href="{% url 'edit_drive_page' id %}" 
+                        class="btn btn-primary rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2" 
+                        style="gap: 6px;" 
+                        title="Edit Company">
+                        <i class="bi bi-pencil-square fs-5"></i>
+                        <span class="fw-semibold">Edit</span>
                         </a>
                         {% endif %}  
                        

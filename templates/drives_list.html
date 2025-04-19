@@ -48,6 +48,15 @@ Manage company drives for placement opportunities.
         background-color: #e2e3e5;
         color: #41464b;
     }
+    .eye-icon, .delete-icon, .trash-icon {
+        cursor: pointer;
+        margin: 0 5px;
+    }
+    
+    .eye-icon {
+        color: #6c7ae0;
+        text-decoration: none;
+    }
 
 </style>
 <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -69,8 +78,12 @@ Manage company drives for placement opportunities.
                 
             {% if permissions.add_drive %}
             <div class="col-12 text-end mb-3">
-                <a href="{% url 'add_drive_page' %}" class="btn btn-outline-primary rounded-pill btn-register">
-                    Publish Drive <i class="bi bi-plus"></i>
+                <a href="{% url 'add_drive_page' %}" 
+                class="btn btn-outline-primary rounded-pill shadow-sm d-inline-flex align-items-center px-4 py-2"
+                style="gap: 8px;" 
+                title="Publish Drive">
+                <i class="bi bi-rocket-takeoff fs-5"></i>
+                <span class="fw-semibold">Publish Drive</span>
                 </a>
             </div>
             {% endif %}
@@ -150,16 +163,16 @@ Manage company drives for placement opportunities.
                                 <td><a href="{% url 'drive_applicants' drive.id %}">{{ drive.applicants }}</a></td>
                                 <td>
                                     {% if permissions.view_drive %}
-                                    <a href="{% url 'view_drive' drive.id %}" class="btn btn-sm btn-primary" title="View">
-                                        <i class="bi bi-eye-fill"></i>
+                                    <a href="{% url 'view_drive' drive.id %}" class="eye-icon" title="View">
+                                        <i class="bi bi-eye"></i>
                                     </a>
                                     {% endif %}
                                     
                                     {% if permissions.delete_drive %}
-                                    <button class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
+                                    <a class="trash-icon" title="Delete" data-bs-toggle="modal"
                                             data-bs-target="#deleteConfirmModal" data-drive-id="{{ drive.id }}">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
+                                        <i class="bi bi-trash"></i>
+                                    </a>
                                     {% endif %}
                                 </td>
                             </tr>

@@ -101,15 +101,16 @@ Add company drive in placemate.
             animation: spin 1s linear infinite;
         }
         
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
     </style>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
-
+ 
     <!-- Loader (initially hidden) -->
     <div id="loader" style="display: none;">
         <div class="loader-overlay">
@@ -350,8 +351,12 @@ Add company drive in placemate.
                     </div>
                     
                     <div class="d-flex justify-content-center mt-3">
-                        <button type="button" id="addJobBtn" class="btn btn-outline-primary">
-                            <i class="fas fa-plus-circle me-2"></i>Add Another Job
+                        <button type="button" id="addJobBtn"
+                        class="btn rounded-pill shadow-sm d-inline-flex align-items-center px-4 py-2 gap-2"
+                        style="background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;"
+                        title="Add Another Job">
+                        <i class="bi bi-briefcase-fill fs-5"></i>
+                        <span>Add Another Job</span>
                         </button>
                     </div>
                 </div>
@@ -359,9 +364,19 @@ Add company drive in placemate.
 
             <!-- Submit Button -->
             <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'list_drives' %}'">Cancel</button>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save me-2"></i>Create Drive
+                <button type="button" 
+                class="btn btn-outline-secondary rounded-pill shadow-sm d-inline-flex align-items-center px-4 py-2 gap-2"
+                onclick="window.location.href='{% url 'list_drives' %}'" 
+                style="font-weight: 600; transition: all 0.3s ease;">
+                <i class="bi bi-x-circle fs-5"></i>
+                <span>Cancel</span>
+                </button>
+                
+                <button type="submit"
+                class="btn btn-primary rounded-pill shadow-lg d-inline-flex align-items-center px-5 py-2 gap-2"
+                style="font-weight: 600; font-size: 1rem;">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <span>Create Drive</span>
                 </button>
             </div>
         </form>

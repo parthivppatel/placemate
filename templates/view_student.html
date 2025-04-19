@@ -138,22 +138,32 @@
 
     <!-- Actions Bar -->
     <div class="actions-bar">
-        {% if permissions.view_applicants %}
-        <a href="{% url 'drive_applicants' drive_id %}" class="btn btn-outline-secondary back-to-students-btn">
-            <i class="bi bi-arrow-left"></i> Back to Applicantions
-        </a>        
+        {% if permissions.view_applicants and drive_id %}
+        <a href="{% url 'drive_applicants' drive_id %}" 
+        class="btn btn-outline-dark rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2" 
+        style="gap: 6px;" 
+        title="Back to Companies">
+        <i class="bi bi-arrow-left fs-5"></i>
+        <span class="fw-semibold">Back</span>
+        </a>       
         {% else %}
-        <a href="{% url 'list_students' %}" class="btn btn-outline-secondary back-to-students-btn">
-            <i class="bi bi-arrow-left"></i> Back to Students
-        </a>
+        <a href="{% url 'list_students' %}" 
+        class="btn btn-outline-dark rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2" 
+        style="gap: 6px;" 
+        title="Back to Companies">
+        <i class="bi bi-arrow-left fs-5"></i>
+        <span class="fw-semibold">Back</span>
+        </a>   
+        {% endif %}  
 
-        {% endif %}
-        
-        {% if not permissions.view_applicants %}
-        <button class="btn btn-outline-primary me-2" id="toggleEditBtn">
-            <i class="bi bi-pencil"></i> Edit Student
+        <button  
+        class="btn btn-primary rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2"  id="toggleEditBtn"
+        style="gap: 6px;" 
+        title="Edit Company">
+        <i class="bi bi-pencil-square fs-5"></i>
+        <span class="fw-semibold">Edit</span>
         </button>
-        {% endif %}
+        
     </div>
 
     <!-- Student Header -->
@@ -182,7 +192,7 @@
         </div>
     </div>
 
-    {% if permissions.view_applicants %}
+    {% if permissions.view_applicants and drive_id %}
     <!-- Resume Section -->
     <div class="card section-card mt-4">
         <div class="section-header">

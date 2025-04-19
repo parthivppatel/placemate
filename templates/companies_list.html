@@ -53,6 +53,17 @@
     select.form-select-sm, .btn-outline-secondary {
         min-width: 120px;
     }
+
+    .eye-icon, .delete-icon, .trash-icon {
+        cursor: pointer;
+        margin: 0 5px;
+    }
+    
+    .eye-icon {
+        color: #6c7ae0;
+        text-decoration: none;
+    }
+ 
 </style>
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <!-- Display Messages -->
@@ -73,8 +84,12 @@
             <!-- Actions Row -->
             <div class="row mb-4 mt-3">
                 <div class="col-12 text-end">
-                    <a href="{% url 'company_registration_page' %}" class="btn btn-outline-primary rounded-pill">
-                        Add New Companies <i class="bi bi-plus"></i>
+                    <a href="{% url 'company_registration_page' %}" 
+                    class="btn btn-outline-primary rounded-pill shadow-sm d-inline-flex align-items-center px-4 py-2"
+                    style="gap: 8px;" 
+                    title="Add New Company">
+                    <i class="bi bi-building-fill-add fs-5"></i>
+                    <span class="fw-semibold">Add Company</span>
                     </a>
                 </div>
             </div>
@@ -150,16 +165,16 @@
                             <td>{{ company.email }}</td>
                             <td>
                                 {% if permissions.view_company %}
-                                <a href="{% url 'view_company' company.id %}" class="btn btn-sm btn-primary" title="View">
-                                    <i class="bi bi-eye-fill"></i>
+                                <a href="{% url 'view_company' company.id %}" class="eye-icon" title="View">
+                                    <i class="bi bi-eye"></i>
                                 </a>
                                 {% endif %}
                                 
                                 {% if permissions.delete_company %}
-                                <button class="btn btn-sm btn-danger" title="Delete" data-bs-toggle="modal"
+                                <a class="trash-icon" title="Delete" data-bs-toggle="modal"
                                         data-bs-target="#deleteConfirmModal" data-company-id="{{ company.id }}">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>
+                                    <i class="bi bi-trash"></i>
+                                </a>
                                 {% endif %}
                             </td>
                         </tr>

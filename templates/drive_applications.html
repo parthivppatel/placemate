@@ -98,6 +98,15 @@ Drive Applications for {{drive.company.name}}
             display: block !important;
             max-width: max-content;
         }
+        .eye-icon, .delete-icon, .trash-icon {
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        
+        .eye-icon {
+            color: #6c7ae0;
+            text-decoration: none;
+        }
         
     </style>
 </head>
@@ -224,8 +233,8 @@ Drive Applications for {{drive.company.name}}
                                     {% endwith %}
                                 </td>
                                 <td>
-                                    <a href="{% url 'view_student' student.student_id.id %}?drive_id={{drive.id}}" class="btn btn-sm btn-primary" title="View">
-                                        <i class="bi bi-eye-fill"></i>
+                                    <a href="{% url 'view_student' student.student_id.id %}?drive_id={{drive.id}}" class="eye-icon" title="View">
+                                        <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
                             </tr>
