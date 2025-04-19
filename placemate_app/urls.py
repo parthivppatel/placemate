@@ -16,7 +16,7 @@ from .view.countries_states_cities import get_countries,get_states,get_cities,ge
 from .view.companydrives import list_drives,add_drive,edit_drive,edit_drive_page,delete_drive,view_drive,add_drive_page,drive_applicants,application_action
 
 from .view.students import student_registrations, student_manual_registrations, view_student, edit_student, delete_student, list_students
-from .view.student import student_profile, student_edit_student, list_student_drives, student_drive_details
+from .view.student import student_profile, student_edit_student, list_student_drives, student_drive_details, student_drives_application
 
 from placemate_app.utils.reset_password_utils import profile_reset_password
 
@@ -82,6 +82,7 @@ urlpatterns = [
     path('student/profile/<int:student_id>/', student_profile, name='student_profile'),
     path('student/edit/<int:student_id>/', student_edit_student, name='student_edit_student'),
     path('student/drive-details/<int:drive_id>/', student_drive_details, name='student_drive_details'),
+    path('student/applications/<int:student_id>/', student_drives_application, name='student_drives_application')
 ]
 
 if settings.DEBUG:

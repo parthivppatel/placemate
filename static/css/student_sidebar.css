@@ -10,17 +10,30 @@ body {
     padding: 0;
 }
 
-
 .sidebar {
-    width: 250px;
+    width: 280px;
     height: 100vh;
     height: 100dvh;
-    /* background-color: #e8e7ff; */
-    background-color: #D1CFFB !important;
+    background-color: #D1CFFB;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-radius: 0 40px 40px 0 !important;
+    border-radius: 0 40px 40px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
 }
 
 .sidebar-top {
@@ -31,19 +44,31 @@ body {
 .logo-container {
     display: flex;
     justify-content: center;
-    margin-top: 16px;
-    margin-bottom: 32px;
+    margin-top: 24px;
+    margin-bottom: 40px;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.logo-container:hover {
+    transform: translateY(-3px);
 }
 
 .logo {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    background-color: #1e3a8a;
-    /* Exact blue from image */
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+    transition: all 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(30, 58, 138, 0.4);
 }
 
 .logo-inner {
@@ -55,6 +80,7 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
 }
 
 .logo-circle-outer {
@@ -64,19 +90,19 @@ body {
     width: 90%;
     height: 90%;
     border: 2px solid #22c55e;
-    /* green color */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: rotate 15s linear infinite;
 }
 
 .logo-circle-inner {
     width: 80%;
     height: 80%;
     border: 2px solid #22c55e;
-    /* green color */
     border-radius: 50%;
+    animation: rotateReverse 10s linear infinite;
 }
 
 .logo-text {
@@ -85,76 +111,483 @@ body {
     font-size: 12px;
     color: #1e3a8a;
     z-index: 2;
+    transition: all 0.3s ease;
 }
 
 .nav-items {
-    padding: 0 16px;
+    padding: 0 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 14px 16px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     color: #000;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+}
+
+.nav-item:hover::before {
+    left: 100%;
 }
 
 .nav-item:hover {
     background-color: #6366f1;
-    /* indigo-500 */
     color: white;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
 }
 
 .nav-item.active {
     background-color: #6366f1;
-    /* indigo-500 */
     color: white;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
 }
 
 .nav-item-icon {
     width: 24px;
     height: 24px;
     flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.nav-item:hover .nav-item-icon {
+    transform: scale(1.1);
 }
 
 .nav-item-text {
-    font-size: 14px; /* Adjust the font size */
+    font-size: 15px;
     font-weight: 500;
-    color: #333; /* Example text color */
+    color: inherit;
+    transition: all 0.3s ease;
 }
 
 .nav-item-content {
     display: flex;
-    align-items: center; /* Vertically center the items */
-    gap: 10px; /* Add spacing between the icon and text */
+    align-items: center;
+    gap: 12px;
 }
 
 .sidebar-bottom {
-    padding: 0 16px;
+    padding: 0 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 24px;
 }
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Create a 2x2 grid */
+    grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 2px; /* Add spacing between grid items */
-    width: 24px; /* Set a fixed width for the grid */
-    height: 24px; /* Set a fixed height for the grid */
+    gap: 3px;
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover .dashboard-grid {
+    transform: rotate(5deg);
 }
 
 .dashboard-grid-item {
-    width: 10px; /* Adjust the size of individual grid items */
+    width: 10px;
     height: 10px;
-    background-color: #000; /* Example color for the grid items */
-    border-radius: 2px; /* Optional: Add rounded corners */
+    background-color: currentColor;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover .dashboard-grid-item {
+    border-radius: 4px;
+    transform: scale(1.1);
+}
+
+.nav-item:hover .dashboard-grid-item:nth-child(1) {
+    transform: translate(-1px, -1px);
+}
+.nav-item:hover .dashboard-grid-item:nth-child(2) {
+    transform: translate(1px, -1px);
+}
+.nav-item:hover .dashboard-grid-item:nth-child(3) {
+    transform: translate(-1px, 1px);
+}
+.nav-item:hover .dashboard-grid-item:nth-child(4) {
+    transform: translate(1px, 1px);
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rotateReverse {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+}
+
+/* Ripple effect for nav items */
+.nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform .5s, opacity 1s;
+}
+
+.nav-item:active:after {
+    transform: scale(0, 0);
+    opacity: .3;
+    transition: 0s;
+}
+
+/* Smooth transition for the active state */
+.nav-item.active {
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+}
+
+/* Add this to your existing CSS */
+
+/* Fix for active state not showing on Drives tab */
+.nav-item.active {
+    background-color: #6366f1 !important;
+    color: white !important;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* Fix for the blue text color issue */
+.nav-item a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.nav-item a:hover {
+    color: inherit;
+}
+
+/* Ensure the active state works with the link structure */
+.nav-item.active a .nav-item-text {
+    color: white !important;
+}
+
+/* Fix for the disabled drives text */
+.nav-item .text-muted {
+    color: #6c757d !important;
+    pointer-events: none;
+}
+
+/* Updated CSS */
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #000;
+    text-decoration: none !important;
+}
+
+/* Disabled state */
+.nav-item.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.nav-item.disabled .nav-item-text {
+    color: #6c757d;
+}
+
+/* Active state */
+.nav-item.active {
+    background-color: #6366f1;
+    color: white !important;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+.nav-item.active .nav-item-text,
+.nav-item.active .nav-item-icon {
+    color: white !important;
+}
+
+/* Hover state - only for enabled items */
+.nav-item:not(.disabled):hover {
+    background-color: #6366f1;
+    color: white;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+.nav-item:not(.disabled):hover .nav-item-text,
+.nav-item:not(.disabled):hover .nav-item-icon {
+    color: white;
+}
+
+/* Update the active state styles */
+.nav-item.active {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    color: white !important;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+/* Add a subtle shine effect to the gradient */
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.2) 50%, 
+        rgba(255, 255, 255, 0) 100%);
+    transition: all 0.6s ease;
+}
+
+.nav-item.active:hover::after {
+    left: 100%;
+}
+
+/* Update hover state to match the gradient */
+.nav-item:not(.disabled):hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    color: white;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* Ensure text and icons remain visible */
+.nav-item.active .nav-item-text,
+.nav-item.active .nav-item-icon,
+.nav-item:not(.disabled):hover .nav-item-text,
+.nav-item:not(.disabled):hover .nav-item-icon {
+    color: white !important;
+}
+
+/* Add transition for smooth gradient appearance */
+.nav-item {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                background 0.3s ease;
+}
+
+/* Update disabled state to work with new styling */
+.nav-item.disabled {
+    background: none;
+    background-color: transparent;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.nav-item.disabled .nav-item-text {
+    color: #6c757d;
+}
+.sidebar {
+    /* Updated background with sophisticated gradient */
+    background: linear-gradient(
+        135deg,
+        #D1CFFB 0%,
+        #C5C3F7 50%,
+        #B9B6F3 100%
+    ) !important;
+    
+    /* Adding subtle texture */
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.2) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255,255,255,0.15) 0%, transparent 25%);
+    
+    /* Enhanced shadow for depth */
+    box-shadow: 
+        5px 0 15px rgba(0, 0, 0, 0.08),
+        inset -2px 0 4px rgba(255, 255, 255, 0.5);
+    
+    /* Other existing properties */
+    width: 280px;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 0 40px 40px 0;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Adding a subtle border glow effect */
+.sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 3px;
+}
+
+.sidebar {
+    /* Make sidebar fixed */
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000; /* Ensure it stays above other content */
+    
+    /* Existing styles with enhanced background */
+    background: linear-gradient(135deg, #D1CFFB 0%, #C5C3F7 50%, #B9B6F3 100%) !important;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.2) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255,255,255,0.15) 0%, transparent 25%);
+    width: 280px;
+    border-radius: 0 40px 40px 0;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: auto; /* Allow sidebar to scroll if content exceeds height */
+}
+
+/* Add this to your main content area */
+.main-content {
+    margin-left: 280px; /* Match sidebar width */
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Optional: Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for cleaner look (optional) */
+.sidebar::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+.sidebar {
+    /* Vibrant yet soft gradient background */
+    background: linear-gradient(
+        152deg,
+        #D1CFFB 0%,
+        #C9C7F9 25%,
+        #BAB7F4 50%,
+        #A8A4EE 100%
+    );
+    
+    /* Subtle noise texture for depth */
+    background-image: 
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25) 0%, transparent 25%);
+    
+    /* Frosted glass effect */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    
+    /* 3D border effect */
+    border-right: 1px solid rgba(255,255,255,0.4);
+    box-shadow:
+        inset -8px 0 12px -8px rgba(255,255,255,0.6),
+        inset 1px 0 0 rgba(0,0,0,0.05),
+        6px 0 20px rgba(0, 0, 0, 0.1);
+    
+    /* Fixed positioning */
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 1000;
+    
+    /* Existing structure */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 0 40px 40px 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Animated gradient overlay */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.15) 0%,
+        rgba(255,255,255,0) 50%,
+        rgba(255,255,255,0.15) 100%
+    );
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+    z-index: -1;
+    
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Main content adjustment */
+.main-content {
+    margin-left: 280px;
+    padding: 2rem;
+    position: relative;
 }
