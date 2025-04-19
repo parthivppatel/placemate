@@ -392,3 +392,31 @@ def student_drive_details(request, drive_id):
 
     except Exception as e:
         return JsonResponse({"message": f"An unexpected error occurred: {str(e)}"}, status=500)
+
+
+def student_drives_application(request, student_id):
+    # ─── 1) AUTH & STUDENT LOOKUP ────────────────────────────────────────────────
+    user_payload = get_user_from_jwt(request)
+    if not user_payload:
+        return JsonResponse({"message": "Invalid or missing token"}, status=401)
+
+    user_email = user_payload.get("email")
+    if not user_email:
+        return JsonResponse({"message": "Email not found in token"}, status=400)
+
+    try:
+        user = User.objects.get(email=user_email)
+        student = get_object_or_404(Student, student_id=student_id)
+    except User.DoesNotExist:
+        return JsonResponse({"message": "User not found"}, status=404)
+    except Student.DoesNotExist:
+        return JsonResponse({"message": "Student not found"}, status=404)
+
+    return render(
+        request,
+        "student_applications_list.html",
+        {
+            "student_id": student.student_id.id,
+            "student": student,
+        }
+    )

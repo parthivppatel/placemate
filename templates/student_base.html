@@ -14,54 +14,135 @@
 
     <style>
         .profile-dropdown {
-        position: relative;
-        display: inline-block;
+            position: relative;
+            display: inline-block;
+            margin-right: 20px;
         }
 
         .dropdown-menu {
             display: none;
             position: absolute;
             right: 0;
-            background-color: #fff;
-            min-width: 160px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            z-index: 999;
-            border-radius: 8px;
+            background-color: #ffffff;
+            min-width: 200px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 12px;
             overflow: hidden;
+            border: 1px solid #f0f0f0;
+            z-index: 1051;
+            transform: translateY(10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown.show .dropdown-menu {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .dropdown-menu a {
-            color: #333;
-            padding: 10px 15px;
+            color: #555;
+            padding: 12px 20px;
             text-decoration: none;
             display: block;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
         }
 
         .dropdown-menu a:hover {
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
+            color: #5644e8;
+            padding-left: 25px;
         }
 
-        .profile-dropdown:hover .dropdown-menu,
-        .profile-dropdown.show .dropdown-menu {
-            display: block;
+        .dropdown-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            color: #5644e8;
         }
 
         .profile-img i {
             font-size: 22px;
-            color: #444;
+            color: #5644e8;
+            transition: all 0.3s ease;
         }
 
         .profile-name {
-            font-weight: bold;
+            font-weight: 600;
             color: #333;
+            font-size: 15px;
         }
 
         .profile-trigger {
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-trigger:hover {
+            background-color: #f5f5ff;
+        }
+
+        .profile-trigger:hover i {
+            transform: scale(1.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        .title-container h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #5644e8, #6a5acd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-container p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .profile-dropdown {
+                margin-top: 15px;
+                margin-right: 0;
+                align-self: flex-end;
+            }
+            
+            .title-container h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -73,9 +154,8 @@
 
             <div class="col main-content">
                 <!-- Header -->
-                <div class="header" style="border-bottom: 1px solid #e0e0e0; z-index: 1050;">
+                <div class="header">
                     <div class="title-container">
-                        <!-- <h1 class="dashboard-title">{{ page_title }}</h1> -->
                         <h1 class="dashboard-title">Placemate</h1>
                         <p class="dashboard-subtitle">Here's a quick overview of your placement progress</p>
                     </div>
@@ -83,20 +163,26 @@
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="profile-trigger" onclick="toggleDropdown()">
                             <div class="profile-img">
-                                <i class="fas fa-user" style="color: #5644e8"></i>
+                                <i class="fas fa-user-circle"></i>
                             </div>
                             <div class="profile-info">
                                 <div class="profile-name">{{ profile_name }}</div>
                             </div>
+                            <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
                         </div>
                     
                         <div class="dropdown-menu" id="dropdownMenu">
-                            <a href="{% url 'student_profile' student.student_id.id %}">Profile</a>
-                            <a href="{% url 'profile_reset_password' %}">Reset Password</a>
-                            <a href="{% url 'logout' %}">Logout</a>
+                            <a href="{% url 'student_profile' student.student_id.id %}">
+                                <i class="fas fa-user"></i> Profile
+                            </a>
+                            <a href="{% url 'profile_reset_password' %}">
+                                <i class="fas fa-key"></i> Reset Password
+                            </a>
+                            <a href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
                         </div>
                     </div>
-                    <hr style="border: 1px solid #ddd; margin: 10px 0;">
                 </div>
             
                 {% block content %}{% endblock %}

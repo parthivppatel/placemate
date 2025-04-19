@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-
+from ..utils.email_utils import send_student_registration_email
 from ..decorators import permission_required
 from ..schema.users import User
 from ..schema.students import Student, PlacementStatus, GraduationStatus, Gender, Company
@@ -183,6 +183,17 @@ def student_manual_registrations(request):
                 company_placedIn=company,
                 package=float(data.get('package')) if data.get('package') else None
             )
+
+            try:
+                full_name = f"{student.first_name} {student.last_name}"
+                send_student_registration_email(
+                    email=email,
+                    password=password if data.get('password') else "placemate@123"
+                )
+                messages.success(request, f"Welcome email sent to {email}.")
+            except Exception as e:
+                print(f"Failed to send welcome email: {str(e)}")
+                messages.warning(request, f"Student registered but failed to send welcome email: {str(e)}")
 
             # Success message
             messages.success(request, f"Student {student.first_name} {student.last_name} added successfully.")

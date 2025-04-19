@@ -4,22 +4,28 @@
 
 {% block content %}
 <style>
+    /* Enhanced Base Styles */
     .student-header {
         display: flex;
         align-items: center;
         margin-bottom: 2rem;
-        padding: 1rem;
-        background: #fefefe;
+        padding: 1.5rem;
+        background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 0.75rem;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .student-header:hover {
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
     }
 
     .student-avatar-wrapper {
         position: relative;
-        width: 110px;
-        height: 110px;
-        margin-right: 1.5rem; /* Added gap between avatar and info */
+        width: 120px;
+        height: 120px;
+        margin-right: 2rem;
     }
 
     .student-avatar {
@@ -27,8 +33,14 @@
         height: 100%;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid #e0e0e0;
-        background-color: #f8f9fa;
+        border: 3px solid #f0f0ff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .student-avatar:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
     }
 
     .student-avatar-placeholder {
@@ -38,9 +50,9 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background-color: #f8f9fa;
-        border: 2px solid #e0e0e0;
-        font-size: 1rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        border: 3px solid #e0e0ff;
+        font-size: 1.2rem;
         font-weight: bold;
         color: #6c757d;
         position: absolute;
@@ -49,67 +61,97 @@
     }
 
     .student-info h1 {
-        font-size: 1.75rem;
+        font-size: 1.8rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
         color: #212529;
     }
 
     .badges .badge {
-        margin-right: 0.5rem;
+        margin-right: 0.75rem;
         font-size: 0.85rem;
+        padding: 0.5rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .badge.text-primary {
+        background-color: rgba(86, 68, 232, 0.1);
+    }
+
+    .badge.text-info {
+        background-color: rgba(13, 202, 240, 0.1);
+    }
+
+    .badge.text-success {
+        background-color: rgba(25, 135, 84, 0.1);
     }
 
     .section-card {
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
         border-radius: 0.75rem;
         border: none;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .section-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
 
     .section-header {
-        background-color: #f1f3f5;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #dee2e6;
-        border-radius: 0.75rem 0.75rem 0 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.25rem 1.75rem;
+        border-bottom: 1px solid #e0e0ff;
     }
 
     .section-header h2 {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
         font-weight: 600;
         color: #343a40;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-header h2 i {
+        margin-right: 0.75rem;
+        color: #5644e8;
     }
 
     .section-content {
-        padding: 1.5rem;
+        padding: 1.75rem;
     }
 
     .detail-row {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 1px dashed #f0f0f0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
 
     .detail-label {
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: #6c757d;
         margin-bottom: 0.25rem;
+        flex: 1;
     }
 
     .detail-value {
         font-size: 1rem;
         color: #212529;
         text-align: right;
-    }
-
-    .detail-row .detail-value {
-        flex: 1;
-        text-align: right;
-    }
-
-    .detail-row .detail-label {
         flex: 1;
     }
 
@@ -117,195 +159,297 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.75rem;
+        margin-bottom: 2rem;
     }
 
-    .btn i {
-        margin-right: 0.5rem;
+    .back-to-students-btn {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 500;
     }
 
     .back-to-students-btn:hover {
-        background-color: #6a5acd;
-        color: white; /* Optional: Change text color to white for better contrast */
-        border-color: #6a5acd; /* Optional: Match border color with background */
+        background-color: #5644e8;
+        color: white;
+        border-color: #5644e8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(86, 68, 232, 0.2);
+    }
+
+    #toggleEditBtn {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 500;
+    }
+
+    #toggleEditBtn:hover {
+        background-color: #5644e8;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(86, 68, 232, 0.2);
+    }
+
+    .alert {
+        border-radius: 10px;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: none;
+    }
+
+    /* Modal Enhancements */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #e0e0ff;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0ff;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #5644e8;
+        box-shadow: 0 0 0 0.25rem rgba(86, 68, 232, 0.15);
+    }
+
+    .btn-primary {
+        background-color: #5644e8;
+        border-color: #5644e8;
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #4535d9;
+        border-color: #4535d9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(86, 68, 232, 0.2);
+    }
+
+    .btn-secondary {
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .student-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .student-avatar-wrapper {
+            margin-right: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .detail-value {
+            text-align: left;
+            margin-top: 0.25rem;
+        }
     }
 </style>
 
-    <!-- Actions Bar -->
-    <div class="actions-bar">
-        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary back-to-students-btn">
-            <i class="bi bi-arrow-left"></i> Back to Students
-        </a>
+<!-- Actions Bar -->
+<div class="actions-bar">
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary back-to-students-btn">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
 
-        <button class="btn btn-outline-primary me-2" id="toggleEditBtn">
-            <i class="bi bi-pencil"></i> Edit Student
-        </button>
-    </div>
+    <button class="btn btn-outline-primary" id="toggleEditBtn">
+        <i class="bi bi-pencil"></i> Edit Profile
+    </button>
+</div>
 
-    <!-- Success Message -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} mt-3">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <!-- Student Header -->
-    <div class="student-header">
-        <div id="studentPhotoWrapper" class="student-avatar-wrapper">
-            <div id="studentPhotoWrapper" class="student-avatar-wrapper">
-                <img 
-                    src="{{ student_details.profile|default:'/static/images/default-profile.png' }}" 
-                    alt="Student Photo" 
-                    class="student-avatar" 
-                    id="studentPhoto"
-                    onerror="handlePhotoError(this)"
-                >
-            </div>
-            <div class="student-avatar-placeholder" id="studentPhotoPlaceholder" style="display: none;">
-                N/A
-            </div>
+<!-- Success Message -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mt-3">
+            {{ message }}
         </div>
-        <div class="student-info">
-            <h1 class="student-name" id="studentName">{{ student_details.name }}</h1>
-            <div class="badges">
-                <span class="badge text-primary bg-primary-subtle" id="studentDepartment">{{ student_details.course }}</span>
-                <span class="badge text-info bg-info-subtle" id="studentBatch">{{ student_details.batch }}</span>
-                <span class="badge text-success bg-success-subtle" id="placementStatus">{{ student_details.placement_status }}</span>
-            </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Student Header -->
+<div class="student-header">
+    <div id="studentPhotoWrapper" class="student-avatar-wrapper">
+        <img 
+            src="{{ student_details.profile|default:'/static/images/default-profile.png' }}" 
+            alt="Student Photo" 
+            class="student-avatar" 
+            id="studentPhoto"
+            onerror="handlePhotoError(this)"
+        >
+        <div class="student-avatar-placeholder" id="studentPhotoPlaceholder" style="display: none;">
+            N/A
         </div>
     </div>
-    
-
-    <!-- Personal Details Section -->
-    <div class="card section-card">
-        <div class="section-header">
-            <h2 class="h5 mb-0">
-                <i class="bi bi-person me-2"></i>Personal Details
-            </h2>
+    <div class="student-info">
+        <h1 class="student-name" id="studentName">{{ student_details.name }}</h1>
+        <div class="badges">
+            <span class="badge text-primary" id="studentDepartment">{{ student_details.course }}</span>
+            <span class="badge text-info" id="studentBatch">{{ student_details.batch }}</span>
+            <span class="badge text-success" id="placementStatus">{{ student_details.placement_status }}</span>
         </div>
-        <div class="section-content">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="detail-row">
-                        <div class="detail-label">Enrollment Number</div>
-                        <div class="detail-value">{{ student_details.enrollment|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Date of Birth</div>
-                        <div class="detail-value">{{ student_details.dob }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Gender</div>
-                        <div class="detail-value">{{ student_details.gender }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Email</div>
-                        <div class="detail-value">{{ student_details.email|default:"N/A" }}</div>
-                    </div>
+    </div>
+</div>
+
+<!-- Personal Details Section -->
+<div class="card section-card">
+    <div class="section-header">
+        <h2 class="h5 mb-0">
+            <i class="bi bi-person me-2"></i>Personal Details
+        </h2>
+    </div>
+    <div class="section-content">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="detail-row">
+                    <div class="detail-label">Enrollment Number</div>
+                    <div class="detail-value">{{ student_details.enrollment|default:"N/A" }}</div>
                 </div>
-                <div class="col-md-6">
-                    <div class="detail-row">
-                        <div class="detail-label">Phone</div>
-                        <div class="detail-value">{{ student_details.phone|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Address</div>
-                        <div class="detail-value">{{ student_details.address|default:"N/A" }}</div>
-                    </div>
-                    
+                <div class="detail-row">
+                    <div class="detail-label">Date of Birth</div>
+                    <div class="detail-value">{{ student_details.dob }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Gender</div>
+                    <div class="detail-value">{{ student_details.gender }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">{{ student_details.email|default:"N/A" }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail-row">
+                    <div class="detail-label">Phone</div>
+                    <div class="detail-value">{{ student_details.phone|default:"N/A" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Address</div>
+                    <div class="detail-value">{{ student_details.address|default:"N/A" }}</div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Academic Details Section -->
-    <div class="card section-card">
-        <div class="section-header">
-            <h2 class="h5 mb-0">
-                <i class="bi bi-book me-2"></i>Academic Details
-            </h2>
-        </div>
-        <div class="section-content">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="detail-row">
-                        <div class="detail-label">Joining Year</div>
-                        <div class="detail-value">{{ student_details.joining_year|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Course</div>
-                        <div class="detail-value">{{ student_details.course }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Current CGPA</div>
-                        <div class="detail-value">{{ student_details.cgpa|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Graduation Status</div>
-                        <div class="detail-value">{{ student_details.graduation_status|default:"N/A" }}</div>
-                    </div>
+<!-- Academic Details Section -->
+<div class="card section-card">
+    <div class="section-header">
+        <h2 class="h5 mb-0">
+            <i class="bi bi-book me-2"></i>Academic Details
+        </h2>
+    </div>
+    <div class="section-content">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="detail-row">
+                    <div class="detail-label">Joining Year</div>
+                    <div class="detail-value">{{ student_details.joining_year|default:"N/A" }}</div>
                 </div>
-                <div class="col-md-6">
-                    <div class="detail-row">
-                        <div class="detail-label">10th Percentage</div>
-                        <div class="detail-value">{{ student_details.tenth_percentage|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">12th Percentage</div>
-                        <div class="detail-value">{{ student_details.twelfth_percentage|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Backlogs</div>
-                        <div class="detail-value">{{ student_details.backlogs|default:"N/A" }}</div>
-                    </div>
+                <div class="detail-row">
+                    <div class="detail-label">Course</div>
+                    <div class="detail-value">{{ student_details.course }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Current CGPA</div>
+                    <div class="detail-value">{{ student_details.cgpa|default:"N/A" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Graduation Status</div>
+                    <div class="detail-value">{{ student_details.graduation_status|default:"N/A" }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail-row">
+                    <div class="detail-label">10th Percentage</div>
+                    <div class="detail-value">{{ student_details.tenth_percentage|default:"N/A" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">12th Percentage</div>
+                    <div class="detail-value">{{ student_details.twelfth_percentage|default:"N/A" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Backlogs</div>
+                    <div class="detail-value">{{ student_details.backlogs|default:"N/A" }}</div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Placement Details Section -->
-    <div class="card section-card">
-        <div class="section-header">
-            <h2 class="h5 mb-0">
-                <i class="bi bi-briefcase me-2"></i>Placement Details
-            </h2>
-        </div>
-        <div class="section-content">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="detail-row">
-                        <div class="detail-label">Placement Status</div>
-                        <div class="detail-value">{{ student_details.placement_status|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Company Placed In</div>
-                        <div class="detail-value">{{ student_details.company_placed_in|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Job Role</div>
-                        <div class="detail-value">{{ student_details.job_role|default:"N/A" }}</div>
-                    </div>
+<!-- Placement Details Section -->
+<div class="card section-card">
+    <div class="section-header">
+        <h2 class="h5 mb-0">
+            <i class="bi bi-briefcase me-2"></i>Placement Details
+        </h2>
+    </div>
+    <div class="section-content">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="detail-row">
+                    <div class="detail-label">Placement Status</div>
+                    <div class="detail-value">{{ student_details.placement_status|default:"N/A" }}</div>
                 </div>
-                <div class="col-md-6">
-                    <div class="detail-row">
-                        <div class="detail-label">Package (LPA)</div>
-                        <div class="detail-value">{{ student_details.package|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Offer Date</div>
-                        <div class="detail-value">{{ student_details.offer_date|default:"N/A" }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Joining Date</div>
-                        <div class="detail-value">{{ student_details.joining_date|default:"N/A" }}</div>
-                    </div>
+                <div class="detail-row">
+                    <div class="detail-label">Company Placed In</div>
+                    <div class="detail-value">{{ student_details.company_placed_in|default:"N/A" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Job Role</div>
+                    <div class="detail-value">{{ student_details.job_role|default:"N/A" }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail-row">
+                    <div class="detail-label">Package (LPA)</div>
+                    <div class="detail-value">{{ student_details.package|default:"N/A" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Offer Date</div>
+                    <div class="detail-value">{{ student_details.offer_date|default:"N/A" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Joining Date</div>
+                    <div class="detail-value">{{ student_details.joining_date|default:"N/A" }}</div>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
 
 <!-- Edit Student Modal -->
 <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
@@ -319,7 +463,7 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <!-- Allowed Fields Message as Heading -->
-                    <h6 class="mb-4 text-muted"><b>{{ allowed_fields_message|default:"Message not passed from view"  }}</b></h6>
+                    <h6 class="mb-4 text-muted"><b>{{ allowed_fields_message|default:"Message not passed from view" }}</b></h6>
 
                     <!-- Editable Fields -->
                     <h5 class="mb-3">Editable Fields</h5>
@@ -378,7 +522,6 @@
         </div>
     </div>
 </div>
-  
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

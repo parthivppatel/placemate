@@ -207,3 +207,35 @@ def send_drive_emails(drive, students,jobs,skills,courses,locations,edit=False):
 
     except Exception as e:
         logger.error(f"Error : {str(e)}", exc_info=True)
+
+def send_student_registration_email(email, password):
+    subject = "Welcome to Placemate - Your Company Registration Details"
+    message = f"Hello {email},\nWelcome to Placemate! We're excited to have you on board."
+
+    html_message = f"""
+    <html>
+    <body>
+        <p>Dear User,</p>
+
+        <p>Welcome to <strong>Placemate</strong>! Your registration is successful.</p>
+
+        <p><strong>Here are your login credentials:</strong></p>
+        <ul>
+            <li><strong>Email:</strong> {email}</li>
+            <li><strong>Password:</strong> {password}</li>
+        </ul>
+
+        <p>You can log in using the following link:</p>
+        <p><a href="http://127.0.0.1:8000/login" target="_blank"><strong>Placemate</strong></a></p>
+
+        <p>Please use these credentials to log in and complete your profile.</p>
+
+        <p>If you have any questions, feel free to contact us.</p>
+
+        <p>Best regards,<br>
+        <strong>Placemate Team</strong></p>
+    </body>
+    </html>
+    """
+
+    send_custom_email(email,subject,message,html_message)

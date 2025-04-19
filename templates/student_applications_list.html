@@ -1,0 +1,31 @@
+{% extends 'student_base.html' %}
+
+{% block title %}Student - Applictions{% endblock %}
+
+{% block content %}
+<style>
+    .back-to-students-btn:hover {
+        background-color: #6a5acd;
+        color: white;
+        border-color: #6a5acd;
+    }
+</style>
+
+<!-- Actions Bar -->
+<div class="actions-bar">
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary back-to-students-btn">
+        <i class="bi bi-arrow-left"></i> Back to Students
+    </a>
+</div>
+
+<!-- Success Message -->
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} mt-3">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+<p>Applications</p>
+{% endblock %}
