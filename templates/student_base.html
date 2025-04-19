@@ -11,6 +11,59 @@
     <link rel="stylesheet" href="{% static 'css/student_sidebar.css' %}">
     <link rel="stylesheet" href="{% static 'css/student_dashboard.css' %}">
     {% block head %}{% endblock %}
+
+    <style>
+        .profile-dropdown {
+        position: relative;
+        display: inline-block;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 999;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dropdown-menu a {
+            color: #333;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            transition: background 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f2f2f2;
+        }
+
+        .profile-dropdown:hover .dropdown-menu,
+        .profile-dropdown.show .dropdown-menu {
+            display: block;
+        }
+
+        .profile-img i {
+            font-size: 22px;
+            color: #444;
+        }
+
+        .profile-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .profile-trigger {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
 </head>
 
 <body>
@@ -26,7 +79,7 @@
                         <p class="dashboard-subtitle">{{ page_subtitle }}</p>
                     </div>
                     
-                    <div class="profile">
+                    <!-- <div class="profile">
                         <div class="profile-img">
                             <i class="fas fa-user"></i>
                         </div>
@@ -36,6 +89,22 @@
                                 <div class="profile-name">{{ profile_name }}</div>
                             </div>
                         </a>
+                    </div> -->
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-trigger" onclick="toggleDropdown()">
+                            <div class="profile-img">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="profile-info">
+                                <div class="profile-name">{{ profile_name }}</div>
+                            </div>
+                        </div>
+                    
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="{% url 'student_profile' student.student_id.id %}">Profile</a>
+                            <a href="{% url 'forgot-password' %}">Reset Password</a>
+                            <a href="{% url 'logout' %}">Logout</a>
+                        </div>
                     </div>
                     <hr style="border: 1px solid #ddd; margin: 10px 0;">
                 </div>
@@ -47,6 +116,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/student_sidebar.js' %}"></script>
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById("profileDropdown");
+            dropdown.classList.toggle("show");
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function (event) {
+            const dropdown = document.getElementById("profileDropdown");
+            const menu = document.getElementById("dropdownMenu");
+
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove("show");
+            }
+        });
+    </script>
 </body>
 
 </html>
