@@ -224,17 +224,6 @@
                                                 </a>
                                             </p>
                                         {% endif %}
-                                    {% else %}
-                                        <form method="post" class="d-inline" id="optInForm">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="action" value="opt_in">
-                                            <input type="hidden" name="resume_link" id="hiddenResumeLink">
-                                            <button 
-                                                type="submit" 
-                                                class="btn btn-primary custom-btn">
-                                                Apply
-                                            </button>
-                                        </form>
                                     {% endif %}
                                 {% else %}
                                     <p class="text-danger">You are not eligible to apply for this drive due to academic criteria.</p>
@@ -255,18 +244,9 @@
             </div>
         </div>
 
-        {% for job in job_details.jobs %}
-            <div class="job-card-detail bg-white">
-                <h3 class="job-title-section">{{ job.job_title }}</h3>
-                <div class="job-content">
-                    <p>{{ job.job_description }}</p>
-                </div>
-            </div>
-        {% endfor %}
-
         {% if drive_status == 'Scheduled' %}
             <div class="resume-card-detail bg-white">
-                <h3 class="job-title-section">Update Resume</h3>
+                <h3 class="job-title-section">Add/Update Resume</h3>
                 <div class="resume-content">
                     <p>Please provide a link to your updated resume that matches the job role before opting in.</p>
                     <p>To ensure the best fit for your application, kindly update your resume according to the specific
@@ -282,16 +262,48 @@
                                 <span class="input-group-text"><i class="fas fa-link"></i></span>
                                 <input type="url" class="form-control" id="resumeLinkInput"
                                     placeholder="Enter your resume link (Google Drive, Dropbox, etc.)">
+                                {% if eligible and not applied %}
+                                    <form method="post" class="d-inline" id="optInForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="opt_in">
+                                        <input type="hidden" name="resume_link" id="hiddenResumeLink">
+                                        <button 
+                                            type="submit" 
+                                            class="btn btn-primary custom-btn">
+                                            Apply
+                                        </button>
+                                    </form>
+                                {% else %}
+                                <form method="post" class="d-inline" id="optInForm">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="opt_in">
+                                    <input type="hidden" name="resume_link" id="hiddenResumeLink">
+                                    <button 
+                                        type="submit" 
+                                        class="btn btn-primary custom-btn">
+                                        Update Resume
+                                    </button>
+                                </form>
+                                {% endif %}
                             </div>
                             <div id="resumeLinkFeedback" class="form-text text-muted">
                                 Make sure the link has proper sharing permissions.
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         {% endif %}
 
+        {% for job in job_details.jobs %}
+            <div class="job-card-detail bg-white">
+                <h3 class="job-title-section">{{ job.job_title }}</h3>
+                <div class="job-content">
+                    <p>{{ job.job_description }}</p>
+                </div>
+            </div>
+        {% endfor %}
 
     </div>
 
