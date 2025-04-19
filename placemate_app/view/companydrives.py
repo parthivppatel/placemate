@@ -7,7 +7,7 @@ from ..schema.drive_skills import DriveSkill
 from ..schema.drive_courses import DriveCourses
 from ..schema.drive_locations import DriveLocation
 from ..schema.company_drives import CompanyDrive,JobMode,JobType,DriveStatus
-from ..schema.drive_applications import DriveApplication
+from ..schema.drive_applications import DriveApplication,ApplicationStatus
 from ..schema.skills import Skill
 from ..schema.course import Course
 from ..schema.cities import City
@@ -17,7 +17,7 @@ from ..utils.random_password_utils import generate_random_password
 from django.urls import reverse
 from ..decorators import permission_required
 from ..utils.email_utils import send_registration_email,send_drive_emails
-from django.db.models import Q,Count, F, ExpressionWrapper, IntegerField
+from django.db.models import Q,Count, F, ExpressionWrapper, IntegerField,OuterRef, Subquery
 from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,update_mapper_by_id,validate_pagination
 from ..utils.jwt_utils import has_permission,get_user_from_jwt
 from django.views.decorators.csrf import csrf_exempt
@@ -46,7 +46,7 @@ def add_drive_page(request):
 
 @permission_required('view_drives')   
 def list_drives(request):
-    page,perpage = 1,10
+    # page,perpage = 1,10
     if request.method == "GET":
         data = request.GET
         # filters = data.get("filters", {})
@@ -303,7 +303,45 @@ def validate_drive_data(data,is_edit=False):
         return False, f"Invalid status: '{status}'. Must be one of {DriveStatus.values}"
     return True, "Validated successfully"
 
-permission_required('view_applicants')
+@permission_required('application_action')
+def application_action(request,id=0):
+    if request.method == "GET": 
+        try:
+            student_id = request.GET.get("student_id")
+            drive = CompanyDrive.objects.get(id=id)         
+            student = Student.objects.get(student_id=student_id)
+ 
+            new_status = request.GET.get('status') 
+            if new_status not in dict(ApplicationStatus.choices):
+                messages.error(request, f"No status provided or invalid status.")
+                return redirect('drive_applicants', id=drive.id)
+            
+            # Get the application record
+            application = DriveApplication.objects.get(drive=drive, student=student)
+
+            # Update and validate
+            application.status = new_status.upper()
+            application.save()
+
+            messages.success(request, f"Status updated to '{new_status}' for {student.first_name} {student.last_name}.")
+            return redirect('drive_applicants', id=drive.id)
+        
+        except CompanyDrive.DoesNotExist:
+            messages.error(request,"Drive Not Found")
+            return redirect('list_drives')
+        except Student.DoesNotExist:
+            messages.error(request,"Student Not Found")
+            return redirect('drive_applicants', id=drive.id)  
+        except Exception as e:
+            messages.error(request, f"Something went wrong: {str(e)}")
+            return redirect('drive_applicants', id=drive.id)
+
+
+    messages.error(request,"Invalid Request Method") 
+    return redirect('list_drives')
+
+
+@permission_required('view_applicants')
 def drive_applicants(request,id=0):
     # page,perpage = 1,10
     if request.method == 'GET':
@@ -318,23 +356,58 @@ def drive_applicants(request,id=0):
         drive = CompanyDrive.objects.get(id=id)
         if not drive:
             messages.error(request,"Drive Not Found")
+            return redirect('dashboard')
+        
+        status = data.get("status","APPLIED").strip()
+
+        resume_subquery = DriveApplication.objects.filter(
+        student_id=OuterRef('student_id'),
+        drive_id=drive.id
+        ).values('resume_link')[:1]  # Get the first resume if multiple
+
+        status_subquery = DriveApplication.objects.filter(
+        student_id=OuterRef('student_id'),
+        drive_id=drive.id
+        ).values('status')[:1]  # Get the first status value (ensure it’s the APPLIED status)
 
         students = Student.objects.filter(
-            student_id__in = DriveApplication.objects.filter(drive_id = drive.id).values("student_id")
-        ).select_related("company_placedIn", "student_id", "course").distinct().order_by("enrollment")
+            student_id__in = DriveApplication.objects.filter(
+                drive_id = drive.id,
+                status=status.upper()
+                ).values("student_id")
+        ).select_related("company_placedIn", "student_id", "course")\
+            .annotate(
+                resume_link=Subquery(resume_subquery),
+                status=Subquery(status_subquery)
+                 )\
+            .distinct().order_by("enrollment")
+        
+        user_payload = get_user_from_jwt(request)
+        user_role = user_payload.get("role") if user_payload else None
+        can_action_applications = has_permission(user_role, 'application_action')
+        
+        filter_options={      
+            "status_dropdown": [
+                {"value": status.value} for status in ApplicationStatus
+            ],
+        }
 
         paginated_students, total, pagination_data = paginate(students, page, perpage)
         
         return render(request, "drive_applications.html", {
             "students": paginated_students,
             "pagination": pagination_data,
+            "filter_options":filter_options,
             "total": total,
+            "permissions":{
+                "application_action":can_action_applications
+            },
             "drive":drive
         })
 
     
     messages.error(request,"Invalid request method")
-    return redirect('dashboard')
+    return redirect('list_drives')
 
 @permission_required('add_drive')
 def add_drive(request):

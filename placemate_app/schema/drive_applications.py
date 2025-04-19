@@ -7,7 +7,7 @@ class ApplicationStatus(models.TextChoices):
     REVIEWED = 'Reviewed', 'Reviewed'
     SHORTLISTED = 'Shortlisted', 'Shortlisted'
     REJECTED = 'Rejected', 'Rejected'
-    SELECTED = 'Selected', 'Selected'
+    # SELECTED = 'Selected', 'Selected'
 
 class DriveApplication(models.Model): 
     student = models.ForeignKey(Student, on_delete=models.CASCADE)

@@ -42,30 +42,30 @@ Drive Applications for {{drive.company.name}}
             font-weight: 500;
         }
     
-        /* PLACED */
-        .status-placed {
+        /* Completed */
+        .status-completed {
             background-color: #d1e7dd;
             color: #0f5132;
         }
     
-        /* INTERNSHIP */
-        .status-intern {
+        /* scheduled */
+        .status-scheduled {
             background-color: #cff4fc;
             color: #055160;
         }
     
-        /* JOB OFFER RECEIVED */
-        .status-offer {
+        /* ongoing */
+        .status-ongoing {
             background-color: #fff3cd;
             color: #664d03;
         }
     
-        /* NOT PLACED */
-        .status-not-placed {
+        /* cancelled */
+        .status-cancelled {
             background-color: #f8d7da;
             color: #842029;
         }
-    
+        
         /* Optional fallback */
         .status-unknown {
             background-color: #e2e3e5;
@@ -103,7 +103,7 @@ Drive Applications for {{drive.company.name}}
             margin: 0 5px;
         }
         
-        .eye-icon {
+        .eye-icon,.approve-icon {
             color: #6c7ae0;
             text-decoration: none;
         }
@@ -170,21 +170,38 @@ Drive Applications for {{drive.company.name}}
                 </div>
             </div>
         </div>
-
+        <!-- Display messages -->
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == "success" %}
+                    <div class="alert alert-success">{{ message }}</div>
+                {% else %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
          
+        <!-- Search & Filters -->
+        <form method="get" id="filterForm">
+            <div class="row mb-3 align-items-center" >
+                    <!-- Hidden inputs for pagination -->
+                <!-- <input type="hidden" name="page" value="1" id="filterPage">
+                <input type="hidden" name="perpage" value="{{ request.GET.perpage|default:'10' }}" id="filterPerPage"> -->
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <!-- Comapny Size Filter -->
+                    <select name="status" class="form-select form-select-sm rounded-pill px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
+                         {% for status in filter_options.status_dropdown %}
+                        <option value="{{ status.value }}" {% if request.GET.status|default:"Applied" == status.value|stringformat:"s" %}selected{% endif %}>
+                            {{ status.value }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                                
+                </div> 
+            </div>
+        </form>
         <div class="row g-0">
             <div>
-    
-                <!-- Display messages -->
-                {% if messages %}
-                    {% for message in messages %}
-                        {% if message.tags == "success" %}
-                            <div class="success-message">{{ message }}</div>
-                        {% else %}
-                            <div class="error-box">{{ message }}</div>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
                 
                 <!-- Student Table -->
                 <div class="table-responsive rounded">
@@ -196,8 +213,9 @@ Drive Applications for {{drive.company.name}}
                                 <th>Registration No.</th>
                                 <th>Batch</th>
                                 <th>Course</th>
-                                <th>Placement Status</th>
+                                <th>Resume Link</th> 
                                 <th>Action</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -210,32 +228,35 @@ Drive Applications for {{drive.company.name}}
                                 <td>{{ student.joining_year }} - {{ student.joining_year|add:"4" }}</td>
                                 <td>{{ student.course }}</td>
                                 <td>
-                                    {% with student.placement_status as status_code %}
-                                    <span class="status-badge 
-                                        {% if status_code == 1 %}status-placed
-                                        {% elif status_code == 2 %}status-intern
-                                        {% elif status_code == 3 %}status-offer
-                                        {% elif status_code == 0 %}status-not-placed
-                                        {% else %}status-unknown
-                                        {% endif %}">
-                                        {% if status_code == 1 %}
-                                        Placed
-                                        {% elif status_code == 2 %}
-                                        Internship
-                                        {% elif status_code == 3 %}
-                                        Job Offer Received
-                                        {% elif status_code == 0 %}
-                                        Not Placed
-                                        {% else %}
-                                        Unknown
-                                        {% endif %}
-                                    </span>
-                                    {% endwith %}
+                                    <a href="{{ student.resume_link }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" target="_blank">
+                                        <i class="bi bi-file-earmark-person-fill"></i> Resume
+                                    </a>
                                 </td>
                                 <td>
                                     <a href="{% url 'view_student' student.student_id.id %}?drive_id={{drive.id}}" class="eye-icon" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                <td>
+                                    {% if student.status == "APPLIED" and permissions.application_action %}
+                                    <!-- Approve Icon -->
+                                    <a href="{% url 'application_action' drive.id %}?student_id={{student.student_id.id}}&status=Shortlisted" class="text-success me-2 approve-icon" title="Approve">
+                                        <i class="bi bi-check-circle"></i>
+                                    </a>
+                                    
+                                    <!-- Reject Icon -->
+                                    <a href="{% url 'application_action' drive.id %}?student_id={{student.student_id.id}}&status=Rejected" class="text-danger" title="Reject">
+                                        <i class="bi bi-x-circle"></i>
+                                    </a>
+                                    {%else%}
+                                    <span class="status-badge
+                                    {% if student.status == 'APPLIED' %}status-scheduled
+                                    {% elif student.status == 'REVIEWED' %}status-ongoing
+                                    {% elif student.status == 'SHORTLISTED' %}status-completed
+                                    {% elif student.status == 'REJECTED' %}status-cancelled
+                                    {% else %}status-unknown
+                                    {% endif %}" id="studentStatus">{{student.status}}</span>
+                                    {% endif %}
+                                </td>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -252,17 +273,19 @@ Drive Applications for {{drive.company.name}}
                 {% if pagination %}
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <div>
+                        {% if students %}
                         Showing {{ pagination.start_index | add:1}} to 
                         {% with students_length=students|length %}
                         {{ pagination.start_index|add:students_length }}
                         {% endwith %} of {{ total }} companies
+                        {% endif %}
                     </div>
                     <nav>
                         <ul class="pagination pagination-sm mb-0">
                             {% if pagination.previous %}
                             <li class="page-item">
                                 <a class="page-link"
-                                    href="?page={{ pagination.previous }}&perpage={{ pagination.perpage }}">
+                                    href="?page={{ pagination.previous }}&perpage={{ pagination.perpage }}&status={{ request.GET.status|default:''}}">
                                     Previous
                                 </a>
                             </li>
@@ -280,7 +303,7 @@ Drive Applications for {{drive.company.name}}
     
                             {% if pagination.next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ pagination.next }}&perpage={{ pagination.perpage }}">
+                                <a class="page-link" href="?page={{ pagination.next }}&perpage={{ pagination.perpage }}&status={{ request.GET.status|default:''}}">
                                     Next
                                 </a>
                             </li>
@@ -307,7 +330,7 @@ Drive Applications for {{drive.company.name}}
     document.addEventListener("DOMContentLoaded", function () {
 
         // Automatically hide messages after 6 seconds
-        const messages = document.querySelectorAll('.success-message, .error-box');
+        const messages = document.querySelectorAll('.alert-success, .alert-danger');
         messages.forEach(message => {
             setTimeout(() => {
                 message.style.transition = "opacity 0.5s ease";

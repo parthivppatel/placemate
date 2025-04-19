@@ -189,10 +189,12 @@
 
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <div class="showing-entries">
+                        {% if data %}
                         Showing {{ pagination.start_index | add:1}} to 
                         {% with data_length=data|length %}
                         {{ pagination.start_index|add:data_length }}
                         {% endwith %} of {{ total }} companies
+                        {% endif %}
                     </div>                    
                     <!-- Pagination Controls -->
                     {% if pagination.next or pagination.previous %}

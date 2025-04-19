@@ -81,3 +81,6 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(40, 1, 12);
 INSERT INTO "Permissions" (id,name, description) VALUES (21,'view_applicants','Permission to view applicant details');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(41,3,21);
 
+INSERT INTO "Permissions" (id,name, description) VALUES (22,'application_action','Approve/Reject the application');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(42,2,22);
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(43,3,22);
