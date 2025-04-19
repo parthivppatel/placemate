@@ -13,9 +13,9 @@ from ..schema.students import Student
 from ..schema.users import User  
 from ..schema.drive_applications import DriveApplication
 from ..schema.company_drives import CompanyDrive
+from ..schema.placement_offers import PlacementOffer, OfferStatus
 
 def get_students_details(student):
-    # Status Breakdown
     application_status = DriveApplication.objects.filter(student=student).values_list('status', flat=True)
     status_counts = Counter(application_status)
 
@@ -27,7 +27,6 @@ def get_students_details(student):
         'Rejected': status_counts.get('Rejected', 0),
     }
 
-    # Drive Participation (last 4 months)
     today = timezone.now()
     four_months_ago = today - timezone.timedelta(days=120)
 
@@ -76,13 +75,27 @@ def get_students_details(student):
     application_data = []
 
     for application in student_applications:
-        # Accessing the company name through the related CompanyDrive model
         application_data.append({
-            'company': application.drive.company.name,  # Corrected to access the company name
+            'company': application.drive.company.name,  
             'drive': application.drive.drive_name,
             'applied_on': application.created_at.strftime('%Y-%m-%d'),
-            'status': application.get_status_display(),  # Optionally use get_status_display() for the human-readable status
+            'status': application.get_status_display(),  
         })
+
+    try:
+        accepted_offer = PlacementOffer.objects.get(student=student, status=OfferStatus.ACCEPTED)
+        if accepted_offer.job and accepted_offer.job.drive and accepted_offer.job.drive.company:
+            offer_data = {
+                "company": accepted_offer.job.drive.company.name,
+                "role": accepted_offer.job.job_title,
+                "package": f"{accepted_offer.package} LPA",
+                "status": accepted_offer.status,
+                "offer_date": accepted_offer.offer_date.strftime('%Y-%m-%d'),
+            }
+        else:
+            offer_data = None
+    except PlacementOffer.DoesNotExist:
+        offer_data = None
 
     return {
         "status_data": status_data,
@@ -91,7 +104,8 @@ def get_students_details(student):
             "data": drive_counts
         },
         "eligible_drives": eligible_drives_data,
-        "applications": application_data
+        "applications": application_data,
+        "offers": offer_data
     }
 
 @permission_required('view_dashboard')

@@ -320,7 +320,7 @@ def application_action(request,id=0):
             application = DriveApplication.objects.get(drive=drive, student=student)
 
             # Update and validate
-            application.status = new_status.upper()
+            application.status = new_status
             application.save()
 
             messages.success(request, f"Status updated to '{new_status}' for {student.first_name} {student.last_name}.")
@@ -358,7 +358,7 @@ def drive_applicants(request,id=0):
             messages.error(request,"Drive Not Found")
             return redirect('dashboard')
         
-        status = data.get("status","APPLIED").strip()
+        status = data.get("status","Applied").strip()
 
         resume_subquery = DriveApplication.objects.filter(
         student_id=OuterRef('student_id'),
@@ -373,7 +373,7 @@ def drive_applicants(request,id=0):
         students = Student.objects.filter(
             student_id__in = DriveApplication.objects.filter(
                 drive_id = drive.id,
-                status=status.upper()
+                status=status
                 ).values("student_id")
         ).select_related("company_placedIn", "student_id", "course")\
             .annotate(
@@ -391,9 +391,8 @@ def drive_applicants(request,id=0):
                 {"value": status.value} for status in ApplicationStatus
             ],
         }
-
-        paginated_students, total, pagination_data = paginate(students, page, perpage)
         
+        paginated_students, total, pagination_data = paginate(students, page, perpage)
         return render(request, "drive_applications.html", {
             "students": paginated_students,
             "pagination": pagination_data,

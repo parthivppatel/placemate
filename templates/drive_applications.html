@@ -237,7 +237,7 @@ Drive Applications for {{drive.company.name}}
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 <td>
-                                    {% if student.status == "APPLIED" and permissions.application_action %}
+                                    {% if student.status == "Applied" and permissions.application_action %}
                                     <!-- Approve Icon -->
                                     <a href="{% url 'application_action' drive.id %}?student_id={{student.student_id.id}}&status=Shortlisted" class="text-success me-2 approve-icon" title="Approve">
                                         <i class="bi bi-check-circle"></i>
@@ -249,10 +249,10 @@ Drive Applications for {{drive.company.name}}
                                     </a>
                                     {%else%}
                                     <span class="status-badge
-                                    {% if student.status == 'APPLIED' %}status-scheduled
-                                    {% elif student.status == 'REVIEWED' %}status-ongoing
-                                    {% elif student.status == 'SHORTLISTED' %}status-completed
-                                    {% elif student.status == 'REJECTED' %}status-cancelled
+                                    {% if student.status == 'Applied' %}status-scheduled
+                                    {% elif student.status == 'Reviewed' %}status-ongoing
+                                    {% elif student.status == 'Shortlisted' %}status-completed
+                                    {% elif student.status == 'Rejected' %}status-cancelled
                                     {% else %}status-unknown
                                     {% endif %}" id="studentStatus">{{student.status}}</span>
                                     {% endif %}
