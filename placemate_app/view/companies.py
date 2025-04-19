@@ -8,8 +8,9 @@ from ..schema.students import Student
 from ..schema.industry import Industry
 from ..schema.cities import City
 from ..schema.job_positions import JobPosition
-from ..schema.company_drive_jobs import CompanyDriveJobs
+from ..schema.placement_offers import PlacementOffer,OfferStatus
 from ..schema.company_drives import CompanyDrive
+from ..schema.drive_applications import DriveApplication,ApplicationStatus
 from ..utils.random_password_utils import generate_random_password
 from ..decorators import permission_required
 from django.contrib.auth.hashers import make_password
@@ -20,10 +21,12 @@ from django.db import transaction
 from ..utils.email_utils import send_registration_email 
 from ..utils.jwt_utils import has_permission,get_user_from_jwt
 from django.db.models import Q,When,Case,CharField,Value
-from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,validate_pagination
+from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,validate_pagination,get_batch_year
 from django.views.decorators.csrf import csrf_exempt
 import json
 import time
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
 
 def get_company_registration_context():
     return {
@@ -526,4 +529,125 @@ def delete_company(request):
 # def get_industries(request):
 #     industries = list(Industry.objects.values("id", "name").order_by("name"))
 #     return ResponseModel(industries,"Industries Fetch Succesfully",200)
+@permission_required('view_applicants')
+def shortlisted_students(request):
+    # page,perpage = 1,10
+    if request.method == 'GET':
+        data = request.GET
+        pagination = validate_pagination(data)
+        if pagination is None:
+            messages.error(request,"Page and perpage must be valid positive integers.")
+            return redirect("dashboard")
+        
+        page, perpage = pagination
+        
+        status = data.get("status","Shortlisted").strip()
+
+        applications = DriveApplication.objects.filter(
+        status=status
+        ).select_related(
+            'student__course', 'drive__company'
+        )
+
+        filter_options={      
+            "status_dropdown": [
+                {"value": status.value} for status in ApplicationStatus if status.value not in ["Applied", "Reviewed"]
+            ],
+        }
+
+        user_payload = get_user_from_jwt(request)
+        user_role = user_payload.get("role") if user_payload else None
+        can_placement_action = has_permission(user_role, 'placement_action')
+               
+        applications, total, pagination_data = paginate(applications, page, perpage)
+
+        results = []
+        for app in applications:
+            student = app.student
+            batch = get_batch_year(student)
+            results.append({
+                'id': app.id,
+                'student_id':student.student_id.id,
+                'status': app.status,
+                'first_name': student.first_name,
+                'last_name': student.last_name,
+                'enrollment': student.enrollment,
+                'batch': batch,  # Custom value
+                'course_name':student.course.name,
+                'drive_name': app.drive.drive_name,
+                'company_name': app.drive.company.name
+            })
+
+        return render(request, "shortlisted_students.html", {
+            "students": results,
+            "pagination": pagination_data,
+            "filter_options":filter_options,
+            "total": total,
+            "permissions":{
+                "placement_action":can_placement_action
+            }
+         })
+        
     
+    messages.error(request,"Invalid request method")
+    return redirect('dashboard')
+
+@permission_required('placement_action')
+def placement_action(request):
+    if request.method == "POST": 
+        try:
+            student_id = request.POST.get("student_id")
+            drive_id = request.POST.get("drive_id")
+            
+            drive = DriveApplication.objects.get(id=drive_id)         
+            student = Student.objects.get(student_id=student_id)
+            
+            new_status = request.POST.get('status') 
+            if not new_status:
+                messages.error(request, f"No status provided or invalid status.")
+                return redirect('shortlisted_students')
+ 
+            with transaction.atomic():
+                if new_status == "Selected":
+                    try:
+                        offer_date = datetime.strptime(request.POST.get('offer_date'), "%Y-%m-%d").date()
+                        package = Decimal(request.POST.get('package'))
+                    except (ValueError, InvalidOperation):
+                        messages.error(request, "Invalid offer date or package format.")
+                        return redirect('shortlisted_students')
+
+                    PlacementOffer.objects.create(
+                        student=student,
+                        job=drive,
+                        offer_date=offer_date,
+                        package=package,
+                        status = OfferStatus.OFFERED
+                    )
+                    company = Company.objects.get(id=drive.drive.company.id)
+                    student.company_placedIn = company
+                    student.save()
+ 
+                # Get the application record
+                application = DriveApplication.objects.get(id=drive_id)
+                # Update and validate
+                application.status = new_status
+                application.save()
+
+            messages.success(request, f"Status updated to '{new_status}' for {student.first_name} {student.last_name}.")
+            return redirect('shortlisted_students')
+           
+
+            
+        except DriveApplication.DoesNotExist:
+            messages.error(request,"Drive Application Not Found")
+            return redirect('shortlisted_students')
+        except Student.DoesNotExist:
+            messages.error(request,"Student Not Found")
+            return redirect('shortlisted_students')  
+        except Exception as e:
+            messages.error(request, f"Something went wrong: {str(e)}")
+            return redirect('shortlisted_students')
+
+
+    messages.error(request,"Invalid Request Method") 
+    return redirect('shortlisted_students')

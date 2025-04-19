@@ -1,5 +1,6 @@
 {% extends "admin_base.html" %}
 {% load static %}
+{% load custom_tags %}
 {% block header_title %}
 Drives Applications
 {% endblock %}
@@ -109,8 +110,7 @@ Drive Applications for {{drive.company.name}}
         }
         
     </style>
-</head>
-<body>
+ 
     <div class="container mt-4">
         <div class="company-card bg-white">
             <div class="row">
@@ -225,7 +225,7 @@ Drive Applications for {{drive.company.name}}
                                 <td>{{ forloop.counter|add:pagination.start_index }}</td>
                                 <td>{{ student.first_name }} {{ student.last_name }}</td>
                                 <td>{{ student.enrollment }}</td>
-                                <td>{{ student.joining_year }} - {{ student.joining_year|add:"4" }}</td>
+                                <td>{{ student|get_student_batch }}</td>
                                 <td>{{ student.course }}</td>
                                 <td>
                                     <a href="{{ student.resume_link }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" target="_blank">
@@ -236,6 +236,7 @@ Drive Applications for {{drive.company.name}}
                                     <a href="{% url 'view_student' student.student_id.id %}?drive_id={{drive.id}}" class="eye-icon" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                </td>
                                 <td>
                                     {% if student.status == "Applied" and permissions.application_action %}
                                     <!-- Approve Icon -->
@@ -256,8 +257,7 @@ Drive Applications for {{drive.company.name}}
                                     {% else %}status-unknown
                                     {% endif %}" id="studentStatus">{{student.status}}</span>
                                     {% endif %}
-                                </td>
-                                </td>
+                                </td> 
                             </tr>
                             {% endfor %}
                             {% else %}
@@ -324,7 +324,6 @@ Drive Applications for {{drive.company.name}}
 
   
     
-</body> 
 <script src="{% static 'js/list_students.js' %}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {

@@ -138,24 +138,13 @@
 
     <!-- Actions Bar -->
     <div class="actions-bar">
-        {% if permissions.view_applicants and drive_id %}
-        <a href="{% url 'drive_applicants' drive_id %}" 
+         <a href="javascript:history.back()" 
         class="btn btn-outline-dark rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2" 
         style="gap: 6px;" 
         title="Back to Companies">
         <i class="bi bi-arrow-left fs-5"></i>
         <span class="fw-semibold">Back</span>
         </a>       
-        {% else %}
-        <a href="{% url 'list_students' %}" 
-        class="btn btn-outline-dark rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2" 
-        style="gap: 6px;" 
-        title="Back to Companies">
-        <i class="bi bi-arrow-left fs-5"></i>
-        <span class="fw-semibold">Back</span>
-        </a>   
-        {% endif %}  
-
         <button  
         class="btn btn-primary rounded-pill shadow-sm d-inline-flex align-items-center px-3 py-2"  id="toggleEditBtn"
         style="gap: 6px;" 

@@ -1,0 +1,300 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% load custom_tags%}
+{% block header_title %}
+Shortlisted Students
+{% endblock %}
+
+{% block header_subtitle %}
+Shortlisted Applications for this year
+{% endblock %}
+{% block content %}
+<style>
+    .approve-icon{
+        text-decoration: none;
+    }
+    .status-badge {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 50px;
+      display: inline-block;
+      min-width: 100px;
+      text-align: center;
+      font-weight: 500;
+  }
+
+  /* Completed */
+  .status-completed {
+      background-color: #d1e7dd;
+      color: #0f5132;
+  }
+
+  /* scheduled */
+  .status-scheduled {
+      background-color: #cff4fc;
+      color: #055160;
+  }
+
+  /* ongoing */
+  .status-ongoing {
+      background-color: #fff3cd;
+      color: #664d03;
+  }
+
+  /* cancelled */
+  .status-cancelled {
+      background-color: #f8d7da;
+      color: #842029;
+  }
+  
+  /* Optional fallback */
+  .status-unknown {
+      background-color: #e2e3e5;
+      color: #41464b;
+  }
+</style>
+<div class="container mt-4">
+    <!-- Display messages -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% else %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+<div class="row g-0">
+    <div>
+              <!-- Search & Filters -->
+              <form method="get" id="filterForm">
+                <div class="row mb-3 align-items-center" >
+                        <!-- Hidden inputs for pagination -->
+                    <!-- <input type="hidden" name="page" value="1" id="filterPage">
+                    <input type="hidden" name="perpage" value="{{ request.GET.perpage|default:'10' }}" id="filterPerPage"> -->
+                    <div class="col-md-3 mb-2 mb-md-0">
+                        <!-- Comapny Size Filter -->
+                        <select name="status" class="form-select form-select-sm rounded-pill px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
+                             {% for status in filter_options.status_dropdown %}
+                            <option value="{{ status.value}}" {% if request.GET.status|default:"Shortlisted" == status.value|stringformat:"s" %}selected{% endif %}>
+                                {{ status.value }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                                    
+                    </div> 
+                </div>
+            </form>
+        <!-- Student Table -->
+        <div class="table-responsive rounded">
+            <table class="table table-hover align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>S.No</th>
+                        <th>Company Name</th>
+                        <th>Drive Name</th>
+                        <th>Student Name</th>
+                        <th>Registration No.</th>
+                        <th>Batch</th>
+                        <th>Course</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if students %}
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ forloop.counter|add:pagination.start_index }}</td>
+                        <td>{{ student.company_name }}</td>
+                        <td>{{ student.drive_name }}</td>
+                        <td>{{ student.first_name }} {{ student.last_name }}</td>
+                        <td>{{ student.enrollment }}</td>
+                        <td>{{ student.batch}}</td>
+                        <td>{{ student.course_name }}</td>
+                        <td>
+                            <a href="{% url 'view_student' student.student_id %}?drive_id={{student.id}}" class="eye-icon" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                        <td>
+                            {% if permissions.placement_action and student.status == 'Shortlisted' %}
+                            <a href="#" class="text-success me-2 approve-icon" 
+                            data-student-id="{{ student.student_id }}" 
+                            data-drive-id="{{student.id}}" 
+                            data-student-name="{{ student.first_name }} {{ student.last_name }}"
+                            data-bs-toggle="modal" data-bs-target="#approveModal" 
+                            title="Approve">
+                            <i class="bi bi-check-circle"></i>
+                            </a>
+                            <!-- Reject Button (Triggers Modal) -->
+                            <a href="#" class="text-danger reject-icon" 
+                            data-student-id="{{ student.student_id }}" 
+                            data-drive-id="{{ student.id }}" 
+                            data-student-name="{{ student.first_name }} {{ student.last_name }}"
+                            data-bs-toggle="modal" data-bs-target="#rejectModal" 
+                            title="Reject">
+                            <i class="bi bi-x-circle"></i>
+                            </a>
+                            {%else%}
+                                <span class="status-badge
+                                {% if student.status == 'Shortlisted' %}status-ongoing
+                                {% elif student.status == 'Selected' %}status-completed
+                                {% elif student.status == 'Rejected' %}status-cancelled
+                                {% else %}status-unknown
+                                {% endif %}" id="studentStatus">{{student.status}}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="9">No Shortlisted students found.</td> <!-- Updated colspan from 7 to 8 -->
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+            <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <form method="POST" id="approveForm" action="{% url 'placement_action' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="student_id" id="approveStudentId">
+                    <input type="hidden" name="drive_id" id="approveDriveId">
+                    <input type="hidden" name="status" value="Selected">
+                    <div class="modal-content">
+                      <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="approveModalLabel">Offer Student</h5>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure you want to Offer <strong id="approveStudentName"></strong>?</p>
+                        <div class="mb-3">
+                          <label for="offer_date" class="form-label">Offer Date</label>
+                          <input type="date" name="offer_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                          <label for="package" class="form-label">Package (in LPA)</label>
+                          <input type="number" name="package" class="form-control" step="0.01" required>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Approve</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <form method="POST" id="rejectForm" action="{% url 'placement_action' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="student_id" id="rejectStudentId">
+                    <input type="hidden" name="drive_id" id="rejectDriveId">
+                    <input type="hidden" name="status" value="Rejected">
+                    <div class="modal-content">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="rejectModalLabel">Reject Student</h5>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure you want to reject <strong id="rejectStudentName"></strong>?</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+        </div>
+                <!-- Pagination Controls -->
+                {% if pagination %}
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        {% if students %}
+                        Showing {{ pagination.start_index | add:1}} to 
+                        {% with students_length=students|length %}
+                        {{ pagination.start_index|add:students_length }}
+                        {% endwith %} of {{ total }} companies
+                        {% endif %}
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            {% if pagination.previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ pagination.previous }}&perpage={{ pagination.perpage }}&status={{ request.GET.status|default:''}}">
+                                    Previous
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                            {% endif %}
+    
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    {{ pagination.page }}
+                                </span>
+                            </li>
+    
+                            {% if pagination.next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pagination.next }}&perpage={{ pagination.perpage }}&status={{ request.GET.status|default:''}}">
+                                    Next
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+
+        </div>
+
+    </div>
+ 
+</div>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+
+      // Automatically hide messages after 6 seconds
+      const messages = document.querySelectorAll('.alert-success, .alert-danger');
+      messages.forEach(message => {
+          setTimeout(() => {
+              message.style.transition = "opacity 0.5s ease";
+              message.style.opacity = "0";
+              setTimeout(() => message.remove(), 500); // Remove the element after fading out
+          }, 6000); // 6 seconds
+      });
+
+        $('.approve-icon').on('click', function () {
+          const studentId = $(this).data('student-id');
+          const driveId = $(this).data('drive-id');
+          const studentName = $(this).data('student-name');
+    
+          $('#approveStudentId').val(studentId);
+          $('#approveDriveId').val(driveId);
+          $('#approveStudentName').text(studentName);
+        });
+    
+        $('.reject-icon').on('click', function () {
+          const studentId = $(this).data('student-id');
+          const driveId = $(this).data('drive-id');
+          const studentName = $(this).data('student-name');
+    
+          $('#rejectStudentId').val(studentId);
+          $('#rejectDriveId').val(driveId);
+          $('#rejectStudentName').text(studentName);
+        });
+      });
+</script>
+{% endblock %}

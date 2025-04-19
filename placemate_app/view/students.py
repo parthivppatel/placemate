@@ -15,7 +15,7 @@ from ..schema.course import Course
 from ..schema.roles import Role
 from ..schema.user_roles import UserRole
 from ..schema.cities import City
-from ..utils.helper_utils import paginate, safe_value,validate_pagination, ResponseModel
+from ..utils.helper_utils import paginate, safe_value,validate_pagination, ResponseModel,get_batch_year
 
 from ..utils.jwt_utils import has_permission, get_user_from_jwt
 
@@ -260,7 +260,7 @@ def view_student(request, student_id):
             "phone": student.student_id.phone,
             "enrollment": student.enrollment,
             "course": student.course.name if student.course else "N/A",
-            "batch": f"{student.joining_year} - {student.joining_year + 4}" if student.joining_year else "N/A",
+            "batch": get_batch_year(student) if student.joining_year else "N/A",
             "joining_year": student.joining_year or "N/A",  # Ensure joining_year is handled properly
             "cgpa": student.cgpa or "N/A",
             "placement_status": PlacementStatus(student.placement_status).label if student.placement_status is not None else "N/A",
@@ -450,7 +450,7 @@ def list_students(request):
                 "enrollment": student.enrollment,
                 "cgpa": student.cgpa,
                 "phone": student.student_id.phone,
-                "batch": f"{student.joining_year} - {student.joining_year + 4}" if student.joining_year else "N/A",  # Added Batch
+                "batch": get_batch_year(student) if student.joining_year else "N/A",  # Added Batch
                 "course": safe_value(student.course, "name"),
                 "placement_status": student.get_placement_status_display(),  # Added Placement Status
                 "graduation_status": student.get_graduation_status_display(),
