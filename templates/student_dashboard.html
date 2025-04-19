@@ -4,193 +4,526 @@
 
 {% block content %}
 
-<style>
-    .card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#4F46E5',
+                    secondary: '#6366F1',
+                }
+            }
+        },
+        boxShadow: {
+            'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)'
+        }
     }
+</script>
+<!-- Side Navigation -->
+<div class="flex h-screen overflow-hidden">
 
-    .stat-box {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #343a40;
-    }
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
 
-    .stat-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-
-    .status-badge {
-        font-size: 0.75rem;
-        padding: 0.35rem 0.7rem;
-        border-radius: 20px;
-        font-weight: 500;
-    }
-
-    .highlight-card {
-        border-left: 4px solid #0d6efd;
-    }
-
-    .profile-quick {
-        background-color: #e9ecef;
-        border-radius: 10px;
-        padding: 10px;
-    }
-
-    .profile-pic {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .progress-thin {
-        height: 8px;
-        border-radius: 4px;
-    }
-
-    .company-logo {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .resume-badge {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.5rem;
-    }
-
-    .nav-pills .nav-link.active {
-        background-color: #0d6efd;
-    }
-
-    .calendar-box {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-    }
-
-    .calendar-month {
-        font-size: 0.6rem;
-        text-transform: uppercase;
-        font-weight: 600;
-        color: #dc3545;
-    }
-
-    .calendar-day {
-        font-size: 0.9rem;
-        font-weight: 700;
-    }
-
-    .event-indicator {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 5px;
-    }
-
-    .skill-tag {
-        background-color: #e9ecef;
-        color: #495057;
-        border-radius: 15px;
-        padding: 3px 10px;
-        font-size: 0.75rem;
-        margin-right: 5px;
-        margin-bottom: 5px;
-    }
-
-    .announcement-card {
-        border-left: 4px solid #ffc107;
-    }
-
-    .task-item {
-        transition: background-color 0.2s;
-    }
-
-    .task-item:hover {
-        background-color: #f8f9fa;
-    }
-
-    .task-checkbox:checked+.task-text {
-        text-decoration: line-through;
-        color: #6c757d;
-    }
-</style>
-<div class="container my-4">
-
-    <!-- Stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3 col-sm-6">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-box">12</div>
-                        <div class="stat-label">Eligible Jobs</div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu"
+            class="md:hidden bg-indigo-900 text-white w-64 absolute h-full z-20 transform -translate-x-full transition-transform duration-200 ease-in-out">
+            <div class="p-6">
+                <div class="flex items-center space-x-2 mb-8">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                        <span class="text-indigo-900 font-bold text-xl">P</span>
                     </div>
-                    <div class="fs-2 text-primary">
+                    <span class="text-xl font-bold">Placemate</span>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 bg-indigo-800 px-4 py-3 rounded-lg">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div
+                        class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-800 rounded-lg cursor-pointer transition">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </div>
+                    <div
+                        class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-800 rounded-lg cursor-pointer transition">
                         <i class="fas fa-briefcase"></i>
+                        <span>Jobs</span>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-box">5</div>
-                        <div class="stat-label">Drives Applied</div>
+                    <div
+                        class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-800 rounded-lg cursor-pointer transition">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Applications</span>
                     </div>
-                    <div class="fs-2 text-success">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-box">2</div>
-                        <div class="stat-label">Upcoming Interviews</div>
-                    </div>
-                    <div class="fs-2 text-warning">
+                    <div
+                        class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-800 rounded-lg cursor-pointer transition">
                         <i class="fas fa-calendar-alt"></i>
+                        <span>Interviews</span>
+                    </div>
+                    <div
+                        class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-800 rounded-lg cursor-pointer transition">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-box">1</div>
-                        <div class="stat-label">Offers Received</div>
+
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto">
+            <div class="max-w-7xl mx-auto">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-xl p-6 mb-6 text-white shadow-md">
+                    <div class="flex flex-col md:flex-row justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold mb-2">Welcome back, John Doe! 👋</h1>
+                            <p class="opacity-90">Track your placement journey and stay updated with the latest
+                                opportunities.</p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                        </div>
                     </div>
-                    <div class="fs-2 text-info">
-                        <i class="fas fa-trophy"></i>
+                </div>
+
+                <!-- Profile and Stats Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+                    <!-- Profile Card -->
+                    <div class="bg-white rounded-xl shadow-card p-6 lg:col-span-1 border border-gray-100">
+                        <div class="relative">
+                            <div class="absolute top-0 right-0">
+                                <div class="bg-blue-50 text-blue-600 px-2 py-1 rounded-md text-xs font-medium">
+                                    Student
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 mb-6">
+                                <div
+                                    class="w-16 h-16 flex-shrink-0 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5">
+                                    <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
+                                        <span
+                                            class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">JD</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold">John Doe</h2>
+                                    <div class="flex items-center text-gray-500 text-sm">
+                                        <i class="fas fa-graduation-cap mr-1"></i>
+                                        <span>Computer Science</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <p class="text-xs text-gray-500 mb-1">CGPA</p>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-chart-line text-indigo-500 mr-2"></i>
+                                        <p class="font-bold text-lg">8.7</p>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <p class="text-xs text-gray-500 mb-1">Resume</p>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-file-alt text-green-500 mr-2"></i>
+                                        <p class="font-bold text-green-600">Uploaded</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-2">
+                                <button
+                                    class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm transition flex items-center justify-center">
+                                    <i class="fas fa-user-edit mr-1"></i> Edit Profile
+                                </button>
+                                <button
+                                    class="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-500 transition">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <!-- Eligible Jobs Card -->
+                        <div
+                            class="bg-white p-6 rounded-xl shadow-card border border-gray-100 relative overflow-hidden">
+                            <!-- Decorative element -->
+                            <div class="absolute top-0 right-0 h-24 w-24 bg-blue-50 rounded-full -mt-8 -mr-8"></div>
+
+                            <div class="relative">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
+                                        <i class="fas fa-briefcase text-blue-600 text-xl"></i>
+                                    </div>
+                                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                        +3 this week
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">10</h3>
+                                    <p class="text-gray-500">Eligible Jobs</p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-gray-100">
+                                    <a href="#"
+                                        class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                        View all jobs <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Applied Jobs Card -->
+                        <div
+                            class="bg-white p-6 rounded-xl shadow-card border border-gray-100 relative overflow-hidden">
+                            <!-- Decorative element -->
+                            <div class="absolute top-0 right-0 h-24 w-24 bg-green-50 rounded-full -mt-8 -mr-8"></div>
+
+                            <div class="relative">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
+                                        <i class="fas fa-file-alt text-green-600 text-xl"></i>
+                                    </div>
+                                    <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                        2 interviews
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">6</h3>
+                                    <p class="text-gray-500">Applied Jobs</p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-gray-100">
+                                    <a href="#"
+                                        class="text-sm text-green-600 hover:text-green-800 font-medium flex items-center">
+                                        Track applications <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Final Placement Card -->
+                        <div
+                            class="bg-white p-6 rounded-xl shadow-card border border-gray-100 relative overflow-hidden">
+                            <!-- Decorative element -->
+                            <div class="absolute top-0 right-0 h-24 w-24 bg-purple-50 rounded-full -mt-8 -mr-8"></div>
+
+                            <div class="relative">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center">
+                                        <i class="fas fa-trophy text-purple-600 text-xl"></i>
+                                    </div>
+                                    <span
+                                        class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
+                                        Confirmed
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">ABC Corp</h3>
+                                    <div class="flex items-center text-gray-500">
+                                        <span>Software Engineer</span>
+                                        <span class="mx-2">•</span>
+                                        <span class="font-medium text-green-600">8 LPA</span>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-gray-100">
+                                    <a href="#"
+                                        class="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center">
+                                        View offer details <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Analytics Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Application Status</h2>
+                            <div class="text-xs text-gray-500">Last updated: Today</div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Drive Participation</h2>
+                            <div class="text-xs text-gray-500">Last 4 months</div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="driveChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Drives & Applications Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Eligible Drives -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm h-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">Eligible Drives</h2>
+                            <button class="text-sm text-indigo-600 hover:text-indigo-800">View All</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-left text-xs text-gray-500 border-b">
+                                        <th class="pb-2 font-medium">Company</th>
+                                        <th class="pb-2 font-medium">Role</th>
+                                        <th class="pb-2 font-medium">Package</th>
+                                        <th class="pb-2 font-medium">Deadline</th>
+                                        <th class="pb-2 font-medium"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="py-3">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
+                                                    XL
+                                                </div>
+                                                <span>XYZ Ltd</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">Backend Developer</td>
+                                        <td class="py-3 font-medium">8 LPA</td>
+                                        <td class="py-3 text-sm">
+                                            <span class="text-red-600">2025-04-25</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <button
+                                                class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition">Apply</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="py-3">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
+                                                    TT
+                                                </div>
+                                                <span>Tech Titans</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">Software Engineer</td>
+                                        <td class="py-3 font-medium">12 LPA</td>
+                                        <td class="py-3 text-sm">
+                                            <span class="text-orange-600">2025-04-28</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <button
+                                                class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition">Apply</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
+                                                    GG
+                                                </div>
+                                                <span>GrowGlobe</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">Data Analyst</td>
+                                        <td class="py-3 font-medium">7.5 LPA</td>
+                                        <td class="py-3 text-sm">
+                                            <span>2025-05-02</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <button
+                                                class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition">Apply</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- My Applications -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm h-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold">My Applications</h2>
+                            <button class="text-sm text-indigo-600 hover:text-indigo-800">View All</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="text-left text-xs text-gray-500 border-b">
+                                        <th class="pb-2 font-medium">Company</th>
+                                        <th class="pb-2 font-medium">Role</th>
+                                        <th class="pb-2 font-medium">Applied On</th>
+                                        <th class="pb-2 font-medium">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="py-3">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
+                                                    AC
+                                                </div>
+                                                <span>ABC Corp</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">Software Engineer</td>
+                                        <td class="py-3 text-sm">2025-04-10</td>
+                                        <td class="py-3">
+                                            <span
+                                                class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">Offered</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="py-3">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
+                                                    PS
+                                                </div>
+                                                <span>PQR Solutions</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">Frontend Intern</td>
+                                        <td class="py-3 text-sm">2025-04-05</td>
+                                        <td class="py-3">
+                                            <span
+                                                class="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">Interview</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
+                                                    DD
+                                                </div>
+                                                <span>DevDigital</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">Full Stack Developer</td>
+                                        <td class="py-3 text-sm">2025-03-28</td>
+                                        <td class="py-3">
+                                            <span
+                                                class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">Shortlisted</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Testimonials -->
+                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-6 mb-6">
+                    <h2 class="text-lg font-semibold mb-4">Success Stories</h2>
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0"></div>
+                            <div>
+                                <p class="italic text-gray-600">"The placement portal helped me track all my
+                                    applications and prepare effectively. I landed my dream job at ABC Corp!"</p>
+                                <p class="mt-2 font-medium">- Sarah Jones, 2024 Batch</p>
+                                <p class="text-sm text-gray-500">Software Engineer at ABC Corp</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
-
-
 </div>
 
+<!-- Scripts -->
+<script>
+    // Charts
+    const statusCtx = document.getElementById('statusChart');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Applied', 'Shortlisted', 'Interview', 'Offered', 'Rejected'],
+            datasets: [{
+                label: 'Status Count',
+                data: [6, 2, 1, 2, 1],
+                backgroundColor: [
+                    '#4F46E5',
+                    '#10B981',
+                    '#F59E0B',
+                    '#8B5CF6',
+                    '#EF4444'
+                ],
+                borderColor: '#FFFFFF',
+                borderWidth: 2,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 10
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+
+    const driveCtx = document.getElementById('driveChart');
+    new Chart(driveCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+            datasets: [{
+                label: 'Drives Participated',
+                data: [2, 4, 3, 5],
+                backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
