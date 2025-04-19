@@ -18,11 +18,15 @@ from .view.companydrives import list_drives,add_drive,edit_drive,edit_drive_page
 from .view.students import student_registrations, student_manual_registrations, view_student, edit_student, delete_student, list_students
 from .view.student import student_profile, student_edit_student, list_student_drives, student_drive_details
 
+from placemate_app.utils.reset_password_utils import profile_reset_password
+
 urlpatterns = [
     path('', dashboard, name="dashboard"),
 
     path('login/', login, name="login"),
     path('logout/', logout, name="logout"),
+
+    path('profile-reset-password/', profile_reset_password, name="profile_reset_password"),
 
     path('forgot-password/', forgot_password, name="forgot-password"),
     path('verify_otp/', verify_otp, name="verify-otp"),
