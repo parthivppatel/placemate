@@ -80,7 +80,7 @@
                 <div class="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-xl p-6 mb-6 text-white shadow-md">
                     <div class="flex flex-col md:flex-row justify-between">
                         <div>
-                            <h1 class="text-3xl font-bold mb-2">Welcome back, John Doe! 👋</h1>
+                            <h1 class="text-3xl font-bold mb-2">Welcome back, {{ profile_name }}! 👋</h1>
                             <p class="opacity-90">Track your placement journey and stay updated with the latest
                                 opportunities.</p>
                         </div>
@@ -95,24 +95,29 @@
                     <div class="bg-white rounded-xl shadow-card p-6 lg:col-span-1 border border-gray-100">
                         <div class="relative">
                             <div class="absolute top-0 right-0">
-                                <div class="bg-blue-50 text-blue-600 px-2 py-1 rounded-md text-xs font-medium">
-                                    Student
-                                </div>
                             </div>
                             <div class="flex items-center space-x-4 mb-6">
                                 <div
                                     class="w-16 h-16 flex-shrink-0 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5">
                                     <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
-                                        <span
-                                            class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">JD</span>
+                                        <div class="w-full h-full flex items-center justify-center">
+                                            <div class="w-full h-full flex items-center justify-center">
+                                                <span
+                                                    style="display: inline-block; width: 100px; height: 100px; border-radius: 50%; overflow: hidden; position: relative;">
+                                                    <p style="position: absolute;">{{ profile_name|slice:":2" }}</p>
+                                                </span>
+                                            </div>
+
+                                        </div>
+
                                     </div>
                                 </div>
                                 <div>
-                                    <h2 class="text-xl font-bold">John Doe</h2>
+                                    <h2 class="text-xl font-bold"></h2>
                                     <div class="flex items-center text-gray-500 text-sm">
-                                        <i class="fas fa-graduation-cap mr-1"></i>
-                                        <span>Computer Science</span>
+                                        <i class="fas fa-graduation-cap mr-1">{{ profile_name }}</i>
                                     </div>
+                                    <div style="margin-top: 10%;">{{ student.course }}</div>
                                 </div>
                             </div>
                         </div>
@@ -125,19 +130,19 @@
                                     <p class="text-xs text-gray-500 mb-1">CGPA</p>
                                     <div class="flex items-center">
                                         <i class="fas fa-chart-line text-indigo-500 mr-2"></i>
-                                        <p class="font-bold text-lg">8.7</p>
+                                        <p class="font-bold text-lg">{{ student.cgpa }}</p>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 rounded-lg p-3">
+                                <!-- <div class="bg-gray-50 rounded-lg p-3">
                                     <p class="text-xs text-gray-500 mb-1">Resume</p>
                                     <div class="flex items-center">
                                         <i class="fas fa-file-alt text-green-500 mr-2"></i>
                                         <p class="font-bold text-green-600">Uploaded</p>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
 
-                            <div class="flex space-x-2">
+                            <!-- <div class="flex space-x-2">
                                 <button
                                     class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm transition flex items-center justify-center">
                                     <i class="fas fa-user-edit mr-1"></i> Edit Profile
@@ -146,15 +151,15 @@
                                     class="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-500 transition">
                                     <i class="fas fa-cog"></i>
                                 </button>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
                     <!-- Summary Cards -->
                     <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <!-- Eligible Jobs Card -->
-                        <div
-                            class="bg-white p-6 rounded-xl shadow-card border border-gray-100 relative overflow-hidden">
+
+                        <!-- Eligible Drives Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-card border border-gray-100 relative overflow-hidden">
                             <!-- Decorative element -->
                             <div class="absolute top-0 right-0 h-24 w-24 bg-blue-50 rounded-full -mt-8 -mr-8"></div>
 
@@ -164,53 +169,54 @@
                                         <i class="fas fa-briefcase text-blue-600 text-xl"></i>
                                     </div>
                                     <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                                        +3 this week
+                                        +{{ student_dashboard_details.eligible_drives|length }} this week
                                     </span>
                                 </div>
 
                                 <div>
-                                    <h3 class="text-lg font-bold text-gray-800">10</h3>
-                                    <p class="text-gray-500">Eligible Jobs</p>
+                                    <h3 class="text-lg font-bold text-gray-800">{{ student_dashboard_details.eligible_drives|length }}</h3>
+                                    <p class="text-gray-500">Eligible drives</p>
                                 </div>
 
                                 <div class="mt-4 pt-3 border-t border-gray-100">
-                                    <a href="#"
+                                    <a href="{% url 'list_student_drives' %}"
                                         class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center">
-                                        View all jobs <i class="fas fa-arrow-right ml-1"></i>
+                                        View all drives <i class="fas fa-arrow-right ml-1"></i>
                                     </a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Applied Jobs Card -->
-                        <div
-                            class="bg-white p-6 rounded-xl shadow-card border border-gray-100 relative overflow-hidden">
+
+                        <!-- Applied Drive Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-card border border-gray-100 relative overflow-hidden">
                             <!-- Decorative element -->
                             <div class="absolute top-0 right-0 h-24 w-24 bg-green-50 rounded-full -mt-8 -mr-8"></div>
-
+                        
                             <div class="relative">
                                 <div class="flex items-center justify-between mb-4">
                                     <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
                                         <i class="fas fa-file-alt text-green-600 text-xl"></i>
                                     </div>
                                     <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                                        2 interviews
+                                        2 Interviews
                                     </span>
                                 </div>
-
+                        
                                 <div>
-                                    <h3 class="text-lg font-bold text-gray-800">6</h3>
-                                    <p class="text-gray-500">Applied Jobs</p>
+                                    <h3 class="text-lg font-bold text-gray-800">{{ student_dashboard_details.status_data.Applied }}</h3>
+                                    <p class="text-gray-500">Applied Drive</p>
                                 </div>
-
+                        
                                 <div class="mt-4 pt-3 border-t border-gray-100">
-                                    <a href="#"
-                                        class="text-sm text-green-600 hover:text-green-800 font-medium flex items-center">
+                                    <a href=""  
+                                       class="text-sm text-green-600 hover:text-green-800 font-medium flex items-center">
                                         Track applications <i class="fas fa-arrow-right ml-1"></i>
                                     </a>
                                 </div>
                             </div>
                         </div>
+                        
 
                         <!-- Final Placement Card -->
                         <div
@@ -248,6 +254,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Analytics Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm">
@@ -272,162 +279,105 @@
 
                 <!-- Upcoming Drives & Applications Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    
                     <!-- Eligible Drives -->
                     <div class="bg-white p-6 rounded-xl shadow-sm h-full">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-lg font-semibold">Eligible Drives</h2>
-                            <button class="text-sm text-indigo-600 hover:text-indigo-800">View All</button>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
+                        <div class="overflow-x-auto max-h-[300px] overflow-y-auto">
+                            <table class="w-full" style="font-size: smaller; text-align: center;" >
                                 <thead>
-                                    <tr class="text-left text-xs text-gray-500 border-b">
+                                    <tr class="text-left text-xs text-gray-500 border-b" style="text-align: center;">
                                         <th class="pb-2 font-medium">Company</th>
-                                        <th class="pb-2 font-medium">Role</th>
+                                        <th class="pb-2 font-medium">Drive</th>
                                         <th class="pb-2 font-medium">Package</th>
                                         <th class="pb-2 font-medium">Deadline</th>
                                         <th class="pb-2 font-medium"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b">
-                                        <td class="py-3">
-                                            <div class="flex items-center">
-                                                <div
-                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
-                                                    XL
+                                    {% for drive in student_dashboard_details.eligible_drives %}
+                                        <tr class="border-b">
+                                            <td class="py-3">
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium" style="text-transform: uppercase;">
+                                                        {{ drive.company|slice:":2" }}
+                                                    </div>
+                                                    <span>{{ drive.company }}</span>
                                                 </div>
-                                                <span>XYZ Ltd</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">Backend Developer</td>
-                                        <td class="py-3 font-medium">8 LPA</td>
-                                        <td class="py-3 text-sm">
-                                            <span class="text-red-600">2025-04-25</span>
-                                        </td>
-                                        <td class="py-3">
-                                            <button
-                                                class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition">Apply</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b">
-                                        <td class="py-3">
-                                            <div class="flex items-center">
-                                                <div
-                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
-                                                    TT
-                                                </div>
-                                                <span>Tech Titans</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">Software Engineer</td>
-                                        <td class="py-3 font-medium">12 LPA</td>
-                                        <td class="py-3 text-sm">
-                                            <span class="text-orange-600">2025-04-28</span>
-                                        </td>
-                                        <td class="py-3">
-                                            <button
-                                                class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition">Apply</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3">
-                                            <div class="flex items-center">
-                                                <div
-                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
-                                                    GG
-                                                </div>
-                                                <span>GrowGlobe</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">Data Analyst</td>
-                                        <td class="py-3 font-medium">7.5 LPA</td>
-                                        <td class="py-3 text-sm">
-                                            <span>2025-05-02</span>
-                                        </td>
-                                        <td class="py-3">
-                                            <button
-                                                class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition">Apply</button>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                            <td class="py-3">{{ drive.role }}</td>
+                                            <td class="py-3 font-medium">{{ drive.package }}</td>
+                                            <td class="py-3 text-sm">
+                                                <span class="text-red-600">{{ drive.end_date }}</span>
+                                            </td>
+                                            <td class="py-3">
+                                                <a href="{% url 'student_drive_details' drive_id=drive.id %}" style="text-decoration: none;">
+                                                <button class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition">View</button>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="5" class="py-3 text-center text-gray-500">No eligible drives available.</td>
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    
 
                     <!-- My Applications -->
                     <div class="bg-white p-6 rounded-xl shadow-sm h-full">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-lg font-semibold">My Applications</h2>
-                            <button class="text-sm text-indigo-600 hover:text-indigo-800">View All</button>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
+                        <div class="overflow-x-auto max-h-[300px] overflow-y-auto"> 
+                            <table class="w-full" style="font-size: smaller; text-align: center !important;">
                                 <thead>
-                                    <tr class="text-left text-xs text-gray-500 border-b">
+                                    <tr class="text-left text-xs text-gray-500 border-b" style="text-align: center !important;">
                                         <th class="pb-2 font-medium">Company</th>
-                                        <th class="pb-2 font-medium">Role</th>
                                         <th class="pb-2 font-medium">Applied On</th>
                                         <th class="pb-2 font-medium">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for application in student_dashboard_details.applications %}
                                     <tr class="border-b">
                                         <td class="py-3">
                                             <div class="flex items-center">
-                                                <div
-                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
-                                                    AC
+                                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
+                                                    {{ application.company|slice:":2" }}
                                                 </div>
-                                                <span>ABC Corp</span>
+                                                <span>{{ application.company }}</span>
                                             </div>
                                         </td>
-                                        <td class="py-3">Software Engineer</td>
-                                        <td class="py-3 text-sm">2025-04-10</td>
+                                        <td class="py-3 text-sm">{{ application.applied_on }}</td>
                                         <td class="py-3">
-                                            <span
-                                                class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">Offered</span>
+                                            {% if application.status == 'Offered' %}
+                                            <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">{{ application.status }}</span>
+                                            {% elif application.status == 'Shortlisted' %}
+                                            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">{{ application.status }}</span>
+                                            {% elif application.status == 'Interview' %}
+                                            <span class="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">{{ application.status }}</span>
+                                            {% elif application.status == 'Applied' %}
+                                            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">{{ application.status }}</span>
+                                            {% else %}
+                                            <span class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800">{{ application.status }}</span>
+                                            {% endif %}
                                         </td>
                                     </tr>
-                                    <tr class="border-b">
-                                        <td class="py-3">
-                                            <div class="flex items-center">
-                                                <div
-                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
-                                                    PS
-                                                </div>
-                                                <span>PQR Solutions</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">Frontend Intern</td>
-                                        <td class="py-3 text-sm">2025-04-05</td>
-                                        <td class="py-3">
-                                            <span
-                                                class="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">Interview</span>
-                                        </td>
-                                    </tr>
+                                    {% empty %}
                                     <tr>
-                                        <td class="py-3">
-                                            <div class="flex items-center">
-                                                <div
-                                                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium">
-                                                    DD
-                                                </div>
-                                                <span>DevDigital</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3">Full Stack Developer</td>
-                                        <td class="py-3 text-sm">2025-03-28</td>
-                                        <td class="py-3">
-                                            <span
-                                                class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">Shortlisted</span>
-                                        </td>
+                                        <td colspan="4" class="py-3 text-center text-gray-500">No applications found.</td>
                                     </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
 
                 <!-- Testimonials -->
@@ -445,85 +395,111 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-6 mb-6">
+                    <h2 class="text-lg font-semibold mb-4">Success Stories</h2>
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0"></div>
+                            <div>
+                                <p class="italic text-gray-600">"Thanks to the placement portal, I was able to stay updated with every interview round. The reminders and support features made all the difference!"</p>
+                                <p class="mt-2 font-medium">- Arjun Mehta, 2025 Batch</p>
+                                <p class="text-sm text-gray-500">Data Analyst at Infosys</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </main>
     </div>
 </div>
+{{ student_dashboard_details|json_script:"student-dashboard-data" }}
 
 <!-- Scripts -->
-<script>
-    // Charts
-    const statusCtx = document.getElementById('statusChart');
-    new Chart(statusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Applied', 'Shortlisted', 'Interview', 'Offered', 'Rejected'],
-            datasets: [{
-                label: 'Status Count',
-                data: [6, 2, 1, 2, 1],
-                backgroundColor: [
-                    '#4F46E5',
-                    '#10B981',
-                    '#F59E0B',
-                    '#8B5CF6',
-                    '#EF4444'
-                ],
-                borderColor: '#FFFFFF',
-                borderWidth: 2,
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        usePointStyle: true,
-                        boxWidth: 10
-                    }
-                }
-            },
-            cutout: '65%'
-        }
-    });
+<script type="text/javascript">
+    window.onload = function () {
+        const statusData = JSON.parse(document.getElementById('student-dashboard-data').textContent);
 
-    const driveCtx = document.getElementById('driveChart');
-    new Chart(driveCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-            datasets: [{
-                label: 'Drives Participated',
-                data: [2, 4, 3, 5],
-                backgroundColor: 'rgba(79, 70, 229, 0.8)',
-                borderRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+        const statusCtx = document.getElementById('statusChart');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Applied', 'Shortlisted', 'Interview', 'Offered', 'Rejected'],
+                datasets: [{
+                    label: 'Status Count',
+                    data: [
+                        statusData.status_data.Applied,   
+                        statusData.status_data.Shortlisted,
+                        statusData.status_data.Interview,
+                        statusData.status_data.Offered,
+                        statusData.status_data.Rejected
+                    ],
+                    backgroundColor: [
+                        '#4F46E5',
+                        '#10B981',
+                        '#F59E0B',
+                        '#8B5CF6',
+                        '#EF4444'
+                    ],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
             },
-            scales: {
-                x: {
-                    grid: {
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 10
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+
+        const driveCtx = document.getElementById('driveChart');
+        new Chart(driveCtx, {
+            type: 'bar',
+            data: {
+                labels: statusData.drive_chart.labels, 
+                datasets: [{
+                    label: 'Drives Participated',
+                    data: statusData.drive_chart.data, 
+                    backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
                         display: false
                     }
                 },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        precision: 0
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            precision: 0
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    };
 </script>
+
 {% endblock %}
