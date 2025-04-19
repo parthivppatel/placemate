@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
-from ..utils.helper_utils import safe_deep_get, safe_value 
+from ..utils.helper_utils import safe_deep_get, get_batch_year, safe_value 
 
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -26,6 +26,7 @@ def student_profile(request, student_id):
     student = get_object_or_404(Student, student_id=student_id)
 
     courses = Course.objects.filter(is_active=True).order_by("name").values("id", "name")
+    batch_year = get_batch_year(student)
 
     student_details = {
         "id": student.student_id.id,
@@ -34,7 +35,7 @@ def student_profile(request, student_id):
         "phone": student.student_id.phone,
         "enrollment": student.enrollment,
         "course": student.course.name if student.course else "N/A",
-        "batch": f"{student.joining_year} - {student.joining_year + 4}" if student.joining_year else "N/A",
+        "batch": batch_year or "N/A",
         "joining_year": student.joining_year or "N/A", 
         "cgpa": student.cgpa or "N/A",
         "placement_status": PlacementStatus(student.placement_status).label if student.placement_status is not None else "N/A",
@@ -45,9 +46,9 @@ def student_profile(request, student_id):
         "profile": student.profile or "N/A",
         "dob": student.dob.strftime('%Y-%m-%d') if student.dob else "N/A",
         "gender": student.gender if student.gender else "",
-        "tenth_percentage": student.tenth_percentage or "N/A",  # Added 10th percentage
-        "twelfth_percentage": student.twelfth_percentage or "N/A",  # Added 12th percentage
-        "backlog": student.backlog or 0,  # Added backlog count
+        "tenth_percentage": student.tenth_percentage or "N/A", 
+        "twelfth_percentage": student.twelfth_percentage or "N/A",  
+        "backlog": student.backlog or 0,  
     }
     
     return render(request, "student_profile.html", {
@@ -139,19 +140,33 @@ def list_student_drives(request):
         except Student.DoesNotExist:
             return JsonResponse({"message": "Student not found"}, status=404)
 
+        batch_year = get_batch_year(student)
+
         status_filter = request.GET.get('status', '').strip()
         search_query = request.GET.get('search', '').strip()  
 
         current_date = timezone.now()
 
         active_drives = CompanyDrive.objects.select_related('company')
+        batch_year = get_batch_year(student)  
+        
+        if batch_year:
+            batch_start_year, batch_end_year = map(int, batch_year.split('-'))
+            active_drives = active_drives.filter(
+                start_date__gte=f"{batch_start_year}-06-01",
+                end_date__lte=f"{batch_end_year}-05-31"  
+            )
+        else:
+            pass
 
-        if status_filter == 'scheduled':
+        if status_filter == 'scheduled' or not status_filter:
             active_drives = active_drives.filter(status="scheduled", start_date__gt=current_date)
         elif status_filter == 'ongoing':
             active_drives = active_drives.filter(status="ongoing", start_date__lte=current_date, end_date__gte=current_date)
         elif status_filter == 'completed':
             active_drives = active_drives.filter(status="completed", end_date__lt=current_date)
+        elif status_filter == 'all_drives':
+            active_drives = active_drives.all()
 
         if search_query:
             active_drives = active_drives.filter(
@@ -346,7 +361,12 @@ def student_drive_details(request, drive_id):
 
         # ─── 8) CHECK IF DRIVE IS COMPLETED OR ONGOING ───────────────────────────
         # Check if the drive's end date has passed
-        is_drive_completed_or_ongoing = now >= drive.end_date
+        if drive.start_date > now:
+            drive_status = "Scheduled"
+        elif drive.start_date <= now <= drive.end_date:
+            drive_status = "Ongoing"
+        else:
+            drive_status = "Completed"
 
         # ─── 9) RENDER TEMPLATE ────────────────────────────────────────────────────
         context = {
@@ -365,7 +385,7 @@ def student_drive_details(request, drive_id):
             "applied":          applied,
             "resume_url":       resume_url,
             "job_details":      job_details,
-            "is_drive_completed_or_ongoing": is_drive_completed_or_ongoing  # Add this flag to the context
+            "drive_status":     drive_status  
         }
 
         return render(request, "student_view_specific_drive.html", context)

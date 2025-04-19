@@ -140,113 +140,119 @@
 
     <div class="container mt-4">
         <div class="company-card-detail bg-white">
-        <div class="row">
-            <!-- Left Section -->
-            <div class="col-md-8 col-12 mb-4 mb-md-0">
-            <div class="d-flex align-items-center mb-4 flex-column flex-md-row text-center text-md-start">
-                <div class="company-logo-container me-md-4 mb-3 mb-md-0">
-                    <a href="{% url 'view_company' drive.company_id %}" style="text-decoration: none !important;">
-                    <img 
-                        src="{{ logo_url }}" 
-                        alt="{{ company.name }} Logo" 
-                        class="img-fluid" 
-                    />
-                </div>
-                <div>
-                <h2 class="mb-0 fw-bold">{{ company.name }}</h2></a>
-                </div>
-            </div>
-            <div class="company-details text-center text-md-start">
-                    <p class="mb-2">
-                        <i class="fas fa-building me-2"></i>
-                        <strong>Drive Name:</strong> {{ job_details.drive_name }}
-                    </p>
-                
-                    <p class="mb-2">
-                        <i class="fas fa-map-marker-alt me-2"></i>
-                        <strong>Location:</strong> {% for loc in location %} {{ loc.city }}, {% endfor %}
-                    </p>
+            <div class="row">
+                <!-- Left Section -->
+                <div class="col-md-8 col-12 mb-4 mb-md-0">
+                    <div class="d-flex align-items-center mb-4 flex-column flex-md-row text-center text-md-start">
+                        <div class="company-logo-container me-md-4 mb-3 mb-md-0">
+                            <a href="{% url 'view_company' drive.company_id %}" style="text-decoration: none !important;">
+                            <img 
+                                src="{{ logo_url }}" 
+                                alt="{{ company.name }} Logo" 
+                                class="img-fluid" 
+                            />
+                        </div>
+                        <div>
+                        <h2 class="mb-0 fw-bold">{{ company.name }}</h2></a>
+                        </div>
+                    </div>
+
+                    <div class="company-details text-center text-md-start">
+                        <p class="mb-2">
+                            <i class="fas fa-building me-2"></i>
+                            <strong>Drive Name:</strong> {{ job_details.drive_name }}
+                        </p>
                     
-                
-                    {% if job_details.ctc.min or job_details.ctc.max %}
-                    <p class="mb-2">
-                        <i class="fas fa-rupee-sign me-2"></i>
-                        <strong>CTC:</strong>
-                        {% if job_details.ctc.min %}{{ job_details.ctc.min }}{% endif %}
-                        {% if job_details.ctc.min and job_details.ctc.max %} - {% endif %}
-                        {% if job_details.ctc.max %}{{ job_details.ctc.max }}{% endif %}
-                        LPA
-                    </p>
-                    {% endif %}
-                
-                    <p class="mb-2">
-                        <i class="fas fa-briefcase me-2"></i>
-                        <strong>Job Type:</strong> {{ job_details.job_type }}
-                    </p>
-                
-                    <p class="mb-2">
-                        <i class="fas fa-laptop-house me-2"></i>
-                        <strong>Job Mode:</strong> {{ job_details.job_mode }}
-                    </p>
-                
-                    <p class="mb-2">
-                        <i class="fas fa-wallet me-2"></i>
-                        <strong>Stipend:</strong> {{ job_details.stipend }}
-                    </p>
+                        <p class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <strong>Location:</strong> {% for loc in location %} {{ loc.city }}, {% endfor %}
+                        </p>
+                        
+                    
+                        {% if job_details.ctc.min or job_details.ctc.max %}
+                            <p class="mb-2">
+                                <i class="fas fa-rupee-sign me-2"></i>
+                                <strong>CTC:</strong>
+                                {% if job_details.ctc.min %}{{ job_details.ctc.min }}{% endif %}
+                                {% if job_details.ctc.min and job_details.ctc.max %} - {% endif %}
+                                {% if job_details.ctc.max %}{{ job_details.ctc.max }}{% endif %}
+                                LPA
+                            </p>
+                        {% endif %}
+                    
+                        <p class="mb-2">
+                            <i class="fas fa-briefcase me-2"></i>
+                            <strong>Job Type:</strong> {{ job_details.job_type }}
+                        </p>
+                    
+                        <p class="mb-2">
+                            <i class="fas fa-laptop-house me-2"></i>
+                            <strong>Job Mode:</strong> {{ job_details.job_mode }}
+                        </p>
+                    
+                        <p class="mb-2">
+                            <i class="fas fa-wallet me-2"></i>
+                            <strong>Stipend:</strong> {{ job_details.stipend }}
+                        </p>
+                    </div>  
                 </div>
-            
-            </div>
-    
-            <!-- Right Section -->
-            <div class="col-md-4 position-relative text-md-end text-center">
-                <div class="eligibility-wrapper mb-3">
-                    {% if eligible %}
-                    <span class="eligibility-badge">Eligible</span>
-                    {% else %}
-                    <span class="eligibility-badge text-danger">Not Eligible</span>
-                    {% endif %}
-                </div>
-    
-                <div class="opt-in-section">
-                    <p class="text-muted small mb-2">
-                        Last date to opt-in: <strong>{{ deadline }}</strong>
-                    </p>
-                    <div class="d-flex justify-content-md-end justify-content-center gap-2 flex-wrap">
-                        {% if not is_drive_completed_or_ongoing %}
-                            {% if eligible %}
-                                {% if applied %}
-                                    <p class="text-success">You have already applied for this drive.</p>
-                                    {% if resume_url %}
-                                        <p class="mb-1">
-                                            <strong>Submitted Resume:</strong> 
-                                            <a href="{{ resume_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-underline">
-                                                View Resume
-                                            </a>
-                                        </p>
-                                    {% endif %}
-                                {% else %}
-                                    <form method="post" class="d-inline" id="optInForm">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="opt_in">
-                                        <input type="hidden" name="resume_link" id="hiddenResumeLink">
-                                        <button 
-                                            type="submit" 
-                                            class="btn btn-primary custom-btn">
-                                            Apply
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            {% else %}
-                                <p class="text-danger">You are not eligible to apply for this drive due to academic criteria.</p>
-                            {% endif %}
+        
+                <!-- Right Section -->
+                <div class="col-md-4 position-relative text-md-end text-center">
+                    <div class="eligibility-wrapper mb-3">
+                        {% if eligible %}
+                        <span class="eligibility-badge">Eligible</span>
                         {% else %}
-                            <p>This drive has either ended or is no longer accepting new applications.</p>
+                        <span class="eligibility-badge text-danger">Not Eligible</span>
                         {% endif %}
                     </div>
+        
+                    <div class="opt-in-section">
+                        <p class="text-muted small mb-2">
+                            Last date to opt-in: <strong>{{ deadline }}</strong>
+                        </p>
+                        <div class="d-flex justify-content-md-end justify-content-center gap-2 flex-wrap">
+                            {% if drive_status == 'Scheduled' %}
+                                {% if eligible %}
+                                    {% if applied %}
+                                        <p class="text-success">You have already applied for this drive.</p>
+                                        {% if resume_url %}
+                                            <p class="mb-1">
+                                                <strong>Submitted Resume:</strong> 
+                                                <a href="{{ resume_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-underline">
+                                                    View Resume
+                                                </a>
+                                            </p>
+                                        {% endif %}
+                                    {% else %}
+                                        <form method="post" class="d-inline" id="optInForm">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="opt_in">
+                                            <input type="hidden" name="resume_link" id="hiddenResumeLink">
+                                            <button 
+                                                type="submit" 
+                                                class="btn btn-primary custom-btn">
+                                                Apply
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-danger">You are not eligible to apply for this drive due to academic criteria.</p>
+                                {% endif %}
+                            
+                            {% elif drive_status == 'Ongoing' %}
+                                <p>This drive is currently ongoing and no longer accepting new applications.</p>
+                            
+                            {% elif drive_status == 'Completed' %}
+                                <p>This drive has been completed and is no longer accepting applications.</p>
+                        
+                            {% else %}
+                                <p>This drive is currently unavailable for applications.</p>
+                            {% endif %}
+                        </div> 
+                    </div>
                 </div>
-
             </div>
-        </div>
         </div>
 
         {% for job in job_details.jobs %}
@@ -258,7 +264,7 @@
             </div>
         {% endfor %}
 
-        {% if not is_drive_completed_or_ongoing %}
+        {% if drive_status == 'Scheduled' %}
             <div class="resume-card-detail bg-white">
                 <h3 class="job-title-section">Update Resume</h3>
                 <div class="resume-content">
@@ -285,6 +291,7 @@
                 </div>
             </div>
         {% endif %}
+
 
     </div>
 

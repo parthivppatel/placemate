@@ -79,3 +79,18 @@ def update_mapper_by_id(model, main_field_id, related_field_id,main_id, incoming
 
     if to_remove:
         model.objects.filter(**filter_kwargs, **{f"{related_field_id}__in": to_remove}).delete()
+
+def get_batch_year(student):
+    """
+    Returns the batch year for the student in the format 'YYYY-YYYY'.
+    
+    Args:
+        student (Student): The Student instance to get the batch year for.
+    
+    Returns:
+        str: The batch year in the format 'YYYY-YYYY' or None if course data is missing.
+    """
+    if student.course:
+        graduation_year = student.joining_year + student.course.years
+        return f"{student.joining_year}-{graduation_year}"
+    return None

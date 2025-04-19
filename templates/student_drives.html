@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> -->
     <style>
         .search-container {
             margin: 0 auto 30px;
@@ -203,11 +203,11 @@
                 <div class="col-md-9 d-flex flex-wrap justify-content-md-end gap-2">
                     <!-- Status Filter -->
                     <select name="status" class="form-select form-select-sm rounded-pill px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
-                        <option value="">Select Status</option>
+                        <option value="all_drives" {% if request.GET.status == 'all_drives' %}selected{% endif %}>All Drives</option>
                         <option value="scheduled" {% if request.GET.status == 'scheduled' or not request.GET.status %}selected{% endif %}>Scheduled</option>
                         <option value="ongoing" {% if request.GET.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
                         <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
-                    </select>
+                    </select>                    
                     
                     <!-- Reset Filters Button -->
                     <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm" id="resetFiltersBtn"
