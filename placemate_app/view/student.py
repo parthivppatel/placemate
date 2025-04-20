@@ -82,17 +82,13 @@ def student_edit_student(request, student_id):
                 file_extension = os.path.splitext(profile_pic.name)[1] 
                 new_filename = f"{student_id}{file_extension}"
 
-                # Remove the old profile picture if it exists
                 if student.profile and os.path.exists(os.path.join('media', student.profile)):
                     os.remove(os.path.join('media', student.profile))
 
-                # Save the new profile picture
                 filename = fs.save(new_filename, profile_pic)
 
-                # Get the file path to store in the database
                 file_path = fs.url(filename)  
 
-                # Save the file path in the Student model
                 student.profile = file_path
             else:
                 pass
@@ -100,11 +96,9 @@ def student_edit_student(request, student_id):
             student.student_id.save()  
             student.save()  
 
-            # Success message
             messages.success(request, "Your profile has been updated successfully.")
             return redirect("student_profile", student_id=student_id)
 
-        # GET request: Render the edit form
         return render(request, "student_profile.html", {
             "student": student,
             "page_title": "Edit Profile",
@@ -112,12 +106,10 @@ def student_edit_student(request, student_id):
         })
 
     except Student.DoesNotExist:
-        # Handle case where student does not exist
         messages.error(request, "The requested student does not exist.")
         return redirect("dashboard")
 
     except Exception as e:
-        # Handle unexpected errors
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return redirect("dashboard")
     
@@ -291,7 +283,6 @@ def student_drive_details(request, drive_id):
             eligible = False
         if drive.twelth and (student.twelfth_percentage or 0) < drive.twelth:
             eligible = False
-        # add additional academic checks here if needed...
 
         # ─── 5) APPLICATION STATE ───────────────────────────────────────────────────
         application = DriveApplication.objects.filter(
@@ -299,14 +290,12 @@ def student_drive_details(request, drive_id):
             drive=drive
         ).first()
         applied = bool(application)
-        # use the application’s resume_link if they applied, otherwise default to an empty string
         resume_url = application.resume_link if application else ""
 
         # ─── 6) HANDLE POST ACTIONS ────────────────────────────────────────────────
         if request.method == "POST":
             action = request.POST.get("action")
 
-            # ---- Opt‑In (Submit Resume & Apply) ----
             if action == "opt_in":
                 link = request.POST.get("resume_link", "").strip()
                 if not link:
@@ -316,14 +305,12 @@ def student_drive_details(request, drive_id):
                     try:
                         validator(link)
 
-                        # If the student has already applied, update the existing DriveApplication
                         if applied:
                             drive_application = DriveApplication.objects.get(student=student, drive=drive)
                             drive_application.resume_link = link
                             drive_application.save(update_fields=["resume_link"])
                             messages.success(request, "Resume link updated.")
                         else:
-                            # Create a new DriveApplication if the student hasn't applied yet
                             DriveApplication.objects.create(
                                 student=student,
                                 drive=drive,
@@ -331,7 +318,7 @@ def student_drive_details(request, drive_id):
                             )
                             messages.success(request, "Resume link submitted and application created.")
                         
-                        resume_url = link  # Store the valid URL
+                        resume_url = link  
 
                     except ValidationError:
                         messages.error(request, "Please enter a valid URL.")
@@ -339,20 +326,18 @@ def student_drive_details(request, drive_id):
             return redirect("student_drive_details", drive_id=drive.id)
 
         # ─── 7) ADD ADDITIONAL INFO TO CONTEXT ───────────────────────────────────
-        # Add the new details to the context
         job_details = {
             "drive_name": drive.drive_name,
             "ctc": {
                 "min": drive.ug_package_min,
                 "max": drive.ug_package_max
             },
-            "job_type": drive.job_type,  # Fetching from the drive model
-            "job_mode": drive.job_mode,  # Fetching from the drive model
-            "stipend": drive.stipend if drive.stipend else "Not Provided",  # Fetching stipend from the drive model
-            "jobs": []  # Empty list to hold multiple jobs
+            "job_type": drive.job_type,  
+            "job_mode": drive.job_mode,  
+            "stipend": drive.stipend if drive.stipend else "Not Provided",  
+            "jobs": []  
         }
 
-        # Loop through the jobs for this specific drive and add each job's details
         for job in jobs:
             job_details["jobs"].append({
                 "job_title": job.job_title,
@@ -360,7 +345,6 @@ def student_drive_details(request, drive_id):
             })
 
         # ─── 8) CHECK IF DRIVE IS COMPLETED OR ONGOING ───────────────────────────
-        # Check if the drive's end date has passed
         if drive.start_date > now:
             drive_status = "Scheduled"
         elif drive.start_date <= now <= drive.end_date:
@@ -394,8 +378,8 @@ def student_drive_details(request, drive_id):
         return JsonResponse({"message": f"An unexpected error occurred: {str(e)}"}, status=500)
 
 
-def student_drives_application(request, student_id):
-    # ─── 1) AUTH & STUDENT LOOKUP ────────────────────────────────────────────────
+def student_drive_applications(request, student_id):
+    # ─── 1) AUTH CHECK ─────────────────────────────────────────────────────
     user_payload = get_user_from_jwt(request)
     if not user_payload:
         return JsonResponse({"message": "Invalid or missing token"}, status=401)
@@ -406,17 +390,53 @@ def student_drives_application(request, student_id):
 
     try:
         user = User.objects.get(email=user_email)
-        student = get_object_or_404(Student, student_id=student_id)
     except User.DoesNotExist:
         return JsonResponse({"message": "User not found"}, status=404)
-    except Student.DoesNotExist:
-        return JsonResponse({"message": "Student not found"}, status=404)
 
+    # ─── 2) FETCH STUDENT ──────────────────────────────────────────────────
+    student = get_object_or_404(Student, student_id=student_id)
+
+    # ─── 3) GET APPLICATIONS ───────────────────────────────────────────────
+    # Fetch applications related to a specific student
+    applications = DriveApplication.objects.filter(student=student).select_related(
+        "drive", "drive__company"
+    )
+
+    application_data = []
+
+    for application in applications:
+        drive = application.drive
+        company = drive.company  
+        
+        application_details = {
+            "id": application.id,
+            "student_name": f"{application.student.first_name} {application.student.last_name}",
+            "drive_name": drive.drive_name,
+            "company_name": company.name,
+            "status": application.get_status_display(),
+            "drive_start_date": drive.start_date.strftime('%B %d, %Y'),  
+            "drive_end_date": drive.end_date.strftime('%B %d, %Y'), 
+            "ug_package_min": drive.ug_package_min if drive.ug_package_min else 'N/A',  
+            "ug_package_max": drive.ug_package_max if drive.ug_package_max else 'N/A',  
+            "pg_package_min": drive.pg_package_min if drive.pg_package_min else 'N/A', 
+            "pg_package_max": drive.pg_package_max if drive.pg_package_max else 'N/A', 
+            "stipend": f"₹ {drive.stipend}" if drive.stipend else 'N/A',  
+            "minimum_cgpa": drive.minimum_cgpa if drive.minimum_cgpa else 'N/A', 
+            # "location": drive.headquater.name if drive.headquater else 'N/A', 
+            "submission_date": application.created_at.strftime('%B %d, %Y'),  
+            "resume_link": application.resume_link if application.resume_link else 'No resume uploaded',  
+        }
+
+        application_data.append(application_details)
+
+    # ─── 4) RENDER TEMPLATE ────────────────────────────────────────────────
     return render(
         request,
         "student_applications_list.html",
         {
-            "student_id": student.student_id.id,
             "student": student,
+            "student_id": student.student_id.id,  
+            "profile_name": f"{student.first_name} {student.last_name}",
+            "applications": application_data,  
         }
     )
