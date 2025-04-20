@@ -283,7 +283,7 @@ def offer_mail(email, student_name, company_name, package, offer_date):
 
     Congratulations! You have been selected by {company_name}.
 
-    CTC Offered: ₹{package}
+    CTC Offered: ₹{package} LPA
     Offer Date: {offer_date}
 
     Please log in to the Placemate portal to view your offer and complete the necessary steps.
@@ -302,7 +302,7 @@ def offer_mail(email, student_name, company_name, package, offer_date):
         <p>We are thrilled to inform you that you have been <strong>offered a position</strong> at <strong>{company_name}</strong>.</p>
 
         <ul>
-            <li><strong>CTC Offered:</strong> ₹{package}</li>
+            <li><strong>CTC Offered:</strong> ₹{package} LPA</li>
             <li><strong>Offer Date:</strong> {offer_date}</li>
         </ul>
 

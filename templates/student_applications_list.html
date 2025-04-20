@@ -240,6 +240,7 @@
         <table class="applications-table">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Company</th>
                     <th>Drive Date</th>
                     <th>Stipend</th>
@@ -259,6 +260,10 @@
                             {% else %}
                             <img src="{% static 'images/default-company.png' %}" alt="Default Logo" class="company-logo"/>
                             {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="company-cell">
                             <div>
                                 <div class="fw-semibold">{{ application.company_name }}</div>
                                 <small class="text-muted">#{{ application.id }}</small>
@@ -275,14 +280,14 @@
                     <td>{{ application.submission_date }}</td>
                     <td>
                         <div class="table-actions">
-                            <a href="{{ application.resume_link }}" class="btn-view" style="text-decoration: none;">
+                            <a href="{{ application.resume_link }}" target="_blank" class="btn-view" style="text-decoration: none;">
                                 <i class="bi bi-eye"></i> View Resume
                             </a>
                         </div>
                     </td>
                     <td>
                         <div class="table-actions">
-                            <a href="{% url 'student_drive_details' application.drive_id %}" class="btn-view" style="text-decoration: none;">
+                            <a href="{% url 'student_drive_details' application.drive_id %}" target="_blank" class="btn-view" style="text-decoration: none;">
                                 <i class="bi bi-eye"></i> View Drive
                             </a>
                         </div>
