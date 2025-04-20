@@ -18,7 +18,7 @@ from ..schema.user_roles import UserRole
 from django.urls import reverse
 from ..schema.roles import Role
 from django.db import transaction
-from ..utils.email_utils import send_registration_email 
+from ..utils.email_utils import send_registration_email,offer_mail,rejection_mail
 from ..utils.jwt_utils import has_permission,get_user_from_jwt
 from django.db.models import Q,When,Case,CharField,Value
 from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,validate_pagination,get_batch_year
@@ -626,6 +626,11 @@ def placement_action(request):
                     company = Company.objects.get(id=drive.drive.company.id)
                     student.company_placedIn = company
                     student.save()
+                    
+                    offer_mail(student.student_id.email,student.first_name,company.name,package,offer_date)
+                else:
+                    rejection_mail(student.student_id.email,student.first_name,drive.drive.company.name)
+                    
  
                 # Get the application record
                 application = DriveApplication.objects.get(id=drive_id)

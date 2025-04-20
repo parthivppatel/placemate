@@ -239,3 +239,121 @@ def send_student_registration_email(email, password):
     """
 
     send_custom_email(email,subject,message,html_message)
+
+
+def shortlist_mail(email, student_name, company_name):
+    subject = f"You’ve Been Shortlisted for {company_name}!"
+    message = f"""
+    Hello {student_name},
+    
+    Congratulations! You have been shortlisted by {company_name}.
+    
+    Interview details will be shared with you shortly. Please keep an eye on your inbox and the Placemate portal.
+    
+    Best regards,  
+    Placemate Team
+    """
+
+    html_message = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <p>Dear {student_name},</p>
+
+        <p>🎉 <strong>Congratulations!</strong></p>
+
+        <p>You have been <strong>shortlisted</strong> by <strong>{company_name}</strong>.</p>
+
+        <p>📩 Interview details will be shared with you soon. Kindly check your email and the <a href="http://127.0.0.1:8000/login" target="_blank"><strong>Placemate portal</strong></a> regularly for updates.</p>
+
+        <p>Wishing you the best of luck!</p>
+
+        <p>Best regards,<br>
+        <strong>Placemate Team</strong></p>
+    </body>
+    </html>
+    """
+
+    send_custom_email(email, subject, message.strip(), html_message.strip())
+
+
+def offer_mail(email, student_name, company_name, package, offer_date):
+    subject = f"🎉 You're Offered a Position at {company_name}!"
+    message = f"""
+    Hello {student_name},
+
+    Congratulations! You have been selected by {company_name}.
+
+    CTC Offered: ₹{package}
+    Offer Date: {offer_date}
+
+    Please log in to the Placemate portal to view your offer and complete the necessary steps.
+
+    Best wishes,  
+    Placemate Team
+    """
+
+    html_message = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <p>Dear {student_name},</p>
+
+        <p>🎉 <strong>Congratulations!</strong></p>
+
+        <p>We are thrilled to inform you that you have been <strong>offered a position</strong> at <strong>{company_name}</strong>.</p>
+
+        <ul>
+            <li><strong>CTC Offered:</strong> ₹{package}</li>
+            <li><strong>Offer Date:</strong> {offer_date}</li>
+        </ul>
+
+        <p>Please log in to the <a href="http://127.0.0.1:8000/login" target="_blank"><strong>Placemate portal</strong></a> to view your offer and proceed with the next steps.</p>
+
+        <p>We’re proud of you — best of luck for your career ahead!</p>
+
+        <p>Warm regards,<br>
+        <strong>Placemate Team</strong></p>
+    </body>
+    </html>
+    """
+
+    send_custom_email(email, subject, message.strip(), html_message.strip())
+
+
+
+def rejection_mail(email, student_name, company_name):
+    subject = f"Update on Your Application for {company_name}"
+    message = f"""
+    Hello {student_name},
+
+    Thank you for participating in the placement process for {company_name}.
+
+    We regret to inform you that you have not been selected.
+
+    Please continue exploring new opportunities on the Placemate portal. We wish you the very best for your future endeavors.
+
+    Sincerely,  
+    Placemate Team
+    """
+
+    html_message = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <p>Dear {student_name},</p>
+
+        <p>Thank you for participating in the placement process for <strong>{company_name}</strong>.</p>
+
+        <p>After careful review, we regret to inform you that you have not been selected.</p>
+
+        <p>We encourage you to keep preparing and exploring upcoming opportunities on the <a href="http://127.0.0.1:8000/login" target="_blank"><strong>Placemate portal</strong></a>.</p>
+
+        <p>We wish you success in your future placements!</p>
+
+        <p>Sincerely,<br>
+        <strong>Placemate Team</strong></p>
+    </body>
+    </html>
+    """
+
+    send_custom_email(email, subject, message.strip(), html_message.strip())
+
+

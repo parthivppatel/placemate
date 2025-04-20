@@ -16,7 +16,7 @@ from ..schema.placement_offers import PlacementOffer
 from ..utils.random_password_utils import generate_random_password
 from django.urls import reverse
 from ..decorators import permission_required
-from ..utils.email_utils import send_registration_email,send_drive_emails
+from ..utils.email_utils import send_registration_email,send_drive_emails,shortlist_mail
 from django.db.models import Q,Count, F, ExpressionWrapper, IntegerField,OuterRef, Subquery
 from ..utils.helper_utils import safe_value,safe_deep_get,paginate,ResponseModel,update_mapper_by_id,validate_pagination
 from ..utils.jwt_utils import has_permission,get_user_from_jwt
@@ -322,6 +322,8 @@ def application_action(request,id=0):
             # Update and validate
             application.status = new_status
             application.save()
+
+            shortlist_mail(student.student_id.email,student.first_name,drive.company.name)
 
             messages.success(request, f"Status updated to '{new_status}' for {student.first_name} {student.last_name}.")
             return redirect('drive_applicants', id=drive.id)
