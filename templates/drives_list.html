@@ -303,8 +303,8 @@ Manage company drives for placement opportunities.
                 });
             }, 6000); // Wait 6 seconds before fading out
             
-            $('button[data-bs-target="#deleteConfirmModal"]').on('click', function () {
-                const driveId = $(this).data('drive-id');
+            $('a[data-bs-target="#deleteConfirmModal"]').on('click', function () {
+                const driveId = $(this).data('drive-id'); 
                 $('#driveIdToDelete').val(driveId);
             });
         });

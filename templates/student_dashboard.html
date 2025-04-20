@@ -239,7 +239,9 @@
                                             </td>
                                             <td class="py-4 text-center">
                                                 <a href="{% url 'student_drive_details' drive_id=drive.id %}" class="inline-block">
-                                                    <button class="text-sm bg-primary hover:bg-primary-dark text-white px-3 py-1 rounded-md transition transform hover:-translate-y-0.5">View</button>
+                                                    <button class="text-primary hover:text-primary-dark px-3 py-1 transition transform hover:-translate-y-0.5">
+                                                        <i class="bi bi-eye text-lg"></i>
+                                                    </button>                                              
                                                 </a>
                                             </td>
                                         </tr>
@@ -263,6 +265,7 @@
                             <table class="w-full">
                                 <thead>
                                     <tr class="text-xs text-gray-500 border-b text-center">
+                                        <th class="pb-3 font-medium"></th>
                                         <th class="pb-3 font-medium">Company</th>
                                         <th class="pb-3 font-medium">Applied On</th>
                                         <th class="pb-3 font-medium">Status</th>
@@ -271,21 +274,25 @@
                                 <tbody class="text-sm">
                                     {% for application in student_dashboard_details.applications %}
                                     <tr class="border-b hover:bg-gray-50 transition">
-                                        <td class="py-4">
+                                        <td>
                                             <div class="flex items-center justify-center">
                                                 <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2 text-xs font-medium uppercase">
                                                     {{ application.company|slice:":2" }}
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4">
+                                            <div class="flex items-center justify-center">
                                                 <span>{{ application.company }}</span>
                                             </div>
                                         </td>
                                         <td class="py-4 text-center text-sm">{{ application.applied_on }}</td>
                                         <td class="py-4 text-center">
-                                            {% if application.status == 'Offered' %}
+                                            {% if application.status == 'Selected' %}
                                             <span class="text-xs px-2 py-1 rounded-full bg-success/10 text-success">{{ application.status }}</span>
                                             {% elif application.status == 'Shortlisted' %}
                                             <span class="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">{{ application.status }}</span>
-                                            {% elif application.status == 'Interview' %}
+                                            {% elif application.status == 'Reviewed' %}
                                             <span class="text-xs px-2 py-1 rounded-full bg-warning/10 text-warning">{{ application.status }}</span>
                                             {% elif application.status == 'Applied' %}
                                             <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">{{ application.status }}</span>

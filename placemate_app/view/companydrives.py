@@ -688,14 +688,15 @@ def delete_drive(request):
                 drive = CompanyDrive.objects.get(id=drive_id)
 
                 # Check for drive mapping
-                if DriveApplication.objects.filter(drive=drive).exists():
+                if DriveApplication.objects.filter(drive_id=drive.id).exists():
                     messages.error(request,"You can't delete the drive because it has applicants")
                     return redirect("list_drives")                
                 # Check for PlacementOffer mapping
-                if PlacementOffer.objects.filter(job__company_drive=drive).exists():
+                 
+                if PlacementOffer.objects.filter(job__drive__company__id=drive.id).exists():
                     messages.error(request,"You can't delete drive which have associated placement data")
                     return redirect("list_drives")
-
+                               
                 # Delete company 
                 drive.delete()
 
