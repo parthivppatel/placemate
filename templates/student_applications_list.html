@@ -14,7 +14,14 @@
         --danger-color: #dc3545;
         --light-gray: #f8f9fa;
         --text-muted: #6c757d;
+
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --info-color: #17a2b8;
+        --dark-color: #343a40;
     }
+
+    
     
     .back-to-students-btn:hover {
         background-color: var(--primary-color);
@@ -67,22 +74,38 @@
         margin: 0 auto;
     }
 
-    .status-pending {
-        color: var(--warning-color);
-        background-color: rgba(255, 165, 0, 0.1);
-        border: 1px solid rgba(255, 165, 0, 0.3);
-    }
-
-    .status-approved {
+    .status-applied {
         color: var(--success-color);
         background-color: rgba(40, 167, 69, 0.1);
         border: 1px solid rgba(40, 167, 69, 0.3);
     }
 
+    /* Rejected - Red */
     .status-rejected {
         color: var(--danger-color);
         background-color: rgba(220, 53, 69, 0.1);
         border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    /* Reviewed - Info Blue */
+    .status-reviewed {
+        color: var(--info-color);
+        background-color: rgba(23, 162, 184, 0.1);
+        border: 1px solid rgba(23, 162, 184, 0.3);
+    }
+
+    /* Shortlisted - Warning Yellow */
+    .status-shortlisted {
+        color: var(--warning-color);
+        background-color: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    /* Selected - Primary Blue */
+    .status-selected {
+        color: var(--primary-color);
+        background-color: rgba(0, 123, 255, 0.1);
+        border: 1px solid rgba(0, 123, 255, 0.3);
     }
 
     .application-header {
@@ -219,11 +242,11 @@
                 <tr>
                     <th>Company</th>
                     <th>Drive Date</th>
-                    <th>Package (UG)</th>
                     <th>Stipend</th>
                     <th>Status</th>
                     <th>Submitted On</th>
-                    <th>Actions</th>
+                    <th>Submitted Resume</th>
+                    <th>View Drive</th>
                 </tr>
             </thead>
             <tbody>
@@ -243,7 +266,6 @@
                         </div>
                     </td>
                     <td>{{ application.drive_start_date }}</td>
-                    <td class="package-value">₹{{ application.ug_package_min }} - ₹{{ application.ug_package_max }} LPA</td>
                     <td class="stipend-value">{{ application.stipend }}/month</td>
                     <td>
                         <span class="status-badge status-{{ application.status|lower }}">
@@ -253,8 +275,15 @@
                     <td>{{ application.submission_date }}</td>
                     <td>
                         <div class="table-actions">
-                            <a href="" class="btn-view" style="text-decoration: none;">
-                                <i class="bi bi-eye"></i> View
+                            <a href="{{ application.resume_link }}" class="btn-view" style="text-decoration: none;">
+                                <i class="bi bi-eye"></i> View Resume
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'student_drive_details' application.drive_id %}" class="btn-view" style="text-decoration: none;">
+                                <i class="bi bi-eye"></i> View Drive
                             </a>
                         </div>
                     </td>
