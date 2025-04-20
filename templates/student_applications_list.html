@@ -1,31 +1,279 @@
 {% extends 'student_base.html' %}
 
-{% block title %}Student - Applictions{% endblock %}
+{% load static %}
+
+{% block title %}Student - Applications{% endblock %}
 
 {% block content %}
 <style>
+    :root {
+        --primary-color: #6a5acd;
+        --primary-hover: #5a4bbd;
+        --success-color: #28a745;
+        --warning-color: #FFA500;
+        --danger-color: #dc3545;
+        --light-gray: #f8f9fa;
+        --text-muted: #6c757d;
+    }
+    
     .back-to-students-btn:hover {
-        background-color: #6a5acd;
+        background-color: var(--primary-color);
         color: white;
-        border-color: #6a5acd;
+        border-color: var(--primary-color);
+    }
+
+    .applications-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .applications-table thead th {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+        padding: 16px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .applications-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .applications-table tbody tr:hover {
+        background-color: rgba(106, 90, 205, 0.05);
+    }
+
+    .applications-table td {
+        padding: 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        display: inline-block;
+        margin: 0 auto;
+    }
+
+    .status-pending {
+        color: var(--warning-color);
+        background-color: rgba(255, 165, 0, 0.1);
+        border: 1px solid rgba(255, 165, 0, 0.3);
+    }
+
+    .status-approved {
+        color: var(--success-color);
+        background-color: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .status-rejected {
+        color: var(--danger-color);
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    .application-header {
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    .application-header:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: var(--primary-color);
+        border-radius: 3px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background-color: white;
+        border-radius: 12px;
+        margin-top: 40px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .empty-state-icon {
+        font-size: 72px;
+        color: var(--primary-color);
+        margin-bottom: 24px;
+        opacity: 0.8;
+    }
+
+    .actions-bar {
+        margin-bottom: 24px;
+    }
+
+    .package-value {
+        font-weight: 600;
+        color: var(--success-color);
+    }
+
+    .stipend-value {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .btn-view {
+        background-color: rgba(106, 90, 205, 0.1);
+        color: var(--primary-color);
+        border: none;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .btn-view:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .company-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .company-icon {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+    }
+
+    .company-logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        border-radius: 4px;
+    }
+
+    @media (max-width: 992px) {
+        .applications-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .company-cell {
+            justify-content: flex-start;
+            min-width: 200px;
+        }
     }
 </style>
 
 <!-- Actions Bar -->
 <div class="actions-bar">
     <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary back-to-students-btn">
-        <i class="bi bi-arrow-left"></i> Back to Students
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
     </a>
 </div>
 
 <!-- Success Message -->
 {% if messages %}
-{% for message in messages %}
-<div class="alert alert-{{ message.tags }} mt-3">
-    {{ message }}
-</div>
-{% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} mt-3 alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
 {% endif %}
 
-<p>Applications</p>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="application-header">My Applications</h2>
+            <p class="text-muted">Track all your submitted placement applications</p>
+        </div>
+    </div>
+
+    {% if applications %}
+    <div class="table-responsive">
+        <table class="applications-table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Drive Date</th>
+                    <th>Package (UG)</th>
+                    <th>Stipend</th>
+                    <th>Status</th>
+                    <th>Submitted On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in applications %}
+                <tr>
+                    <td>
+                        <div class="company-cell">
+                            {% if logo %}
+                            <img src="/media/{{logo}}" alt="Company Logo" class="company-logo">
+                            {% else %}
+                            <img src="{% static 'images/default-company.png' %}" alt="Default Logo" class="company-logo"/>
+                            {% endif %}
+                            <div>
+                                <div class="fw-semibold">{{ application.company_name }}</div>
+                                <small class="text-muted">#{{ application.id }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ application.drive_start_date }}</td>
+                    <td class="package-value">₹{{ application.ug_package_min }} - ₹{{ application.ug_package_max }} LPA</td>
+                    <td class="stipend-value">{{ application.stipend }}/month</td>
+                    <td>
+                        <span class="status-badge status-{{ application.status|lower }}">
+                            {{ application.status }}
+                        </span>
+                    </td>
+                    <td>{{ application.submission_date }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="" class="btn-view" style="text-decoration: none;">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <h4>No Applications Found</h4>
+        <p class="text-muted mb-4">You haven't applied to any placement drives yet</p>
+        <a href="#" class="btn btn-primary px-4">
+            <i class="bi bi-search"></i> Browse Available Drives
+        </a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

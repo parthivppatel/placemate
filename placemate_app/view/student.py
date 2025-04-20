@@ -394,8 +394,8 @@ def student_drive_details(request, drive_id):
         return JsonResponse({"message": f"An unexpected error occurred: {str(e)}"}, status=500)
 
 
-def student_drives_application(request, student_id):
-    # ─── 1) AUTH & STUDENT LOOKUP ────────────────────────────────────────────────
+def student_drive_applications(request, student_id):
+    # ─── 1) AUTH CHECK ─────────────────────────────────────────────────────
     user_payload = get_user_from_jwt(request)
     if not user_payload:
         return JsonResponse({"message": "Invalid or missing token"}, status=401)
@@ -406,17 +406,57 @@ def student_drives_application(request, student_id):
 
     try:
         user = User.objects.get(email=user_email)
-        student = get_object_or_404(Student, student_id=student_id)
     except User.DoesNotExist:
         return JsonResponse({"message": "User not found"}, status=404)
-    except Student.DoesNotExist:
-        return JsonResponse({"message": "Student not found"}, status=404)
 
+    # ─── 2) FETCH STUDENT ──────────────────────────────────────────────────
+    student = get_object_or_404(Student, student_id=student_id)
+
+    # ─── 3) GET APPLICATIONS ───────────────────────────────────────────────
+    # Fetch applications related to a specific student
+    applications = DriveApplication.objects.filter(student=student).select_related(
+        "drive", "drive__company"
+    )
+
+    # Initialize the list to store application details
+    application_data = []
+
+    # Iterate through the applications and extract detailed fields
+    for application in applications:
+        drive = application.drive
+        company = drive.company  # Access the related company
+        
+        # Build a dictionary of application details to pass to the template
+        application_details = {
+            "id": application.id,
+            "student_name": f"{application.student.first_name} {application.student.last_name}",
+            "drive_name": drive.drive_name,
+            "company_name": company.name,
+            "status": application.get_status_display(),
+            "drive_start_date": drive.start_date.strftime('%B %d, %Y'),  # Drive start date
+            "drive_end_date": drive.end_date.strftime('%B %d, %Y'),  # Drive end date
+            "ug_package_min": drive.ug_package_min if drive.ug_package_min else 'N/A',  # Undergraduate package min
+            "ug_package_max": drive.ug_package_max if drive.ug_package_max else 'N/A',  # Undergraduate package max
+            "pg_package_min": drive.pg_package_min if drive.pg_package_min else 'N/A',  # Postgraduate package min
+            "pg_package_max": drive.pg_package_max if drive.pg_package_max else 'N/A',  # Postgraduate package max
+            "stipend": f"₹ {drive.stipend}" if drive.stipend else 'N/A',  # Stipend (if any)
+            "minimum_cgpa": drive.minimum_cgpa if drive.minimum_cgpa else 'N/A',  # Minimum CGPA
+            # "location": drive.headquater.name if drive.headquater else 'N/A',  # Location (related to City)
+            "submission_date": application.created_at.strftime('%B %d, %Y'),  # Application submission date
+            "resume_link": application.resume_link if application.resume_link else 'No resume uploaded',  # Resume link
+        }
+
+        # Append the dictionary to the application_data list
+        application_data.append(application_details)
+
+    # ─── 4) RENDER TEMPLATE ────────────────────────────────────────────────
     return render(
         request,
         "student_applications_list.html",
         {
-            "student_id": student.student_id.id,
             "student": student,
+            "student_id": student.student_id.id,  
+            "profile_name": f"{student.first_name} {student.last_name}",
+            "applications": application_data,  # Pass the structured data to the template
         }
     )
