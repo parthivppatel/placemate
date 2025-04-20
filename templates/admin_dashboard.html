@@ -619,7 +619,7 @@
                             {% for branch in data.branch_performance%}
                             <h4 class="small font-weight-bold">{{branch.branch}} <span class="float-end">{{branch.percentage}}</span></h4>
                             <div class="progress mb-4">
-                                <div class="progress-bar bg-primary" role="progressbar" aria-valuenow="{{branch.percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{branch.percentage}}%"  aria-valuenow="{{branch.percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                             {% endfor%}
                         </div>
