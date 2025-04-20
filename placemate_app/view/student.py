@@ -410,6 +410,7 @@ def student_drive_applications(request, student_id):
         
         application_details = {
             "id": application.id,
+            "drive_id": drive.id,
             "student_name": f"{application.student.first_name} {application.student.last_name}",
             "drive_name": drive.drive_name,
             "company_name": company.name,

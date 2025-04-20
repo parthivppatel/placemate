@@ -88,19 +88,31 @@ def get_students_details(student):
         })
 
     try:
-        accepted_offer = PlacementOffer.objects.get(student=student, status=OfferStatus.ACCEPTED)
-        if accepted_offer.job and accepted_offer.job.drive and accepted_offer.job.drive.company:
-            offer_data = {
-                "company": accepted_offer.job.drive.company.name,
-                "role": accepted_offer.job.job_title,
-                "package": f"{accepted_offer.package} LPA",
-                "status": accepted_offer.status,
-                "offer_date": accepted_offer.offer_date.strftime('%Y-%m-%d'),
-            }
-        else:
-            offer_data = None
+        offer = PlacementOffer.objects.select_related(
+            'job__drive__company'
+        ).get(
+            student=student,
+            status__in=[
+                OfferStatus.OFFERED,
+                OfferStatus.ACCEPTED,
+                OfferStatus.DECLINED
+            ]
+        )
+        
+        offer_data = {
+            "company": offer.job.drive.company.name if offer.job and offer.job.drive and offer.job.drive.company else "N/A",
+            "package": f"{offer.package} LPA",
+            "status": offer.status,
+            "offer_date": offer.offer_date.strftime('%Y-%m-%d'),
+        }
     except PlacementOffer.DoesNotExist:
-        offer_data = None
+        offer_data = {
+            "company": None,
+            "package": None,
+            "status": None,
+            "offer_date": None
+        }
+
 
     return {
         "status_data": status_data,
