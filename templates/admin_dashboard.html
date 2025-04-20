@@ -1,5 +1,5 @@
 {% extends 'admin_base.html' %}
-
+{% load static %}
 {% block title %}Dashboard - Placemate{% endblock %}
 
 {% block content %}
@@ -266,11 +266,7 @@
         .event-cancelled {
             background-color: var(--danger);
         }
-        
-        .profile-dropdown {
-            min-width: 15rem;
-        }
-        
+   
         .dropdown-header {
             font-weight: bold;
             font-size: 0.65rem;
@@ -371,12 +367,7 @@
             <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="h2 text-white mb-1">Placement Dashboard</h1>
-                    <p class="mb-0">Welcome back! Here's the placement status as of April 19, 2025</p>
-                </div>
-                <div>
-                    <button class="btn btn-light">
-                        <i class="fas fa-download fa-sm me-2"></i> Generate Report
-                    </button>
+                    <p class="mb-0">Welcome back! Here's the placement status as of {{data.today|date:"F d, Y" }}</p>
                 </div>
             </div>
             
@@ -387,59 +378,11 @@
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
-                                    <h5 class="mb-1">Drives Conducted</h5>
-                                    <div class="h1 mb-0 font-weight-bold">68
-                                        <span class="trend-indicator trend-up">
-                                            <i class="fas fa-arrow-up"></i> 
-                                            <span class="text-xs">+8</span>
-                                        </span>
-                                    </div>
-                                    <div class="text-xs text-muted">+13.5% from last year</div>
-                                </div>
+                                    <h5 class="mb-3">Companies Visited</h5>
+                                    <div class="h1 mb-0 font-weight-bold">{{data.card.visited}} </div>
+                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-calendar fa-2x text-primary"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2 stat-card">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <h5 class="mb-1">Students Placed</h5>
-                                    <div class="h1 mb-0 font-weight-bold">487
-                                        <span class="trend-indicator trend-up">
-                                            <i class="fas fa-arrow-up"></i> 
-                                            <span class="text-xs">+42</span>
-                                        </span>
-                                    </div>
-                                    <div class="text-xs text-muted">+9.4% from last year</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-user-graduate fa-2x text-success"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-info shadow h-100 py-2 stat-card">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <h5 class="mb-1">Placement Rate</h5>
-                                    <div class="h1 mb-0 font-weight-bold">78%
-                                        <span class="trend-indicator trend-up">
-                                            <i class="fas fa-arrow-up"></i> 
-                                            <span class="text-xs">+5%</span>
-                                        </span>
-                                    </div>
-                                    <div class="text-xs text-muted">+6.8% from last year</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-percentage fa-2x text-info"></i>
                                 </div>
                             </div>
                         </div>
@@ -450,14 +393,38 @@
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
-                                    <h5 class="mb-1">Open Positions</h5>
-                                    <div class="h1 mb-0 font-weight-bold">24
-                                        <span class="trend-indicator trend-up">
-                                            <i class="fas fa-arrow-up"></i> 
-                                            <span class="text-xs">+7</span>
-                                        </span>
-                                    </div>
-                                    <div class="text-xs text-muted">Closing in 7 days: 12</div>
+                                    <h5 class="mb-3">Drive Conducted</h5>
+                                    <div class="h1 mb-0 font-weight-bold">{{data.card.drives}}</div>
+                                 </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-graduate fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-danger shadow h-100 py-2 stat-card">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <h5 class="mb-3">Total Applications</h5>
+                                    <div class="h1 mb-0 font-weight-bold">{{data.card.applications}}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-percentage fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2 stat-card">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <h5 class="mb-3">Students Placed</h5>
+                                    <div class="h1 mb-0 font-weight-bold">{{data.card.placed}}</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-briefcase fa-2x text-warning"></i>
@@ -478,28 +445,28 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <div class="quick-action-button bg-primary">
-                                        <i class="fas fa-calendar-plus"></i>
-                                        Add New Drive
-                                    </div>
+                                    <a href="{% url 'company_registration_page' %}" style="text-decoration:none;" class="quick-action-button bg-primary">
+                                        <i class="bi bi-building-fill-add fs-5"></i>
+                                          Register Company
+                                    </a>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="quick-action-button bg-success">
-                                        <i class="fas fa-file-upload"></i>
-                                        Upload Results
-                                    </div>
+                                    <a href="{% url 'add_drive_page' %}" class="quick-action-button bg-success" style="text-decoration:none;">
+                                        <i class="bi bi-rocket-takeoff fs-5"></i>
+                                         Publish Drive
+                                    </a>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="quick-action-button bg-info">
-                                        <i class="fas fa-sync"></i>
-                                        Sync Companies
-                                    </div>
+                                    <a href="{% url 'shortlisted_students' %}" class="quick-action-button bg-warning" style="text-decoration:none;">
+                                        <i class="bi bi-check2-circle"></i>
+                                         View Shortlist 
+                                    </a>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="quick-action-button bg-warning">
-                                        <i class="fas fa-file-download"></i>
-                                        Generate Reports
-                                    </div>
+                                    <a href="{% url 'student_registrations' %}" class="quick-action-button bg-info" style="text-decoration:none;">
+                                        <i class="bi bi-person-fill-add fs-5"></i>
+                                        Register Student
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -561,20 +528,9 @@
                             </div>
                             <div class="mt-3 text-center small">
                                 <span class="me-2">
-                                    <i class="fas fa-circle text-primary"></i> CSE
+                                    <i class="fas fa-circle text-primary"></i>
                                 </span>
-                                <span class="me-2">
-                                    <i class="fas fa-circle text-success"></i> ECE
-                                </span>
-                                <span class="me-2">
-                                    <i class="fas fa-circle text-info"></i> IT
-                                </span>
-                                <span class="me-2">
-                                    <i class="fas fa-circle text-danger"></i> EEE
-                                </span>
-                                <span>
-                                    <i class="fas fa-circle text-warning"></i> MECH
-                                </span>
+                               
                             </div>
                         </div>
                     </div>
@@ -587,9 +543,7 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold"><i class="fas fa-calendar-alt me-1"></i> Upcoming Drives</h6>
-                        <a href="#" class="btn btn-sm btn-primary">
-                            <i class="fas fa-plus"></i> Add Drive
-                        </a>
+                       
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -597,85 +551,38 @@
                                 <thead>
                                     <tr>
                                         <th>Company</th>
-                                        <th>Date</th>
-                                        <th>Positions</th>
+                                        <th>Drive Name</th>
+                                        <th>start date</th>
                                         <th>Status</th>
-                                        <th>Actions</th>
+                                        <th>view</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for drive in data.upcoming_drives%}
                                     <tr>
                                         <td class="d-flex align-items-center">
-                                            <img src="/api/placeholder/36/36" class="rounded me-2" width="36" height="36" alt="Microsoft">
-                                            Microsoft
+                                            {% if drive.logo %}
+                                            <img src="/media/{{logo}}" class="rounded me-2" width="36" height="36" alt="Microsoft">
+                                            {% else %}
+                                            <!-- {{ student.photo_url|default:'/static/images/default-profile.png' }} -->
+                                            <img src="{% static 'images/default-company.png'%}" class="rounded me-2" width="36" height="36" alt="Microsoft" />
+                                            {% endif %}
+                                            {{drive.company_name}}
                                         </td>
-                                        <td>May 5, 2025</td>
-                                        <td>25</td>
-                                        <td><span class="badge bg-primary">Upcoming</span></td>
+                                        <td>{{drive.drive_name}}</td>
+                                        <td>{{drive.start_date}}</td>
+                                        <td><span class="badge bg-warning">{{drive.status}}</span></td>
                                         <td>
-                                            <div class="action-button action-button-view">
-                                                <i class="fas fa-eye"></i>
-                                            </div>
-                                            <div class="action-button action-button-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </div>
+                                            <a href="{% url 'view_drive' drive.id %}" class="action-button action-button-view">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td class="d-flex align-items-center">
-                                            <img src="/api/placeholder/36/36" class="rounded me-2" width="36" height="36" alt="Amazon">
-                                            Amazon
-                                        </td>
-                                        <td>May 12, 2025</td>
-                                        <td>18</td>
-                                        <td><span class="badge bg-primary">Upcoming</span></td>
-                                        <td>
-                                            <div class="action-button action-button-view">
-                                                <i class="fas fa-eye"></i>
-                                            </div>
-                                            <div class="action-button action-button-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="d-flex align-items-center">
-                                            <img src="/api/placeholder/36/36" class="rounded me-2" width="36" height="36" alt="Google">
-                                            Google
-                                        </td>
-                                        <td>May 18, 2025</td>
-                                        <td>12</td>
-                                        <td><span class="badge bg-primary">Upcoming</span></td>
-                                        <td>
-                                            <div class="action-button action-button-view">
-                                                <i class="fas fa-eye"></i>
-                                            </div>
-                                            <div class="action-button action-button-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="d-flex align-items-center">
-                                            <img src="/api/placeholder/36/36" class="rounded me-2" width="36" height="36" alt="Deloitte">
-                                            Deloitte
-                                        </td>
-                                        <td>May 25, 2025</td>
-                                        <td>40</td>
-                                        <td><span class="badge bg-warning">Pending</span></td>
-                                        <td>
-                                            <div class="action-button action-button-view">
-                                                <i class="fas fa-eye"></i>
-                                            </div>
-                                            <div class="action-button action-button-edit">
-                                                <i class="fas fa-edit"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
-                        <a href="#" class="btn btn-sm btn-outline-primary w-100 mt-2">View All Drives</a>
+                        <a href="{% url 'list_drives' %}" class="btn btn-sm btn-outline-primary w-100 mt-2">View All Drives</a>
                     </div>
                 </div>
             </div>
@@ -708,34 +615,23 @@
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold"><i class="fas fa-graduation-cap me-1"></i> Branch-wise Performance</h6>
                         </div>
-                        <div class="card-body">
-                            <h4 class="small font-weight-bold">Computer Science <span class="float-end">92%</span></h4>
+                        <div class="card-body" style="max-height: 280px; overflow-y: auto;">
+                            {% for branch in data.branch_performance%}
+                            <h4 class="small font-weight-bold">{{branch.branch}} <span class="float-end">{{branch.percentage}}</span></h4>
                             <div class="progress mb-4">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: 92%" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{branch.percentage}}%" aria-valuenow="{{branch.percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                            <h4 class="small font-weight-bold">Information Technology <span class="float-end">83%</span></h4>
-                            <div class="progress mb-4">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: 83%" aria-valuenow="83" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <h4 class="small font-weight-bold">Electronics & Communication <span class="float-end">75%</span></h4>
-                            <div class="progress mb-4">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <h4 class="small font-weight-bold">Electrical Engineering <span class="float-end">66%</span></h4>
-                            <div class="progress mb-4">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <h4 class="small font-weight-bold">Mechanical Engineering <span class="float-end">45%</span></h
-                            <div class="progress">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
+                            {% endfor%}
                         </div>
                     </div>
                 </div>
             </div>
  
         </div>
- 
+       
+       
+        {{ data|json_script:"admin-dashboard-data" }}
+
     
     <!-- Bootstrap core JavaScript-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
@@ -743,17 +639,21 @@
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
-    <script>
+    <script type="text/javascript">
         // Set new default font family and font color to mimic Bootstrap's default styling
         Chart.defaults.font.family = 'Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
         Chart.defaults.color = '#858796';
-
+        const statusData = JSON.parse(document.getElementById('admin-dashboard-data').textContent);
+        
+        let labels = statusData.placement_trend.map(item => item.label);
+        let counts = statusData.placement_trend.map(item => item.count);
+         
         // Placement Trend Chart
         var ctx = document.getElementById("placementTrendChart");
         var myLineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ["Nov '24", "Dec '24", "Jan '25", "Feb '25", "Mar '25", "Apr '25"],
+                labels: labels,
                 datasets: [{
                     label: "Students Placed",
                     lineTension: 0.3,
@@ -767,7 +667,7 @@
                     pointHoverBorderColor: "rgba(78, 115, 223, 1)",
                     pointHitRadius: 10,
                     pointBorderWidth: 2,
-                    data: [65, 90, 120, 56, 76, 80],
+                    data: counts,
                 }],
             },
             options: {
@@ -804,14 +704,16 @@
             }
         });
 
+        
+ 
         // Placement Distribution Chart
         var ctx2 = document.getElementById("placementDistributionChart");
         var myPieChart = new Chart(ctx2, {
             type: 'doughnut',
             data: {
-                labels: ["CSE", "ECE", "IT", "EEE", "MECH"],
+                labels: statusData.placement_distribution.labels,
                 datasets: [{
-                    data: [42, 20, 15, 12, 11],
+                    data: statusData.placement_distribution.data,
                     backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#e74a3b', '#f6c23e'],
                     hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#e02d1b', '#dda20a'],
                     hoverBorderColor: "rgba(234, 236, 244, 1)",
@@ -838,7 +740,7 @@
                     label: "Students",
                     backgroundColor: "#4e73df",
                     hoverBackgroundColor: "#2e59d9",
-                    data: [210, 152, 75, 32, 15, 3],
+                    data: statusData.salary_range,
                 }],
             },
             options: {
@@ -872,49 +774,7 @@
             }
         });
 
-        // Company Types Chart
-        var ctx4 = document.getElementById("companyTypesChart");
-        var myCompanyChart = new Chart(ctx4, {
-            type: 'bar',
-            data: {
-                labels: ["IT/Software", "Core Eng.", "Consulting", "Finance", "R&D", "Others"],
-                datasets: [{
-                    label: "Companies",
-                    backgroundColor: "#1cc88a",
-                    hoverBackgroundColor: "#17a673",
-                    data: [28, 15, 12, 8, 5, 2],
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            maxTicksLimit: 5,
-                            padding: 10
-                        },
-                        grid: {
-                            color: "rgb(234, 236, 244)",
-                            zeroLineColor: "rgb(234, 236, 244)",
-                            drawBorder: false,
-                            borderDash: [2],
-                            zeroLineBorderDash: [2]
-                        }
-                    },
-                }
-            }
-        });
+        
     </script>
  
 {% endblock %}
