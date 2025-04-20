@@ -305,34 +305,38 @@
     
                 <div class="opt-in-section">
                     <p class="text-muted small mb-2">
-                        <i class="far fa-clock me-1"></i> Last date to opt-in: <strong>{{ deadline }}</strong>
+                        <i class="far fa-clock me-1"></i> Last date to opt-in: <strong>{{ registration_deadline }}</strong>
                     </p>
                     <div class="d-flex justify-content-md-end justify-content-center gap-2 flex-wrap">
-                        {% if drive_status == 'Scheduled' %}
-                            {% if eligible %}
-                                {% if applied %}
-                                    <p class="text-success mb-0"><i class="fas fa-check-circle me-1"></i> You have already applied</p>
-                                    {% if resume_url %}
-                                        <p class="mb-1">
-                                            <strong>Submitted Resume:</strong> 
-                                            <a href="{{ resume_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-underline">
-                                                View Resume
-                                            </a>
-                                        </p>
+                        {% if applications_status != 'Rejected' or applications_status == 'N/A'%}
+                            {% if drive_status == 'Scheduled' %}
+                                {% if eligible %}
+                                    {% if applied %}
+                                        <p class="text-success mb-0"><i class="fas fa-check-circle me-1"></i> You have already applied</p>
+                                        {% if resume_url %}
+                                            <p class="mb-1">
+                                                <strong>Submitted Resume:</strong> 
+                                                <a href="{{ resume_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-underline">
+                                                    View Resume
+                                                </a>
+                                            </p>
+                                        {% endif %}
                                     {% endif %}
+                                {% else %}
+                                    <p class="text-danger mb-0"><i class="fas fa-exclamation-circle me-1"></i> Not eligible due to academic criteria</p>
                                 {% endif %}
+                            
+                            {% elif drive_status == 'Ongoing' %}
+                                <p class="text-warning mb-0"><i class="fas fa-hourglass-half me-1"></i> Drive ongoing (no new applications)</p>
+                            
+                            {% elif drive_status == 'Completed' %}
+                                <p class="text-secondary mb-0"><i class="fas fa-flag-checkered me-1"></i> Drive completed</p>
+                        
                             {% else %}
-                                <p class="text-danger mb-0"><i class="fas fa-exclamation-circle me-1"></i> Not eligible due to academic criteria</p>
+                                <p class="text-info mb-0"><i class="fas fa-info-circle me-1"></i> Drive currently unavailable</p>
                             {% endif %}
-                        
-                        {% elif drive_status == 'Ongoing' %}
-                            <p class="text-warning mb-0"><i class="fas fa-hourglass-half me-1"></i> Drive ongoing (no new applications)</p>
-                        
-                        {% elif drive_status == 'Completed' %}
-                            <p class="text-secondary mb-0"><i class="fas fa-flag-checkered me-1"></i> Drive completed</p>
-                    
                         {% else %}
-                            <p class="text-info mb-0"><i class="fas fa-info-circle me-1"></i> Drive currently unavailable</p>
+                            <p class="text-danger mb-0"><i class="fas fa-exclamation-circle me-1"></i> Sorry You're Applications has been rejected.</p>
                         {% endif %}
                     </div> 
                 </div>
@@ -340,7 +344,7 @@
         </div>
     </div>
 
-    {% if drive_status == 'Scheduled' and eligible %}
+    {% if drive_status == 'Scheduled' and eligible and applications_status != 'Rejected' %}
         <div class="resume-card-detail bg-white">
             <h3 class="job-title-section"><i class="fas fa-file-alt me-2"></i>Add/Update Resume</h3>
             <div class="resume-content">

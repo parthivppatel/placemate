@@ -159,6 +159,7 @@ def list_student_drives(request):
             active_drives = active_drives.filter(status="completed", end_date__lt=current_date)
         elif status_filter == 'all_drives':
             active_drives = active_drives.all()
+        
 
         if search_query:
             active_drives = active_drives.filter(
@@ -352,18 +353,23 @@ def student_drive_details(request, drive_id):
         else:
             drive_status = "Completed"
 
+
+        application = DriveApplication.objects.filter(student=student, drive=drive).first()
+
         # ─── 9) RENDER TEMPLATE ────────────────────────────────────────────────────
         context = {
             "page_title":       drive.drive_name,
             "page_subtitle":    f"{company.name} Placement Drive",
             "student_id":       student.student_id.id,
             "student":          student,
+            "applications_status": application.status if application else 'N/A',
             "profile_name":     f"{student.first_name} {student.last_name}",
             "company":          company,
             "logo_url":         logo_url,
             "location":         location_list,
             "drive":            drive,
             "jobs":             jobs,
+            "registration_deadline": drive.start_date.strftime("%d/%m/%Y"),
             "deadline":         drive.end_date.strftime("%d/%m/%Y"),
             "eligible":         eligible,
             "applied":          applied,
