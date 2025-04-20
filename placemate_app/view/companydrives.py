@@ -323,7 +323,8 @@ def application_action(request,id=0):
             application.status = new_status
             application.save()
 
-            shortlist_mail(student.student_id.email,student.first_name,drive.company.name)
+            if new_status == 'Shortlisted':
+                shortlist_mail(student.student_id.email,student.first_name,drive.company.name)
 
             messages.success(request, f"Status updated to '{new_status}' for {student.first_name} {student.last_name}.")
             return redirect('drive_applicants', id=drive.id)
