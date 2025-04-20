@@ -263,34 +263,41 @@
 
                     <div class="header-actions">
                         <!-- Elegant Profile Dropdown -->
-                        <div class="profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="profile-wrapper d-flex align-items-center">
-                                <div class="profile-avatar mt-3 bg-gradient-primary shadow-sm">
-                                    <span>A</span>
+                        <div class="dropdown">
+                            <div class="profile-dropdown dropdown-toggle" 
+                                role="button" 
+                                id="profileDropdown" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                                <div class="profile-wrapper d-flex align-items-center">
+                                    <div class="profile-avatar mt-3 bg-gradient-primary shadow-sm">
+                                        <span>A</span>
+                                    </div>
+                                    <div class="profile-info d-none d-md-block ms-2">
+                                        <span class="profile-name fw-semibold">Admin User</span>
+                                    </div>
+                                    <i class="bi bi-chevron-down dropdown-chevron ms-2 text-muted"></i>
                                 </div>
-                                <div class="profile-info d-none d-md-block ms-2">
-                                    <span class="profile-name fw-semibold">Admin User</span>
-                                </div>
-                                <i class="bi bi-chevron-down dropdown-chevron ms-2 text-muted"></i>
                             </div>
-                            
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 py-2">
+
+                            <!-- Bootstrap Dropdown Menu -->
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 py-2" aria-labelledby="profileDropdown">
                                 <li class="px-2">
                                     <a href="{% url 'profile_reset_password' %}" class="dropdown-item rounded-3 d-flex align-items-center py-2">
-                                        <i class="bi bi-key-fill me-2 text-primary"></i> 
+                                        <i class="bi bi-key-fill me-2 text-primary"></i>
                                         <span>Change Password</span>
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider mx-2 my-2"></li>
                                 <li class="px-2">
                                     <a href="{% url 'logout' %}" class="dropdown-item rounded-3 d-flex align-items-center py-2 text-danger">
-                                        <i class="bi bi-box-arrow-right me-2"></i> 
+                                        <i class="bi bi-box-arrow-right me-2"></i>
                                         <span>Logout</span>
                                     </a>
                                 </li>
                             </ul>
-                    
                         </div>
+
                     </div>
                 </div>
                 
