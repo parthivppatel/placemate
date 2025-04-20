@@ -4,6 +4,7 @@ from django.contrib import messages
 from ..utils import authenticate_user, set_jwt_cookie
 
 def login(request):
+    page_title = "Placemate - Login"
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password", "").strip()
@@ -23,4 +24,4 @@ def login(request):
 
         return response
 
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'title': page_title})
