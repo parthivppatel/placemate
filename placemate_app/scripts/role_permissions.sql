@@ -103,7 +103,6 @@ INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(50, 1, 28);
 INSERT INTO "Permissions" (id, name, description) VALUES (29, 'edit_students', 'PlacementCell Permission to view their applications');
 INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(51, 3, 29);
 
-
 INSERT INTO "Permissions" (id,name, description) VALUES (30,'view_members','can view placement members list');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(52,3,30); 
 

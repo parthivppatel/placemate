@@ -27,6 +27,9 @@ def login(request):
                 "email": email,
                 "password": password
             })
+        
+        if roles[0] == "Company":
+            return JsonResponse({"status": 400, "message": "The company portal is coming soon. Please check back later."})
 
         response = redirect("/")
         response = set_jwt_cookie(response, user, roles[0])
