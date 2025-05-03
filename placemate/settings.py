@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = False
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', config('RENDER_HOST', default='')] 
+ALLOWED_HOSTS = ['placemate-88qn.onrender.com'] 
 
 
 # Application definition
