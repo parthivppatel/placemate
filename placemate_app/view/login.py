@@ -11,14 +11,12 @@ def login(request):
         password = request.POST.get("password", "").strip()
 
         if not email or not password:
-            messages.error(request, "Email and password are required.")
-            return render(request, 'login.html', {'status': 400})
+            return JsonResponse({"status": 400, "message": "Email and password are required."})
 
         user, roles_or_error = authenticate_user(email, password)
 
         if not user:
-            messages.error(request, "Invalid email or password.")
-            return render(request, 'login.html', {'status': 400})
+            return JsonResponse({"status": 400, "message": "Invalid email or password."})
         
         roles = roles_or_error
         if len(roles) == 2:
@@ -39,31 +37,21 @@ def login(request):
 
 def roleloggin(request):
     if request.method == "POST":
-        # Get data from the AJAX request
         role = request.POST.get("role")
         email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password", "").strip()
 
-        print("Role:", role)
-        print("Email:", email)
-        print("Password:", password)
-
-        # Validate the inputs
         if not role or not email or not password:
             return JsonResponse({"status": 400, "message": "Role, email, and password are required."})
 
-        # Authenticate the user
         user, roles_or_error = authenticate_user(email, password)
-        print("User:", user)
 
         if not user:
             return JsonResponse({"status": 400, "message": "Invalid email or password."})
 
-        # Check if the selected role is valid
         if role not in roles_or_error:
             return JsonResponse({"status": 400, "message": "Invalid role selected."})
 
-        # Set the JWT cookie with the selected role
         response = JsonResponse({"status": 200, "message": "Logged in successfully."})
         response = set_jwt_cookie(response, user, role)
         return response

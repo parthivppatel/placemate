@@ -1,0 +1,68 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/admin_sidebar.css' %}">
+
+<!-- Icon-Only Expanding Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <img src="{% static 'images/da-logo.img' %}" alt="Logo">
+    </div>
+    <h5 class="app-title">Placemate</h5>
+  </div>
+  
+  <div class="nav-section">
+    <p class="section-title">MENU</p>
+    
+    <ul class="nav-links">
+      <!-- Dashboard -->
+      <li>
+        <a href="{% url 'dashboard' %}" id="dashboard-link" class="nav-link" title="Dashboard">
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      
+      <!-- Company Profile -->
+      <li>
+        <a href="{% url 'company_profile' %}" id="profile-link" class="nav-link" title="Company Profile">
+          <i class="bi bi-building"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+      
+      <!-- Job Postings -->
+      <li>
+        <a href="#" id="jobs-link" class="nav-link" title="Job Postings">
+          <i class="bi bi-briefcase"></i>
+          <span>Job Postings</span>
+        </a>
+      </li>
+      
+      <!-- Applicants -->
+      <li>
+        <a href="#" id="applicants-link" class="nav-link" title="Applicants">
+          <i class="bi bi-people"></i>
+          <span>Applicants</span>
+        </a>
+      </li>
+      
+      <!-- Placement Drives -->
+      <li>
+        <a href="#" id="drives-link" class="nav-link" title="Placement Drives">
+          <i class="bi bi-calendar-event"></i>
+          <span>Placement Drives</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+  <div class="sidebar-footer">
+    <a href="{% url 'logout' %}" id="logout-link" class="logout-btn" title="Logout">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</div>
+
+<script src="{% static 'js/admin_sidebar.js' %}"></script>
+
