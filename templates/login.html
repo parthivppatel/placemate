@@ -55,13 +55,8 @@
                                     <h2>Welcome to Placemate!</h2>
                                     <p>Ready to continue?</p>
                                 </div>
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        {% if message.tags != "success" %}
-                                            <div class="alert alert-danger" role="alert">{{ message }}</div>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
+                                <!-- Message container -->
+                                <div id="messageContainer"></div>
                                 <form id="loginForm" method="post">
                                     {% csrf_token %}
                                     <div class="mb-3">
@@ -89,31 +84,89 @@
     </div>
 
     <!-- Modal for Role Selection -->
-    <div class="modal fade" id="roleSelectionModal" tabindex="-1" aria-labelledby="roleSelectionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="roleSelectionModalLabel">Select Role</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="roleSelectionModal" tabindex="-1" aria-labelledby="roleSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: 2px solid #6a5acd;">
+            <div class="modal-header text-white" style="background-color: #6a5acd; border-radius: 13px 13px 0 0;">
+                <div class="d-flex align-items-center w-100">
+                    <img src="{% static '/images/da-logo.img'%}" alt="Logo" style="height: 40px; margin-right: 15px;">
+                    <h5 class="modal-title mb-0" id="roleSelectionModalLabel">Select Your Access Level</h5>
                 </div>
-                <div class="modal-body">
-                    <p>Please select the role you want to log in as:</p>
-                    <div id="roleButtons" class="d-grid gap-2">
-                        {% for role in roles %}
-                        <button class="btn btn-outline-primary" onclick="selectRole('{{ role }}', '{{ email }}', '{{ password }}')">
-                            {{ role|title }}
-                        </button>
-                        {% endfor %}
-                    </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="lead text-center mb-4" style="color: #4b4b4b;">
+                    Welcome back! Please choose your entry point:
+                </p>
+                <div id="roleButtons" class="d-grid gap-3">
+                    {% for role in roles %}
+                    <button class="btn btn-lg d-flex align-items-center justify-content-start p-3" 
+                            onclick="selectRole('{{ role }}', '{{ email }}', '{{ password }}')"
+                            style="border: 2px solid #6a5acd; 
+                                   color: #6a5acd;
+                                   border-radius: 10px;
+                                   transition: all 0.3s ease;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-circle me-3" viewBox="0 0 16 16">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                        </svg>
+                        <span style="font-weight: 500;">{{ role|title }} Portal</span>
+                    </button>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4" style="color: #6a5acd;">
+                    <small>Not sure which to choose? Contact administrator</small>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
     <script>
+        // Function to display messages dynamically
+        function displayMessage(message, type) {
+            const messageContainer = $("#messageContainer");
+            const alertDiv = `
+                <div class="alert alert-${type}" role="alert">
+                    ${message}
+                </div>
+            `;
+            messageContainer.html(alertDiv); // Replace any existing messages
+
+            setTimeout(() => {
+                $(".alert").fadeOut("slow", function () {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+
+        // Function to handle role selection
+        function selectRole(role, email, password) {
+            $.ajax({
+                url: "{% url 'roleloggin' %}",
+                type: "POST",
+                data: {
+                    role: role,
+                    email: email,
+                    password: password,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    if (response.status === 200) {
+                        window.location.href = "/";
+                    } else {
+                        displayMessage(response.message, "danger");
+                    }
+                },
+                error: function () {
+                    displayMessage("An error occurred. Please try again.", "danger");
+                }
+            });
+        }
+
         $(document).ready(function () {
             // Handle login form submission
             $("#loginForm").on("submit", function (e) {
@@ -135,41 +188,17 @@
                             var roleModal = new bootstrap.Modal(document.getElementById('roleSelectionModal'));
                             roleModal.show();
                         } else if (response.status === 400) {
-                            alert(response.message);
+                            displayMessage(response.message, "danger");
                         } else {
                             window.location.href = "/";
                         }
                     },
                     error: function () {
-                        alert("An error occurred. Please try again.");
+                        displayMessage("An error occurred. Please try again.", "danger");
                     }
                 });
             });
         });
-
-        // Handle role selection
-        function selectRole(role, email, password) {
-            $.ajax({
-                url: "{% url 'roleloggin' %}",
-                type: "POST",
-                data: {
-                    role: role,
-                    email: email,
-                    password: password,
-                    csrfmiddlewaretoken: "{{ csrf_token }}"
-                },
-                success: function (response) {
-                    if (response.status === 200) {
-                        window.location.href = "/";
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function () {
-                    alert("An error occurred. Please try again.");
-                }
-            });
-        }
     </script>
 </body>
 </html>

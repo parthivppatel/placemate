@@ -275,7 +275,7 @@ def dashboard(request):
     try:
         user = User.objects.get(email=user_email)
     except User.DoesNotExist:
-        return render(request, "403.html", {"error": "User not found"})
+        return render(request, "403.html", {"error": "User not found"}) 
 
     if user_role == "Student":
         try:
@@ -296,7 +296,7 @@ def dashboard(request):
         })
 
     elif user_role == "Company":
-        return render(request, "company_dashboard.html", {"user_email": user_email})
+        return render(request, "./Company/company_dashboard.html", {"user_email": user_email})
     elif user_role == "Admin":
         admin_dashboard_details = get_sumary_details()
 

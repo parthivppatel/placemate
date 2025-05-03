@@ -1,0 +1,189 @@
+{% extends 'Company/company_base.html' %}
+{% load static %}
+{% block title %}Placemate - Company Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --success: #06d6a0;
+        --info: #3a86ff;
+        --warning: #ffbe0b;
+        --danger: #ef476f;
+        --secondary: #6c757d;
+        --light: #f8f9fc;
+        --dark: #343a40;
+    }
+
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.15);
+    }
+
+    .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        font-weight: bold;
+        color: var(--primary);
+        padding: 1rem 1.25rem;
+        border-top-left-radius: 0.75rem !important;
+        border-top-right-radius: 0.75rem !important;
+    }
+
+    .stat-card {
+        border-left: 4px solid;
+        border-radius: 0.75rem;
+    }
+
+    .border-left-primary { border-left-color: var(--primary); }
+    .border-left-success { border-left-color: var(--success); }
+    .border-left-info { border-left-color: var(--info); }
+    .border-left-warning { border-left-color: var(--warning); }
+    .border-left-danger { border-left-color: var(--danger); }
+
+    .stat-card h5 {
+        color: var(--dark);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-card .h1 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--dark);
+        margin-bottom: 0;
+    }
+
+    .quick-action-button {
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.75rem;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .quick-action-button i {
+        margin-right: 0.75rem;
+        font-size: 1.25rem;
+    }
+
+    .quick-action-button:hover {
+        opacity: 0.9;
+        transform: translateY(-3px);
+    }
+
+    .dashboard-header {
+        background: linear-gradient(to right, var(--primary), var(--info));
+        color: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-white mb-1">Company Dashboard</h1>
+            <p class="mb-0">Welcome back! Here's an overview of your company's activities.</p>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2 stat-card">
+                <div class="card-body">
+                    <h5 class="mb-3">Active Drives</h5>
+                    <div class="h1 mb-0 font-weight-bold">{{ data.card.active_drives }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2 stat-card">
+                <div class="card-body">
+                    <h5 class="mb-3">Total Applications</h5>
+                    <div class="h1 mb-0 font-weight-bold">{{ data.card.total_applications }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2 stat-card">
+                <div class="card-body">
+                    <h5 class="mb-3">Shortlisted Candidates</h5>
+                    <div class="h1 mb-0 font-weight-bold">{{ data.card.shortlisted }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2 stat-card">
+                <div class="card-body">
+                    <h5 class="mb-3">Hired Candidates</h5>
+                    <div class="h1 mb-0 font-weight-bold">{{ data.card.hired }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold"><i class="fas fa-bolt me-1"></i> Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="#" class="quick-action-button bg-primary">
+                                <i class="bi bi-rocket-takeoff fs-5"></i>
+                                Publish Drive
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="quick-action-button bg-success">
+                                <i class="bi bi-people fs-5"></i>
+                                View Applicants
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="quick-action-button bg-warning">
+                                <i class="bi bi-check2-circle"></i>
+                                View Shortlist
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="quick-action-button bg-info">
+                                <i class="bi bi-building"></i>
+                                Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
