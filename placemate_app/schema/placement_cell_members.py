@@ -18,6 +18,7 @@ class PlacementCellMember(models.Model):
     join_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True, blank=True)
     active_status = models.BooleanField(default=True)
+    description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

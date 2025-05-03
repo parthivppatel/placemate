@@ -153,6 +153,10 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD") 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# Create logs directory if it doesn't exist
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOG_DIR, exist_ok=True)
+
 LOGGING = { 
     'version': 1,
     'disable_existing_loggers': False,

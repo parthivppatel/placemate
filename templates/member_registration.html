@@ -1,0 +1,340 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block title %}Register Member{% endblock %}
+{% block header_title %}
+Register Cell Member
+{% endblock %}
+
+{% block header_subtitle %}
+Add placement cell member in placemate.
+{% endblock %}
+{% block content %} 
+    <style>
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            color: white;
+            padding: 30px 0;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .form-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            padding: 25px;
+            color: white;
+        }
+        
+        .form-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .form-subtitle {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .form-content {
+            padding: 30px;
+        }
+        
+        .section-title-m {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .section-title-m::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(108, 122, 224, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .form-select {
+            border-radius: 8px;
+            padding: 12px 15px;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+        
+        .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(108, 122, 224, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .input-group-text {
+            background-color: rgba(108, 122, 224, 0.1);
+            border-color: #ddd;
+            color: var(--primary-color);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+            gap: 15px;
+        }
+        
+        .btn-action {
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+      
+        
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 80%;
+        }
+        .form-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+    
+        .required-field::after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn-action {
+                width: 100%;
+            }
+        }
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* transparent white */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+      <!-- Display Messages -->
+    {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == "success" %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% else %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    <!-- Loader (initially hidden) -->
+    <div id="loader" style="display: none;">
+    <div class="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+    </div>
+    <div class="container mb-5">
+        <div class="form-card">
+ 
+            <div class="form-content">
+                <form id="addMemberForm" method="post" action="{% url 'add_member'%}" class="needs-validation" novalidate>
+                    {% csrf_token%}
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h3 class="section-title-m">Personal Information</h3>
+                    
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label required-field">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter email address" required>
+                                </div>
+                                <div class="form-text invalid-feedback">Email id is required.</div>
+                             </div>
+                            
+                            <div class="mb-3">
+                                <label for="phone" class="form-label required-field">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h3 class="section-title-m">Cell Information</h3>
+                            
+                            <div class="mb-3">
+                                <label for="role" class="form-label required-field">Role in Cell</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="" selected disabled>Select Role</option>
+                                    {% for role in roles%}
+                                    <option value="{{role.value}}">{{role.value}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="branch" class="form-label">Branch</label>
+                                <select class="form-select" name="branch" id="branch">
+                                    <option value="" selected disabled>Select Branch</option>
+                                   {% for branch in branches%}
+                                    <option value="{{branch.id}}">{{branch.name}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="joinDate" class="form-label required-field">Join Date</label>
+                                    <input type="date" class="form-control" name="join_date" id="joinDate" required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="endDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" name="end_date" id="endDate">
+                                    <div class="form-text">Leave blank if no end date</div>
+                                </div>
+                            </div>
+                       
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h3 class="section-title-m">Additional Information</h3>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description / Notes</label>
+                                <textarea class="form-control" name="description" id="description" rows="4" placeholder="Enter any additional information about the member"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="actions">
+                        <button type="button" class="btn btn-outline-secondary btn-action" onclick="window.location.href='{% url 'list_members' %}'">
+                            <i class="bi bi-x-circle me-2"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-action">
+                            <i class="bi bi-check-circle me-2"></i> Add Member
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+ 
+</body>
+</html>
+
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>
+
+    $(document).ready(function() { 
+        
+        $('.needs-validation').each(function () {
+            $(this).on('submit', function (event) {
+                if (!this.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $(this).addClass('was-validated');
+                }
+                else{
+                    $('#loader').show();
+                }
+            });
+        });
+
+  
+        setTimeout(function () {
+            $('.alert-success, .alert-danger').each(function () {
+                $(this).fadeTo(500, 0, function () {
+                    $(this).remove();
+                });
+            });
+        }, 6000); // Wait 6 seconds before fading out
+        
+  
+    });
+</script>
+{%endblock%}

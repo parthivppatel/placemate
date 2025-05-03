@@ -1,0 +1,315 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block title %}Member Profile{% endblock %}
+{% block header_title %}
+    Placement Cell Member Profile
+{% endblock %}
+
+{% block header_subtitle %}
+    Details of Member
+{% endblock %}
+{% block content %}
+    <style>
+       
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            color: white;
+            padding: 30px 0;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .profile-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .profile-header {
+            background: #6c7ae0;;
+            padding: 25px;
+            color: white;
+            position: relative;
+        }
+        
+        .profile-avatar-m {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+        
+        .profile-avatar-m i {
+            font-size: 50px;
+            color: #6c7ae0;
+        }
+        
+        .profile-name-m {
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 1.8rem;
+        }
+        
+        .profile-role {
+            text-align: center;
+            opacity: 0.9;
+            color:white;
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+        
+        .profile-content {
+            padding: 30px;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title-m {
+            font-weight: 600;
+            color: #6c7ae0;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .section-title-m::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: #6c7ae0;;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(43, 101, 226, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #6c7ae0; 
+        }
+        
+        .info-icon i {
+            font-size: 18px;
+        }
+        
+        .info-content {
+            flex-grow: 1;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+        
+        .status-badge {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            display: inline-block;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .status-badge.inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .btn-action {
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 500;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+        
+        
+        @media (max-width: 768px) {
+            .profile-avatar-m {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .profile-name-m {
+                font-size: 1.5rem;
+            }
+            
+            .profile-role {
+                font-size: 1rem;
+            }
+            
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .info-icon {
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+        }
+    </style> 
+<body> 
+
+    <div class="container mb-5">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar-m">
+                    {% if profile %}
+                    <img src="/media/{{profile}}" alt="student Profile">
+                    {% else %} 
+                    <i class="bi bi-person"></i>
+                     {% endif %}
+                </div>
+                
+                <h2 class="profile-name-m">{{name}}</h2>
+                <p class="profile-role">{{role}}</p>
+            </div>
+            
+            <div class="profile-content">
+                <div class="info-section">
+                    <h3 class="section-title-m">Contact Information</h3>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">{{email}}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Phone</div>
+                            <div class="info-value">{{phone}}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3 class="section-title-m">Cell Information</h3>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-briefcase"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Role in Cell</div>
+                            <div class="info-value">{{role}}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-buildings"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Branch</div>
+                            <div class="info-value">{{branch|default:'-'}}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Join Date</div>
+                            <div class="info-value">{{join_date|date:"j F, Y"}}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-x"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">End Date</div>
+                            <div class="info-value">{%if end_date %} {{end_date|date:"j F, Y"}} {%else%} - {%endif%}  </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-card-text"></i>  <!-- Use a suitable icon -->
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Description</div>
+                            <div class="info-value"> 
+                                    {{ description|default:'-' }} 
+                            </div>
+                        </div>
+                    </div>
+                    
+                   
+                </div> 
+                
+                <div class="actions">
+                    {% if edit_member %}
+                    <a href="{% url 'edit_member_page' id %}" class="btn btn-outline-primary btn-action">
+                        <i class="bi bi-pencil me-2"></i> Edit Profile
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'list_members'%}" class="btn btn-secondary btn-action">
+                        <i class="bi bi-arrow-left me-2"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</body> 
+{% endblock %}

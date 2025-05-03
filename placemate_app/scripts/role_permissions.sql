@@ -88,3 +88,18 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(43,3,22);
 INSERT INTO "Permissions" (id,name, description) VALUES (23,'placement_action','Approve/Reject the placement application');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(44,2,23);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(45,3,23);
+
+INSERT INTO "Permissions" (id,name, description) VALUES (24,'view_members','can view placement members list');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(46,3,24); 
+
+INSERT INTO "Permissions" (id,name, description) VALUES (25,'view_member','can view specific placement member profile');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(47,3,25); 
+
+INSERT INTO "Permissions" (id,name, description) VALUES (26,'add_member','can add new placement member');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(48,3,26); 
+
+INSERT INTO "Permissions" (id,name, description) VALUES (27,'delete_member','can delete plaecment member');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(49,3,27); 
+ 
+INSERT INTO "Permissions" (id,name, description) VALUES (28,'edit_member','can edit placement member details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(50,3,28); 

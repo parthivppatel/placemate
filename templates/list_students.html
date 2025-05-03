@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Manage Students{% endblock %}
 {% block header_title %}
-    Students List
+    Registered Students
 {% endblock %}
 
 {% block header_subtitle %}
@@ -101,7 +101,7 @@
                     <input type="hidden" name="perpage" value="{{ request.GET.perpage|default:'10' }}" id="filterPerPage">
                     
                     <div class="col-md-3 mb-2 mb-md-0">
-                        <div class="d-flex align-items-center rounded-pill px-3 py-1 shadow-sm border border-1" style="min-height: 42px;">
+                        <div class="d-flex align-items-center rounded-pill px-3 shadow-sm border border-1">
                             <i class="bi bi-search text-muted me-2 fs-6"></i>
                             <input type="text"
                                    class="form-control border-0 shadow-none bg-transparent"
@@ -114,7 +114,7 @@
                     
                     <div class="col-md-9 d-flex flex-wrap justify-content-md-end gap-2">
                         <!-- Course Filter -->
-                        <select name="course" class="form-select form-select-sm rounded-pill px-3 pe-5 shadow-sm w-auto" onchange="this.form.submit()">
+                        <select name="course" class="form-select form-select-sm rounded-pill  px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">Select Course</option>
                             {% for course in filter_options.courses %}
                             <option value="{{ course.value }}" {% if request.GET.course == course.value|stringformat:"s" %}selected{% endif %}>
@@ -124,7 +124,7 @@
                         </select>
 
                         <!-- Batch Filter -->
-                        <select name="batch" class="form-select form-select-sm rounded-pill px-3 pe-5 shadow-sm w-auto" onchange="this.form.submit()">
+                        <select name="batch" class="form-select form-select-sm rounded-pill  px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">Select Batch</option>
                             {% for batch in filter_options.batches %}
                             <option value="{{ batch }}" {% if request.GET.batch == batch|stringformat:"s" %}selected{% endif %}>
@@ -134,7 +134,7 @@
                         </select>
 
                         <!-- Placement Status Filter -->
-                        <select name="placement_status" class="form-select form-select-sm rounded-pill px-3 pe-5 shadow-sm w-auto" onchange="this.form.submit()">
+                        <select name="placement_status" class="form-select form-select-sm rounded-pill  px-3 pe-5 py-2 shadow-sm w-auto" onchange="this.form.submit()">
                             <option value="">Select Placement Status</option>
                             {% for status in filter_options.placement_statuses %}
                             <option value="{{ status.value }}" {% if request.GET.placement_status == status.value|stringformat:"s" %}selected{% endif %}>

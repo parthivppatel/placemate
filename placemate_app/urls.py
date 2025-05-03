@@ -17,7 +17,7 @@ from .view.companydrives import list_drives,add_drive,edit_drive,edit_drive_page
 
 from .view.students import student_registrations, student_manual_registrations, view_student, edit_student, delete_student, list_students
 from .view.student import student_profile, student_edit_student, list_student_drives, student_drive_details, student_drive_applications
-
+from .view.members import list_members,delete_member,view_member,member_registration_page,add_member,edit_member_page,edit_member
 from placemate_app.utils.reset_password_utils import profile_reset_password
 
 urlpatterns = [
@@ -35,6 +35,14 @@ urlpatterns = [
     path('resend_otp/', resend_otp, name="resend_otp"),
     
     # path('get-industries/',get_industries,name="get_industries"),
+    path('members/list-members/',list_members,name="list_members"),
+    path('members/delete-member/',delete_member,name="delete_member"),
+    path('members/view-member/<int:id>',view_member,name="view_member"),
+    path('members/register-member/',member_registration_page,name="member_registration_page"),
+    path('members/register/',add_member,name="add_member"),
+    path('members/edit/<int:id>',edit_member_page,name="edit_member_page"),
+    path('members/edit-member/<int:id>',edit_member,name="edit_member"),
+
 
     path('companies/register_company/',register_company,name="register_company"),
     path('companies/register/',company_registration_page,name="company_registration_page"),
