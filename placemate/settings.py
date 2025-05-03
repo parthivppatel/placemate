@@ -15,6 +15,7 @@ import datetime
 import os
 from dotenv import load_dotenv
 import dj_database_url
+from decouple import config
 
 load_dotenv()
 
@@ -31,7 +32,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [os.getenv('RENDER_HOST', default='127.0.0.1')]
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', config('RENDER_HOST', default='')] 
 
 
 # Application definition
