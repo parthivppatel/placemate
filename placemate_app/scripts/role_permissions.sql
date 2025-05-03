@@ -88,3 +88,18 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(43,3,22);
 INSERT INTO "Permissions" (id,name, description) VALUES (23,'placement_action','Approve/Reject the placement application');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(44,2,23);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(45,3,23);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (24, 'student_view_profile', 'Students Permission to view student their details');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(46, 1, 24);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (25, 'student_edit_profile', 'Students Permission to edit their student details');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(47, 1, 25);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (26, 'student_view_drives', 'Students Permission to view list of drives');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(48, 1, 26);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (27, 'student_view_drive', 'Students Permission to view specific drive details');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(49, 1, 27);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (28, 'student_view_applications', 'Students Permission to view their applications');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(50, 1, 28);

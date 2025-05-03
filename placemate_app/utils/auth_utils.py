@@ -10,7 +10,7 @@ from ..schema.user_roles import UserRole
 from .jwt_utils import generate_jwt_token 
 
 def authenticate_user(email, password):
-    """Validates user credentials and returns user & role if valid."""
+    """Validates user credentials and returns user & list of roles if valid."""
     try:
         user = User.objects.get(email__iexact=email)
     except User.DoesNotExist:
@@ -19,10 +19,14 @@ def authenticate_user(email, password):
     if not check_password(password, user.password):
         return None, "Invalid email or password."
 
-    user_role = UserRole.objects.filter(user=user).select_related("role").first()
-    role_name = user_role.role.name if user_role else "Unknown"
+    # Fetch all roles for the user
+    user_roles = UserRole.objects.filter(user=user).select_related("role")
+    roles = [ur.role.name for ur in user_roles]
 
-    return user, role_name
+    if not roles:
+        roles = ["Unknown"]
+
+    return user, roles
 
 def set_jwt_cookie(response, user, role_name):
     """Generates JWT token and sets it as a secure HttpOnly cookie."""
