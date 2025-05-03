@@ -72,10 +72,6 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(36,3,18);
 INSERT INTO "Permissions" (id,name, description) VALUES (19,'delete_drive','Permission to delete the drive details');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(37,3,19);
 
-INSERT INTO "Permissions" (id,name, description) VALUES (20,'edit_students','Permission to edit student details');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(38,1,20);
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(39,3,20);
-
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(40, 1, 12);
 
 INSERT INTO "Permissions" (id,name, description) VALUES (21,'view_applicants','Permission to view applicant details');
@@ -103,3 +99,6 @@ INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(49, 1, 27);
 
 INSERT INTO "Permissions" (id, name, description) VALUES (28, 'student_view_applications', 'Students Permission to view their applications');
 INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(50, 1, 28);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (29, 'edit_students', 'PlacementCell Permission to view their applications');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(51, 3, 29);
