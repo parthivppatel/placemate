@@ -3,7 +3,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .view.login import login
+from .view.login import login, roleloggin
 from .view.forgot_password import forgot_password
 from .view.verify_otp import verify_otp, resend_otp
 
@@ -24,6 +24,7 @@ urlpatterns = [
     path('', dashboard, name="dashboard"),
 
     path('login/', login, name="login"),
+    path('roleloggin/', roleloggin, name="roleloggin"),
     path('logout/', logout, name="logout"),
 
     path('profile-reset-password/', profile_reset_password, name="profile_reset_password"),

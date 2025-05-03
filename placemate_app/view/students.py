@@ -73,7 +73,6 @@ def format_student_data(paginated_students, page, perpage):
     ]
 
 @permission_required('add_students')
-@csrf_exempt
 def student_registrations(request):
     return render(request, "student_registrations.html", {
         "page_title": "Student Registrations",
@@ -81,7 +80,6 @@ def student_registrations(request):
     })
 
 @permission_required('add_students')
-@csrf_exempt
 def student_manual_registrations(request):
     if request.method == "POST":
         try:
@@ -222,7 +220,6 @@ def student_manual_registrations(request):
     })
 
 @permission_required('delete_students')
-@csrf_exempt
 def delete_student(request):
     if request.method != "POST":
         messages.error(request, "Only POST requests are allowed.")
@@ -254,7 +251,6 @@ def delete_student(request):
         return redirect("list_students")
 
 @permission_required('view_students')
-@csrf_exempt
 def view_student(request, student_id):
     try:
         # Retrieve the student by ID
@@ -320,7 +316,6 @@ def view_student(request, student_id):
         return redirect("list_students")
 
 @permission_required('edit_students')
-@csrf_exempt
 def edit_student(request, student_id):
     try:
         # Retrieve the student by ID

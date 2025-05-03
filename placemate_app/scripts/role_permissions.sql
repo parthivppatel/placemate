@@ -72,10 +72,6 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(36,3,18);
 INSERT INTO "Permissions" (id,name, description) VALUES (19,'delete_drive','Permission to delete the drive details');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(37,3,19);
 
-INSERT INTO "Permissions" (id,name, description) VALUES (20,'edit_students','Permission to edit student details');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(38,1,20);
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(39,3,20);
-
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(40, 1, 12);
 
 INSERT INTO "Permissions" (id,name, description) VALUES (21,'view_applicants','Permission to view applicant details');
@@ -89,17 +85,36 @@ INSERT INTO "Permissions" (id,name, description) VALUES (23,'placement_action','
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(44,2,23);
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(45,3,23);
 
-INSERT INTO "Permissions" (id,name, description) VALUES (24,'view_members','can view placement members list');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(46,3,24); 
+INSERT INTO "Permissions" (id, name, description) VALUES (24, 'student_view_profile', 'Students Permission to view student their details');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(46, 1, 24);
 
-INSERT INTO "Permissions" (id,name, description) VALUES (25,'view_member','can view specific placement member profile');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(47,3,25); 
+INSERT INTO "Permissions" (id, name, description) VALUES (25, 'student_edit_profile', 'Students Permission to edit their student details');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(47, 1, 25);
 
-INSERT INTO "Permissions" (id,name, description) VALUES (26,'add_member','can add new placement member');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(48,3,26); 
+INSERT INTO "Permissions" (id, name, description) VALUES (26, 'student_view_drives', 'Students Permission to view list of drives');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(48, 1, 26);
 
-INSERT INTO "Permissions" (id,name, description) VALUES (27,'delete_member','can delete plaecment member');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(49,3,27); 
+INSERT INTO "Permissions" (id, name, description) VALUES (27, 'student_view_drive', 'Students Permission to view specific drive details');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(49, 1, 27);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (28, 'student_view_applications', 'Students Permission to view their applications');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(50, 1, 28);
+
+INSERT INTO "Permissions" (id, name, description) VALUES (29, 'edit_students', 'PlacementCell Permission to view their applications');
+INSERT INTO "Role_Permission" (id, role_id, permission_id) VALUES(51, 3, 29);
+
+
+INSERT INTO "Permissions" (id,name, description) VALUES (30,'view_members','can view placement members list');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(52,3,30); 
+
+INSERT INTO "Permissions" (id,name, description) VALUES (31,'view_member','can view specific placement member profile');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(53,3,31); 
+
+INSERT INTO "Permissions" (id,name, description) VALUES (32,'add_member','can add new placement member');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(54,3,32); 
+
+INSERT INTO "Permissions" (id,name, description) VALUES (33,'delete_member','can delete plaecment member');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(55,3,33); 
  
-INSERT INTO "Permissions" (id,name, description) VALUES (28,'edit_member','can edit placement member details');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(50,3,28); 
+INSERT INTO "Permissions" (id,name, description) VALUES (34,'edit_member','can edit placement member details');
+INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(56,3,34); 

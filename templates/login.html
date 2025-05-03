@@ -62,11 +62,11 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
-                                <form method="post">
+                                <form id="loginForm" method="post">
                                     {% csrf_token %}
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email ID</label>
-                                        <input type="email" name ="email" class="form-control" id="email" placeholder="Enter your Registered Email">
+                                        <input type="email" name="email" class="form-control" id="email" placeholder="Enter your Registered Email">
                                     </div>
                                     <div class="mb-3">
                                         <label for="password" class="form-label">Password</label>
@@ -78,7 +78,6 @@
                                     <div class="d-grid mb-3">
                                         <button type="submit" class="btn btn-purple">Log In</button>
                                     </div>
-                                    
                                 </form>
                             </div>
                         </div>
@@ -89,7 +88,88 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS (Optional) -->
+    <!-- Modal for Role Selection -->
+    <div class="modal fade" id="roleSelectionModal" tabindex="-1" aria-labelledby="roleSelectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roleSelectionModalLabel">Select Role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please select the role you want to log in as:</p>
+                    <div id="roleButtons" class="d-grid gap-2">
+                        {% for role in roles %}
+                        <button class="btn btn-outline-primary" onclick="selectRole('{{ role }}', '{{ email }}', '{{ password }}')">
+                            {{ role|title }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Handle login form submission
+            $("#loginForm").on("submit", function (e) {
+                e.preventDefault();
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: "{% url 'login' %}",
+                    type: "POST",
+                    data: formData,
+                    success: function (response) {
+                        if (response.status === 200 && response.roles) {
+                            const roleButtons = response.roles.map(role => `
+                                <button class="btn btn-outline-primary" onclick="selectRole('${role}', '${response.email}', '${response.password}')">
+                                    ${role.charAt(0).toUpperCase() + role.slice(1)}
+                                </button>
+                            `).join("");
+                            $("#roleButtons").html(roleButtons);
+                            var roleModal = new bootstrap.Modal(document.getElementById('roleSelectionModal'));
+                            roleModal.show();
+                        } else if (response.status === 400) {
+                            alert(response.message);
+                        } else {
+                            window.location.href = "/";
+                        }
+                    },
+                    error: function () {
+                        alert("An error occurred. Please try again.");
+                    }
+                });
+            });
+        });
+
+        // Handle role selection
+        function selectRole(role, email, password) {
+            $.ajax({
+                url: "{% url 'roleloggin' %}",
+                type: "POST",
+                data: {
+                    role: role,
+                    email: email,
+                    password: password,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    if (response.status === 200) {
+                        window.location.href = "/";
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("An error occurred. Please try again.");
+                }
+            });
+        }
+    </script>
 </body>
 </html>

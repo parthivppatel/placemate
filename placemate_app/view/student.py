@@ -21,7 +21,9 @@ from ..schema.drive_applications import DriveApplication
 from ..schema.drive_locations import DriveLocation
 
 from ..utils.jwt_utils import get_user_from_jwt
+from ..decorators import permission_required
 
+@permission_required("student_view_profile")
 def student_profile(request, student_id):
     student = get_object_or_404(Student, student_id=student_id)
 
@@ -60,7 +62,7 @@ def student_profile(request, student_id):
         "allowed_fields_message": "You are allowed to update your phone number, address, profile picture, 10th percentage, and 12th percentage.",
     })
 
-
+@permission_required("student_edit_profile")
 def student_edit_student(request, student_id):
     try:
         student = Student.objects.select_related("student_id").get(student_id=student_id)
@@ -113,7 +115,7 @@ def student_edit_student(request, student_id):
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return redirect("dashboard")
     
-
+@permission_required("student_view_drives")
 def list_student_drives(request):
     try:
         user_payload = get_user_from_jwt(request)
@@ -227,7 +229,7 @@ def list_student_drives(request):
     except Exception as e:
         return JsonResponse({"message": f"An unexpected error occurred: {str(e)}"}, status=500)
 
-
+@permission_required("student_view_drive")
 def student_drive_details(request, drive_id):
     try:
         # ─── 1) AUTH & STUDENT LOOKUP ────────────────────────────────────────────────
@@ -383,7 +385,7 @@ def student_drive_details(request, drive_id):
     except Exception as e:
         return JsonResponse({"message": f"An unexpected error occurred: {str(e)}"}, status=500)
 
-
+@permission_required("student_view_applications")
 def student_drive_applications(request, student_id):
     # ─── 1) AUTH CHECK ─────────────────────────────────────────────────────
     user_payload = get_user_from_jwt(request)
