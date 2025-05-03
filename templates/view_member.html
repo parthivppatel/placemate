@@ -59,6 +59,13 @@
             font-size: 50px;
             color: #6c7ae0;
         }
+
+        .profile-avatar-m img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* This ensures the image covers the whole circle */
+            object-position: center; /* Centers the image if it has an aspect ratio different from the container */
+        }
         
         .profile-name-m {
             text-align: center;
@@ -203,7 +210,7 @@
             <div class="profile-header">
                 <div class="profile-avatar-m">
                     {% if profile %}
-                    <img src="/media/{{profile}}" alt="student Profile">
+                    <img src="{{profile}}" alt="student Profile">
                     {% else %} 
                     <i class="bi bi-person"></i>
                      {% endif %}
