@@ -7,7 +7,7 @@ class RoleEnum(models.TextChoices):
     HEAD = 'Head', 'Head'
     FACULTY_MEMBER = 'Faculty Member', 'Faculty Member'
     STUDENT_COORDINATOR = 'Student Coordinator', 'Student Coordinator'
-    STUDENT_MEMBER = 'Student Member', 'Student Member'
+    STUDENT_MEMBER = 'Student Member', '     Member'
     PLACEMENT_OFFICER = 'Placement Officer', 'Placement Officer'
     ASSISTANT_PLACEMENT_OFFICER = 'Assistant Placement Officer', 'Assistant Placement Officer'
 

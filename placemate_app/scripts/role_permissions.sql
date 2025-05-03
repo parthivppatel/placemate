@@ -113,8 +113,13 @@ INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(53,3,31);
 INSERT INTO "Permissions" (id,name, description) VALUES (32,'add_member','can add new placement member');
 INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(54,3,32); 
 
-INSERT INTO "Permissions" (id,name, description) VALUES (33,'delete_member','can delete plaecment member');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(55,3,33); 
+-- INSERT INTO "Permissions" (id,name, description) VALUES (33,'delete_member','can delete plaecment member');
+-- INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(55,3,33); 
  
-INSERT INTO "Permissions" (id,name, description) VALUES (34,'edit_member','can edit placement member details');
-INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(56,3,34); 
+-- INSERT INTO "Permissions" (id,name, description) VALUES (34,'edit_member','can edit placement member details');
+-- INSERT INTO "Role_Permission" (id,role_id, permission_id) VALUES(56,3,34); 
+
+delete from "Role_Permission" where id in(55,56); 
+
+INSERT INTO placement_cell_members (id_id, role_in_cell, branch_id, join_date, end_date, active_status, created_at, updated_at)
+VALUES (154, 'Student Coordinator', 3, '2023-08-01 00:00:00', NULL, TRUE, '2023-08-01 00:00:00', '2023-08-01 00:00:00');

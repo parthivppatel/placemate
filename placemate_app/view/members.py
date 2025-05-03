@@ -156,14 +156,13 @@ def add_member(request):
     context = get_member_context()
     messages.error(request,"Invalid request method passed")
     return render(request,"member_registration.html", context)
-
-@permission_required('edit_member')
+ 
 def edit_member_page(request,id=0):
     url = reverse('view_member', kwargs={'id': id}) + "?mode=edit"
     return redirect(url)
     # return ResponseModel(data,"Dropdowns Get Succesfully",200)
 
-@permission_required('view_member','edit_member')
+@permission_required('view_member')
 def view_member(request,id=0):
     member = get_object_or_404(PlacementCellMember,id=id)
     mode = request.GET.get('mode', 'view')
@@ -171,8 +170,11 @@ def view_member(request,id=0):
  
     # Check if the user has the 'add_students' and 'delete_students' permissions
     user_payload = get_user_from_jwt(request)
+    get_role_of_cell=PlacementCellMember.objects.filter(Q(id=user_payload.get('user_id')) & (Q(role_in_cell=RoleEnum.HEAD) | Q(role_in_cell=RoleEnum.FACULTY_MEMBER)
+                     | Q(role_in_cell=RoleEnum.PLACEMENT_OFFICER) | Q(role_in_cell=RoleEnum.STUDENT_COORDINATOR))).exists()
+ 
     user_role = user_payload.get("role") if user_payload else None
-    edit_member = has_permission(user_role, 'edit_member')
+    edit_member = get_role_of_cell
     student = Student.objects.filter(student_id=member.id.id).first()
 
     data={
@@ -281,10 +283,13 @@ def list_members(request):
          }
          
         user_payload = get_user_from_jwt(request)
+        get_role_of_cell=PlacementCellMember.objects.filter(Q(id=user_payload.get('user_id')) & (Q(role_in_cell=RoleEnum.HEAD) | Q(role_in_cell=RoleEnum.FACULTY_MEMBER)
+                     | Q(role_in_cell=RoleEnum.PLACEMENT_OFFICER) | Q(role_in_cell=RoleEnum.STUDENT_COORDINATOR))).exists()
+ 
         user_role = user_payload.get("role") if user_payload else None
         add_member = has_permission(user_role, 'add_member')
         view_member = has_permission(user_role, 'view_member')
-        delete_member = has_permission(user_role, 'delete_member')
+        delete_member =  get_role_of_cell
         # response={
         #     "data":result,
         #     "total":total,
@@ -306,8 +311,6 @@ def list_members(request):
     messages.error(request,"Invalid request method")
     return redirect("dashboard")
 
-
-@permission_required('edit_member')
 def edit_member(request,id=0):
     if request.method == "POST":
         try: 
@@ -353,7 +356,6 @@ def edit_member(request,id=0):
     messages.error(request, "Invalid Request Method Found")
     return redirect("list_companies")
 
-@permission_required('delete_member')
 def delete_member(request):
     if request.method == "POST":
         member_id = request.POST.get("member_id")
