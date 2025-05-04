@@ -21,14 +21,11 @@ def forgot_password(request):
             messages.error(request, "Email not registered.")
             return render(request, "forgot_password.html")
 
-        # Generate OTP and token
         otp = generate_otp()
         otp_token = generate_otp_token(email, otp)
 
-        # Send OTP email
         send_otp_email(email, otp)
 
-        # Store token in HTTP-only cookie
         response = redirect('verify-otp')
         response.set_cookie("otp_token", otp_token, httponly=True, secure=True)
         return response

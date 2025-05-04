@@ -10,7 +10,6 @@ def logout(request):
     
     response.delete_cookie("reset_token")
     
-    # Clear any existing messages from the session
     messages.get_messages(request).used = True
 
     return response

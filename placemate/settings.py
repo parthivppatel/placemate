@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'placemate.wsgi.application'
 DATABASES = {
    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'placemate',
+        'NAME': 'placeemate',
         'USER': 'postgres',
         'PASSWORD': 'root',
         'HOST': 'localhost',

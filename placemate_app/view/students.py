@@ -83,34 +83,27 @@ def student_registrations(request):
 def student_manual_registrations(request):
     if request.method == "POST":
         try:
-            # Sanitize input data
             data = {key: value.strip() for key, value in request.POST.items()}
 
-            # Validate required fields
             required_fields = ['email', 'phone', 'enrollment', 'first_name', 'last_name', 'joining_year']
             missing_fields = [field for field in required_fields if not data.get(field)]
             if missing_fields:
                 messages.error(request, f"Missing required fields: {', '.join(missing_fields)}")
                 return redirect("student_manual_registrations")
 
-            # Check if email, phone, or enrollment already exists
             email = data.get('email')
             phone = data.get('phone')
 
-            # Ensure enrollment is an integer
             try:
                 enrollment = int(data.get('enrollment').strip())
             except ValueError:
                 messages.error(request, "Enrollment must be a valid integer.")
                 return redirect("student_manual_registrations")
 
-            # Debugging: Log the enrollment value
             print(f"Checking enrollment: {enrollment}")
 
-            # Query the database for existing enrollment
             existing_student = Student.objects.filter(enrollment=enrollment).first()
             if existing_student:
-                # Debugging: Log the existing student details
                 print(f"Existing student found: {existing_student}")
                 messages.error(request, f"Student with enrollment number '{enrollment}' already exists.")
                 return redirect("student_manual_registrations")
@@ -123,7 +116,6 @@ def student_manual_registrations(request):
                 messages.error(request, f"User with phone number '{phone}' already exists.")
                 return redirect("student_manual_registrations")
 
-            # Create user with hashed password
             password = data.get('password') or "placemate@123"
             hashed_password = make_password(password)
             user = User.objects.create(
@@ -136,7 +128,6 @@ def student_manual_registrations(request):
                 messages.error(request, "A student record already exists for this user.")
                 return redirect("student_manual_registrations")
 
-            # Assign role to user
             student_role = Role.objects.filter(name="Student").first()
             if not student_role:
                 messages.error(request, "Student role not found in the database.")
@@ -144,7 +135,6 @@ def student_manual_registrations(request):
 
             UserRole.objects.create(user=user, role=student_role)
 
-            # Fetch optional foreign keys
             course = Course.objects.filter(id=data.get('course')).first()
             if not course and data.get('course'):
                 messages.error(request, "Invalid course selected.")
@@ -162,7 +152,6 @@ def student_manual_registrations(request):
                     messages.error(request, "Invalid company selected.")
                     return redirect("student_manual_registrations")
 
-            # Create student profile
             student = Student.objects.create(
                 student_id=user,
                 enrollment=enrollment,
@@ -193,22 +182,18 @@ def student_manual_registrations(request):
                 print(f"Failed to send welcome email: {str(e)}")
                 messages.warning(request, f"Student registered but failed to send welcome email: {str(e)}")
 
-            # Success message
             messages.success(request, f"Student {student.first_name} {student.last_name} added successfully.")
             return redirect("student_manual_registrations")
 
         except IntegrityError as e:
-            # Debugging: Log the IntegrityError
             print(f"IntegrityError: {e}")
             messages.error(request, "Enrollment already exists.")
         except ValueError as ve:
             messages.error(request, f"Invalid data: {str(ve)}")
         except Exception as e:
-            # Debugging: Log the unexpected error
             print(f"Unexpected error: {e}")
             messages.error(request, f"An unexpected error occurred: {str(e)}")
 
-    # GET request
     return render(request, "student_manual_registrations.html", {
         "page_title": "Student Manual Registrations",
         "page_subtitle": "Add Student Details",
@@ -231,35 +216,28 @@ def delete_student(request):
         return redirect("list_students")
 
     try:
-        # Attempt to retrieve the student
         student = Student.objects.get(student_id=student_id)
-        student_name = f"{student.first_name} {student.last_name}"  # For better logging
+        student_name = f"{student.first_name} {student.last_name}"  
         student.delete()
 
-        # Add success message and redirect
         messages.success(request, f"The student '{student_name}' has been successfully removed from the system.")
         return redirect("list_students")
 
     except Student.DoesNotExist:
-        # Handle case where student does not exist
         messages.error(request, f"The student with the provided ID does not exist.")
         return redirect("list_students")
 
     except Exception as e:
-        # Handle unexpected errors
         messages.error(request, f"An unexpected error occurred. Please try again later.")
         return redirect("list_students")
 
 @permission_required('view_students')
 def view_student(request, student_id):
     try:
-        # Retrieve the student by ID
         student = Student.objects.select_related("student_id", "course", "company_placedIn").get(student_id=student_id)
 
-        # Fetch the list of courses
         courses = Course.objects.filter(is_active=True).order_by("name").values("id", "name")
 
-        # Prepare the student details for rendering
         student_details = {
             "id": student.student_id.id,
             "name": f"{student.first_name} {student.last_name}",
@@ -268,7 +246,7 @@ def view_student(request, student_id):
             "enrollment": student.enrollment,
             "course": student.course.name if student.course else "N/A",
             "batch": get_batch_year(student) if student.joining_year else "N/A",
-            "joining_year": student.joining_year or "N/A",  # Ensure joining_year is handled properly
+            "joining_year": student.joining_year or "N/A",  
             "cgpa": student.cgpa or "N/A",
             "placement_status": PlacementStatus(student.placement_status).label if student.placement_status is not None else "N/A",
             "graduation_status": student.get_graduation_status_display(),
@@ -278,9 +256,9 @@ def view_student(request, student_id):
             "profile": student.profile or "N/A",
             "dob": student.dob.strftime('%Y-%m-%d') if student.dob else "N/A",
             "gender": student.gender if student.gender else "",  
-             "tenth_percentage": student.tenth_percentage or "N/A",  # Added 10th percentage
-            "twelfth_percentage": student.twelfth_percentage or "N/A",  # Added 12th percentage
-            "backlog": student.backlog or 0,  # Added backlog count
+             "tenth_percentage": student.tenth_percentage or "N/A",  
+            "twelfth_percentage": student.twelfth_percentage or "N/A", 
+            "backlog": student.backlog or 0,  
         }
 
         user_payload = get_user_from_jwt(request)
@@ -291,7 +269,7 @@ def view_student(request, student_id):
             "student": student_details,
             "page_title": "View Student",
             "page_subtitle": f"Details of {student.first_name} {student.last_name}",
-            "courses": courses,  # Pass courses to the template
+            "courses": courses,  
             "permissions":{
                 "view_applicants":can_view_applicants
             }
@@ -302,49 +280,41 @@ def view_student(request, student_id):
             resume_link = DriveApplication.objects.filter(drive_id = drive_id,student_id = student_id).values("resume_link").first()
             context.update({'resume':resume_link,'drive_id':drive_id})
 
-        # Render the student details page
         return render(request, "view_student.html",context)
 
     except Student.DoesNotExist:
-        # Handle case where student does not exist
         messages.error(request, "The requested student does not exist.")
         return redirect("list_students")
 
     except Exception as e:
-        # Handle unexpected errors
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return redirect("list_students")
 
 @permission_required('edit_students')
 def edit_student(request, student_id):
     try:
-        # Retrieve the student by ID
         student = Student.objects.select_related("student_id", "course", "company_placedIn").get(student_id=student_id)
 
         if request.method == "POST":
-            # Sanitize input data
             data = {key: value.strip() for key, value in request.POST.items()}
 
-            # Validate required fields
             required_fields = ['name', 'email', 'phone', 'graduation_status', 'placement_status', 'dob', 'enrollment']
             missing_fields = [field for field in required_fields if not data.get(field)]
             if missing_fields:
                 messages.error(request, f"Missing required fields: {', '.join(missing_fields)}")
                 return redirect("view_student", student_id=student_id)
 
-            # Update student details
             student.enrollment = int(data.get('enrollment')) if data.get('enrollment') else student.enrollment
             student.first_name, _, student.last_name = data.get('name').partition(' ')
             student.student_id.email = data.get('email')
             student.student_id.phone = data.get('phone')
             student.address = data.get('address') or ""
             student.city = City.objects.filter(id=data.get('city')).first() if data.get('city') else None
-            student.dob = data.get('dob') or None  # Ensure dob is updated
-            student.gender = data.get('gender') or None  # Ensure gender is updated
+            student.dob = data.get('dob') or None  
+            student.gender = data.get('gender') or None  
             student.cgpa = float(data.get('cgpa')) if data.get('cgpa') else None
             student.graduation_status = data.get('graduation_status')
 
-            # Map placement_status string to integer
             placement_status_map = {
                 "not_placed": PlacementStatus.NOT_PLACED,
                 "placed": PlacementStatus.PLACED,
@@ -356,14 +326,12 @@ def edit_student(request, student_id):
             student.company_placedIn = Company.objects.filter(name=data.get('company_placed_in')).first() if data.get('company_placed_in') else None
             student.package = float(data.get('package')) if data.get('package') else None
             student.course = Course.objects.filter(id=data.get('course')).first() if data.get('course') else None
-            student.student_id.save()  # Save changes to the User model
-            student.save()  # Save changes to the Student model
+            student.student_id.save()  
+            student.save()  
 
-            # Success message
             messages.success(request, f"Student {student.first_name} {student.last_name} updated successfully.")
             return redirect("view_student", student_id=student_id)
 
-        # GET request: Render the edit form
         return render(request, "view_student.html", {
             "student": student,
             "page_title": "Edit Student",
@@ -375,12 +343,10 @@ def edit_student(request, student_id):
         })
 
     except Student.DoesNotExist:
-        # Handle case where student does not exist
         messages.error(request, "The requested student does not exist.")
         return redirect("list_students")
 
     except Exception as e:
-        # Handle unexpected errors
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return redirect("list_students")
 
@@ -391,13 +357,11 @@ def list_students(request):
     if request.method == "GET":
         data = request.GET
 
-        # Validate pagination
         validate_pg = validate_pagination(data)
         if validate_pg is None:
             return ResponseModel({},"Page and perpage must be valid positive integers", 400)
         page, perpage = validate_pg
 
-        # Apply filters
         students = Student.objects.select_related("company_placedIn", "student_id", "course")
 
         if search := data.get("search", "").strip():
@@ -420,7 +384,6 @@ def list_students(request):
         if graduation_status := data.get("graduation_status", "").strip():
             students = students.filter(graduation_status=graduation_status)
 
-        # Sorting
         sort = data.get("sort", {})
         sort_field = sort.get("field", "").strip()
         sort_type = sort.get("type", "asc").lower()
@@ -443,10 +406,8 @@ def list_students(request):
 
         students = students.order_by(ordering)
 
-        # Pagination
         students, total, pagination = paginate(students, page, perpage)
 
-        # Format results
         result = []
         for student in students:
             result.append({
@@ -456,14 +417,13 @@ def list_students(request):
                 "enrollment": student.enrollment,
                 "cgpa": student.cgpa,
                 "phone": student.student_id.phone,
-                "batch": get_batch_year(student) if student.joining_year else "N/A",  # Added Batch
+                "batch": get_batch_year(student) if student.joining_year else "N/A",  
                 "course": safe_value(student.course, "name"),
-                "placement_status": student.get_placement_status_display(),  # Added Placement Status
+                "placement_status": student.get_placement_status_display(),  
                 "graduation_status": student.get_graduation_status_display(),
                 "company_placedIn": safe_value(student.company_placedIn, "name")
             })
 
-        # Filter options
         batches = list(Student.objects.values_list("joining_year", flat=True).distinct().order_by("joining_year"))
         course_ids = Student.objects.values_list("course", flat=True).distinct()
         courses = Course.objects.filter(id__in=course_ids, is_active=True).order_by("name")
@@ -479,7 +439,6 @@ def list_students(request):
             "graduation_statuses": graduation_status_options
         }
 
-        # Permissions
         user_payload = get_user_from_jwt(request)
         user_role = user_payload.get("role") if user_payload else None
         can_add_student = has_permission(user_role, 'add_students')
